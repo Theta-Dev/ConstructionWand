@@ -1,0 +1,10 @@
+{
+  "item.constructionwand.stone_wand": "Stone Wand",
+  "item.constructionwand.iron_wand": "Iron Wand",
+  "item.constructionwand.diamond_wand": "Diamond Wand",
+  "item.constructionwand.infinity_wand": "Infinity Wand",
+
+  "constructionwand.key.category": "Construction Wand",
+  "constructionwand.key.mode": "Mode",
+  "constructionwand.key.option": "Options"
+}
