@@ -3,11 +3,8 @@ package thetadev.constructionwand.job;
 import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.state.DirectionProperty;
+import net.minecraft.item.*;
+import net.minecraft.state.IProperty;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Direction;
@@ -23,50 +20,62 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.IFluidBlock;
 import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.basics.EnumLock;
-import thetadev.constructionwand.basics.WandUtil;
+import thetadev.constructionwand.basics.*;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.ItemWand;
 
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
-public class WandJob
+public abstract class WandJob
 {
-	private PlayerEntity player;
-	private World world;
-	private BlockRayTraceResult rayTraceResult;
-	private ItemStack wand;
-	private int maxBlocks;
+	protected PlayerEntity player;
+	protected World world;
+	protected BlockRayTraceResult rayTraceResult;
+	protected ItemStack wand;
+	protected ItemWand wandItem;
+	protected WandOptions options;
 
-	private HashMap<Item, Integer> placeItems;
-	private LinkedList<BlockPos> blocksToPlace;
-	private LinkedList<PlaceSnapshot> placeSnapshots;
+	protected int maxBlocks;
+	protected boolean ignoreFluid;
+	protected boolean targetDirection;
 
-	public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack itemStack)
+	protected LinkedHashMap<Item, Integer> placeItems;
+	protected LinkedList<PlaceSnapshot> placeSnapshots;
+
+	public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand)
 	{
 		this.player = player;
 		this.world = world;
 		this.rayTraceResult = rayTraceResult;
-		placeItems = new HashMap<>();
-		blocksToPlace = new LinkedList<>();
+		placeItems = new LinkedHashMap<>();
+		placeSnapshots = new LinkedList<>();
 
 		// Get wand
-		if(itemStack == null || itemStack == ItemStack.EMPTY || !(itemStack.getItem() instanceof ItemWand)) return;
-		wand = itemStack;
+		if(wand == null || wand == ItemStack.EMPTY || !(wand.getItem() instanceof ItemWand)) return;
+		this.wand = wand;
 
-		ItemWand wandItem = (ItemWand) wand.getItem();
+		wandItem = (ItemWand) wand.getItem();
+
+		// Get options
+		options = new WandOptions(wand);
+		ignoreFluid = options.getOption(EnumFluidLock.IGNORE) == EnumFluidLock.IGNORE;
+		targetDirection = options.getOption(EnumDirection.TARGET) == EnumDirection.TARGET;
 
 		// Target block + item
 		BlockPos targetPos = rayTraceResult.getPos();
 		BlockState targetState = world.getBlockState(targetPos);
 		Block targetBlock = targetState.getBlock();
-		Item item = targetBlock.getPickBlock(targetState, rayTraceResult, world, targetPos, player).getItem();
+		Item item;
+		ItemStack offhandStack = player.getHeldItem(Hand.OFF_HAND);
+
+		if(!offhandStack.isEmpty() && offhandStack.getItem() instanceof BlockItem) item = offhandStack.getItem();
+		else item = targetBlock.getBlock().getItem(world, targetPos, targetState).getItem();
+		if(item == Items.AIR) return;
+
+		placeItems.put(item, 0);
 
 		// Get substitutions (e.g. Grass -> Dirt)
-		placeItems.put(item, 0);
 		SubstitutionManager substitutionManager = ConstructionWand.instance.substitutionManager;
 		for(Item it : substitutionManager.getSubstitutions(item)) {
 			placeItems.put(it, 0);
@@ -74,12 +83,20 @@ public class WandJob
 
 		// Get inventory supply
 		maxBlocks = Math.min(countItems(), wandItem.getLimit(player, wand));
+		ConstructionWand.LOGGER.info("MaxBlocks: "+maxBlocks);
+		if(maxBlocks == 0) return;
 
-		// Get list of block positions
 		getBlockPositionList();
 	}
 
-	public LinkedList<BlockPos> getBlockPositions() { return blocksToPlace; }
+	public LinkedList<BlockPos> getBlockPositions() {
+		LinkedList<BlockPos> res = new LinkedList<>();
+
+		for(PlaceSnapshot snapshot : placeSnapshots) {
+			res.add(snapshot.pos);
+		}
+		return res;
+	}
 
 	public BlockRayTraceResult getRayTraceResult() { return rayTraceResult; }
 
@@ -119,7 +136,7 @@ public class WandJob
 		return total;
 	}
 
-	private int countItems()
+	protected int countItems()
 	{
 		int total = 0;
 
@@ -166,7 +183,7 @@ public class WandJob
 		return total;
 	}
 
-	private int takeItems(int count)
+	protected int takeItems(int count)
 	{
 		int total = 0;
 		if(placeItems.size() == 0 || player.inventory == null || player.inventory.mainInventory == null) return 0;
@@ -182,136 +199,54 @@ public class WandJob
 		return total;
 	}
 
-	private boolean shouldContinue(BlockPos currentCandidate, BlockState targetBlock, BlockState candidateSupportingBlock) {
+	protected abstract void getBlockPositionList();
+
+	protected boolean shouldContinue(BlockPos currentCandidate, BlockState targetBlock, BlockState candidateSupportingBlock) {
+		// Can place block on currentCandidate position?
+		if(!world.isBlockPresent(currentCandidate)) return false;
+
 		if(!world.isAirBlock(currentCandidate)){
 			Block currrentCandidateBlock = world.getBlockState(currentCandidate).getBlock();
-			if(!(currrentCandidateBlock instanceof IFluidBlock || currrentCandidateBlock instanceof FlowingFluidBlock)) return false;
+			if(!(ignoreFluid && (currrentCandidateBlock instanceof IFluidBlock || currrentCandidateBlock instanceof FlowingFluidBlock))) return false;
 		};
 
+		// Is supporting block equal to target block?
 		if(!targetBlock.getBlock().equals(candidateSupportingBlock.getBlock())) return false;
-		//if(!placeItems.containsKey(candidateSupportingBlock.getBlock().getPickBlock(candidateSupportingBlock, rayTraceResult, world, supportingPoint, player).getItem())) return false;
 
+		// Can block be placed?
 		BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), currentCandidate, false)));
-
 		if(!ctx.canPlace()) return false;
 
 		BlockState blockState = targetBlock.getBlock().getStateForPlacement(ctx);
 		if(blockState == null) return false;
 		if(!targetBlock.isValidPosition(world, currentCandidate)) return false;
 
+		// No entities in area?
 		AxisAlignedBB blockBB = new AxisAlignedBB(currentCandidate);
 		return world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty();
 	}
 
-	private void getBlockPositionList() {
-		EnumLock directionLock = EnumLock.NOLOCK;
-		EnumLock faceLock = EnumLock.NOLOCK;
+	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
+		Item blockItem = placeSnapshot.item;
+		BlockPos blockPos = placeSnapshot.pos;
 
-		LinkedList<BlockPos> candidates = new LinkedList<>();
-		HashSet<BlockPos> allCandidates = new HashSet<>();
-
-		Direction placeDirection = rayTraceResult.getFace();
-		BlockState targetBlock = world.getBlockState(rayTraceResult.getPos());
-		BlockPos startingPoint = rayTraceResult.getPos().offset(placeDirection);
-
-		int directionMaskInt = directionLock.mask;
-		int faceMaskInt = faceLock.mask;
-
-		if (((directionLock != EnumLock.HORIZONTAL && directionLock != EnumLock.VERTICAL) || (placeDirection != Direction.UP && placeDirection != Direction.DOWN))
-				&& (directionLock != EnumLock.NORTHSOUTH || (placeDirection != Direction.NORTH && placeDirection != Direction.SOUTH))
-				&& (directionLock != EnumLock.EASTWEST || (placeDirection != Direction.EAST && placeDirection != Direction.WEST))) {
-			candidates.add(startingPoint);
-		}
-		while(!candidates.isEmpty() && blocksToPlace.size() < maxBlocks) {
-
-			BlockPos currentCandidate = candidates.removeFirst();
-			try {
-				BlockPos supportingPoint = currentCandidate.offset(placeDirection.getOpposite());
-				BlockState candidateSupportingBlock = world.getBlockState(supportingPoint);
-
-				if (shouldContinue(currentCandidate, targetBlock, candidateSupportingBlock) && allCandidates.add(currentCandidate)) {
-					blocksToPlace.add(currentCandidate);
-
-					switch (placeDirection) {
-						case DOWN:
-						case UP:
-							if ((faceMaskInt & EnumLock.UP_DOWN_MASK) > 0) {
-								if ((directionMaskInt & EnumLock.NORTH_SOUTH_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.NORTH));
-								if ((directionMaskInt & EnumLock.EAST_WEST_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.EAST));
-								if ((directionMaskInt & EnumLock.NORTH_SOUTH_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.SOUTH));
-								if ((directionMaskInt & EnumLock.EAST_WEST_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.WEST));
-								if ((directionMaskInt & EnumLock.NORTH_SOUTH_MASK) > 0 && (directionMaskInt & EnumLock.EAST_WEST_MASK) > 0) {
-									candidates.add(currentCandidate.offset(Direction.NORTH).offset(Direction.EAST));
-									candidates.add(currentCandidate.offset(Direction.NORTH).offset(Direction.WEST));
-									candidates.add(currentCandidate.offset(Direction.SOUTH).offset(Direction.EAST));
-									candidates.add(currentCandidate.offset(Direction.SOUTH).offset(Direction.WEST));
-								}
-							}
-							break;
-						case NORTH:
-						case SOUTH:
-							if ((faceMaskInt & EnumLock.NORTH_SOUTH_MASK) > 0) {
-								if ((directionMaskInt & EnumLock.UP_DOWN_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.UP));
-								if ((directionMaskInt & EnumLock.EAST_WEST_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.EAST));
-								if ((directionMaskInt & EnumLock.UP_DOWN_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.DOWN));
-								if ((directionMaskInt & EnumLock.EAST_WEST_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.WEST));
-								if ((directionMaskInt & EnumLock.UP_DOWN_MASK) > 0 && (directionMaskInt & EnumLock.EAST_WEST_MASK) > 0) {
-									candidates.add(currentCandidate.offset(Direction.UP).offset(Direction.EAST));
-									candidates.add(currentCandidate.offset(Direction.UP).offset(Direction.WEST));
-									candidates.add(currentCandidate.offset(Direction.DOWN).offset(Direction.EAST));
-									candidates.add(currentCandidate.offset(Direction.DOWN).offset(Direction.WEST));
-								}
-							}
-							break;
-						case WEST:
-						case EAST:
-							if ((faceMaskInt & EnumLock.EAST_WEST_MASK) > 0) {
-								if ((directionMaskInt & EnumLock.UP_DOWN_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.UP));
-								if ((directionMaskInt & EnumLock.NORTH_SOUTH_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.NORTH));
-								if ((directionMaskInt & EnumLock.UP_DOWN_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.DOWN));
-								if ((directionMaskInt & EnumLock.NORTH_SOUTH_MASK) > 0)
-									candidates.add(currentCandidate.offset(Direction.SOUTH));
-								if ((directionMaskInt & EnumLock.UP_DOWN_MASK) > 0 && (directionMaskInt & EnumLock.NORTH_SOUTH_MASK) > 0) {
-									candidates.add(currentCandidate.offset(Direction.UP).offset(Direction.NORTH));
-									candidates.add(currentCandidate.offset(Direction.UP).offset(Direction.SOUTH));
-									candidates.add(currentCandidate.offset(Direction.DOWN).offset(Direction.NORTH));
-									candidates.add(currentCandidate.offset(Direction.DOWN).offset(Direction.SOUTH));
-								}
-							}
-					}
-				}
-			}
-			catch(Exception e) {
-				// Can't do anything, could be anything.
-				// Skip if anything goes wrong.
-			}
-		}
-	}
-
-	private boolean placeBlock(BlockPos blockPos, Item blockItem) {
 		BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), blockPos, false)));
 		if(!ctx.canPlace()) return false;
 		BlockState placeBlock = Block.getBlockFromItem(blockItem).getStateForPlacement(ctx);
 		if(placeBlock == null) return false;
 
-		BlockState targetBlock = world.getBlockState(rayTraceResult.getPos());
+		BlockState supportingBlock = placeSnapshot.supportingBlock;
 
-		if(targetBlock.has(HorizontalBlock.HORIZONTAL_FACING)) {
-			placeBlock = placeBlock.with(HorizontalBlock.HORIZONTAL_FACING, targetBlock.get(HorizontalBlock.HORIZONTAL_FACING));
-		}
-		if(targetBlock.has(BlockStateProperties.AXIS)) {
-			placeBlock = placeBlock.with(BlockStateProperties.AXIS, targetBlock.get(BlockStateProperties.AXIS));
+		if(targetDirection && placeBlock.getBlock() == supportingBlock.getBlock()) {
+
+			// Block properties to be copied (alignment/rotation properties)
+			for(IProperty property : new IProperty[] {
+					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP, BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS})
+			{
+				if(supportingBlock.has(property)) {
+					placeBlock = placeBlock.with(property, supportingBlock.get(property));
+				}
+			}
 		}
 
 		BlockSnapshot snapshot = new BlockSnapshot(world, blockPos, placeBlock);
@@ -326,45 +261,48 @@ public class WandJob
 		SoundType sound = placeBlock.getSoundType();
 		world.playSound(player, blockPos, sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
 
+		placeSnapshot.block = placeBlock;
 		return true;
 	}
 
 	public boolean doIt() {
-		placeSnapshots = new LinkedList<>();
-
-		takeItems(blocksToPlace.size());
+		takeItems(placeSnapshots.size());
 		int iB = 0;
 
 		place_items:
 		for(Item item : placeItems.keySet()) {
 			for(int i=0; i<placeItems.get(item); i++) {
 				ItemWand wandItem = (ItemWand) wand.getItem();
-				if(iB >= blocksToPlace.size() || wand.isEmpty() || wandItem.getLimit(player, wand) == 0) break place_items;
-				BlockPos pos = blocksToPlace.get(iB);
+				if(iB >= placeSnapshots.size() || wand.isEmpty() || wandItem.getLimit(player, wand) == 0) break place_items;
 
-				if(placeBlock(pos, item)) {
-					//placeSnapshots.add(BlockSnapshot.getBlockSnapshot(world, pos));
-					placeSnapshots.add(new PlaceSnapshot(world, pos, item));
+				PlaceSnapshot snapshot = placeSnapshots.get(iB);
+				BlockPos pos = snapshot.pos;
+				snapshot.item = item;
+
+				if(placeBlock(snapshot)) {
 					wand.damageItem(1, player, (e) -> e.sendBreakAnimation(player.swingingHand));
 				}
-				else {
+				else if(!player.isCreative()) {
 					ConstructionWand.LOGGER.info("[CWand] Place error. Return item: "+item.toString());
 					ItemStack stack = new ItemStack(item);
 					if(!player.inventory.addItemStackToInventory(stack)) {
 						player.dropItem(stack, false);
 					}
 					player.inventory.markDirty();
+					placeSnapshots.remove(snapshot);
 				}
 
 				iB++;
 			}
 		}
 
-		if(!placeSnapshots.isEmpty()) {
-			ConstructionWand.instance.jobHistory.add(this);
-			return true;
-		}
-		return false;
+		// Remove snapshots that were not placed
+		while(iB < placeSnapshots.size()) placeSnapshots.remove(iB);
+
+		// Add to job history for undo
+		if(placeSnapshots.size() > 1) ConstructionWand.instance.jobHistory.add(this);
+
+		return !placeSnapshots.isEmpty();
 	}
 
 	public boolean undo() {
@@ -372,7 +310,8 @@ public class WandJob
 			BlockState currentBlock = world.getBlockState(snapshot.pos);
 
 			// If placed block is still present and can be broken, break it and return item
-			if(currentBlock.equals(snapshot.block) && world.isBlockModifiable(player, snapshot.pos) && (player.isCreative() || currentBlock.getBlockHardness(world, snapshot.pos) > -1)) {
+			if(currentBlock.getBlock() == snapshot.block.getBlock() && world.isBlockModifiable(player, snapshot.pos) &&
+					(player.isCreative() || (currentBlock.getBlockHardness(world, snapshot.pos) > -1 && world.getTileEntity(snapshot.pos) == null))) {
 				BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, snapshot.pos, currentBlock, player);
 				MinecraftForge.EVENT_BUS.post(breakEvent);
 				if(breakEvent.isCanceled()) continue;
@@ -380,9 +319,11 @@ public class WandJob
 				if(!world.setBlockState(snapshot.pos, Blocks.AIR.getDefaultState())) continue;
 				world.notifyNeighbors(snapshot.pos, Blocks.AIR);
 
-				ItemStack stack = new ItemStack(snapshot.item);
-				if(!player.inventory.addItemStackToInventory(stack)) {
-					player.dropItem(stack, false);
+				if(!player.isCreative()) {
+					ItemStack stack = new ItemStack(snapshot.item);
+					if(!player.inventory.addItemStackToInventory(stack)) {
+						player.dropItem(stack, false);
+					}
 				}
 			}
 		}

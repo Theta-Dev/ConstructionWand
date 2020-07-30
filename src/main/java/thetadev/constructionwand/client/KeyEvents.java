@@ -9,7 +9,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 import thetadev.constructionwand.ConstructionWand;
+import thetadev.constructionwand.basics.*;
 import thetadev.constructionwand.network.PacketWandOption;
+
+import java.util.Arrays;
 
 
 public class KeyEvents
@@ -17,31 +20,31 @@ public class KeyEvents
 	private final String langPrefix = ConstructionWand.MODID + ".key.";
 	private final String langCategory = langPrefix + "category";
 
-	public KeyBinding keyMode = new KeyBinding(langPrefix+"mode", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory);
-	public KeyBinding keyOption = new KeyBinding(langPrefix+"option", KeyConflictContext.IN_GAME, KeyModifier.ALT, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory);
+	public final KeyBinding[] keys = {
+			//new KeyBinding(langPrefix+"mode", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
+			new KeyBinding(langPrefix+"lock", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
+			new KeyBinding(langPrefix+"direction", KeyConflictContext.IN_GAME, KeyModifier.SHIFT, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
+			new KeyBinding(langPrefix+"fluid", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory)
+	};
 
-	private boolean modePressed;
-	private boolean optionPressed;
+	public static final IEnumOption[] keyOptions = {
+			//EnumMode.DEFAULT,
+			EnumLock.NOLOCK,
+			EnumDirection.TARGET,
+			EnumFluidLock.IGNORE
+	};
 
 	public KeyEvents() {
-		ClientRegistry.registerKeyBinding(keyMode);
-		ClientRegistry.registerKeyBinding(keyOption);
-
-		modePressed = false;
-		optionPressed = false;
+		for(KeyBinding key : keys) ClientRegistry.registerKeyBinding(key);
 	}
 
 	@SubscribeEvent
 	public void KeyEvent(InputEvent e) {
-		boolean currentModePressed = keyMode.isPressed();
-		boolean currentOptionPressed = keyOption.isPressed();
+		boolean sendPacket = false;
 
-		if(currentModePressed != modePressed || currentModePressed != optionPressed) {
-			modePressed = currentModePressed;
-			optionPressed = currentOptionPressed;
-
-			if(modePressed || optionPressed) {
-				PacketWandOption packet = new PacketWandOption(modePressed, optionPressed);
+		for(int i=0; i<keyOptions.length; i++) {
+			if(keys[i].isPressed()) {
+				PacketWandOption packet = new PacketWandOption(keyOptions[i]);
 				ConstructionWand.instance.HANDLER.sendToServer(packet);
 			}
 		}

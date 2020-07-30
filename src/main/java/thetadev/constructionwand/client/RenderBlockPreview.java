@@ -15,6 +15,7 @@ import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.WandUtil;
+import thetadev.constructionwand.job.ConstructionJob;
 import thetadev.constructionwand.job.WandJob;
 
 import java.util.LinkedList;
@@ -38,14 +39,14 @@ public class RenderBlockPreview
 
 		if(player.isSneaking()) {
 			blocks = ConstructionWand.instance.renderCache.undoBlocks;
-			if(blocks == null || !blocks.contains(rtr.getPos())) return;
+			if(blocks == null || blocks.isEmpty()) return;
 			colorG=1;
 		}
 		else {
 			WandJob cachedJob = ConstructionWand.instance.renderCache.wandJob;
 
 			if(cachedJob == null || !(cachedJob.getRayTraceResult().equals(rtr)) || !(cachedJob.getWand().equals(wand))) {
-				ConstructionWand.instance.renderCache.wandJob  = new WandJob(player, player.getEntityWorld(), rtr, wand);
+				ConstructionWand.instance.renderCache.wandJob = WandUtil.getJob(player, player.getEntityWorld(), rtr, wand);
 			}
 			blocks = ConstructionWand.instance.renderCache.wandJob.getBlockPositions();
 		}

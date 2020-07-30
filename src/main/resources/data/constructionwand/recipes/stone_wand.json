@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern":
+  [
+    "  X",
+    " # ",
+    "#  "
+  ],
+  "key":
+  {
+    "X":
+    {
+      "tag": "forge:cobblestone"
+    },
+    "#":
+    {
+      "item": "minecraft:stick"
+    }
+  },
+  "result":
+  {
+    "item": "constructionwand:stone_wand"
+  }
+}

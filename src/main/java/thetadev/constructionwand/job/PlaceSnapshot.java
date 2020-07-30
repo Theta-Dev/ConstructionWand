@@ -7,21 +7,14 @@ import net.minecraft.world.World;
 
 public class PlaceSnapshot
 {
-	public final BlockState block;
-	public final BlockPos pos;
-	public final Item item;
+	public BlockState block;
+	public BlockState supportingBlock;
+	public BlockPos pos;
+	public Item item;
 
-	public PlaceSnapshot(BlockState block, BlockPos pos, Item item)
+	public PlaceSnapshot(BlockPos pos, BlockState supportingBlock)
 	{
-		this.block = block;
 		this.pos = pos;
-		this.item = item;
-	}
-
-	public PlaceSnapshot(World world, BlockPos pos, Item item)
-	{
-		this.block = world.getBlockState(pos);
-		this.pos = pos;
-		this.item = item;
+		this.supportingBlock = supportingBlock;
 	}
 }

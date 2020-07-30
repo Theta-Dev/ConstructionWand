@@ -4,13 +4,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 
 public class ItemWandBasic extends ItemWand
 {
-	public ItemWandBasic(int durability, int limit)
+	public ItemWandBasic(int durability, int maxBlocks, int angelDistance)
 	{
-		super(new Properties().maxDamage(durability));
-		maxBlocks = limit;
+		super(new Properties().maxDamage(durability), maxBlocks, angelDistance);
 	}
 
 	@Override

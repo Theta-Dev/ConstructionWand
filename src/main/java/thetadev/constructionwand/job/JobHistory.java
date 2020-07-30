@@ -31,18 +31,19 @@ public class JobHistory
 		list.add(job);
 		while(list.size() > ConfigHandler.UNDO_HISTORY.get()) list.removeFirst();
 
-		updateClient(job.getPlayer());
+		//updateClient(job.getPlayer());
 	}
 
 	public void updateClient(PlayerEntity player) {
-		if(!player.isServerWorld()) return;
+		World world = player.getEntityWorld();
+		if(world.isRemote) return;
 
 		LinkedList<BlockPos> positions;
 		LinkedList<WandJob> jobs = getJobsFromPlayer(player);
 		if(jobs.isEmpty()) positions = new LinkedList<>();
 		else {
 			WandJob job = jobs.getLast();
-			if(job == null) positions = new LinkedList<>();
+			if(job == null || !job.getWorld().equals(world)) positions = new LinkedList<>();
 			else positions = job.getBlockPositions();
 		}
 
@@ -55,13 +56,14 @@ public class JobHistory
 		if(jobs.isEmpty()) return null;
 		WandJob job = jobs.getLast();
 
-		if(job.getWorld().dimension.getType().equals(world.dimension.getType()) && job.getBlockPositions().contains(pos)) {
+		//job.getWorld().dimension.getType().equals(world.dimension.getType())
+		if(job.getWorld().equals(world) && job.getBlockPositions().contains(pos)) {
 			// Update job world/player entity, they could have changed by rejoin/respawn
 			job.setPlayer(player);
-			job.setWorld(world);
+			//job.setWorld(world);
 
 			jobs.remove(job);
-			updateClient(player);
+			//updateClient(player);
 			return job;
 		}
 		return null;

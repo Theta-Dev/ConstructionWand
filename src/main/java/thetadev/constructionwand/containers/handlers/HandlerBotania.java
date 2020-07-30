@@ -3,7 +3,6 @@ package thetadev.constructionwand.containers.handlers;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IContainerHandler;
 import vazkii.botania.api.item.IBlockProvider;
 

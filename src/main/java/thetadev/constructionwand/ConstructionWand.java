@@ -19,6 +19,7 @@ import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
 import thetadev.constructionwand.job.JobHistory;
 import thetadev.constructionwand.job.SubstitutionManager;
+import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 import thetadev.constructionwand.network.PacketWandOption;
 
@@ -58,6 +59,7 @@ public class ConstructionWand
         HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, "main"), ()->PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
         int packetIndex = 0;
         HANDLER.registerMessage(packetIndex++, PacketUndoBlocks.class, PacketUndoBlocks::encode, PacketUndoBlocks::decode, PacketUndoBlocks.Handler::handle);
+        HANDLER.registerMessage(packetIndex++, PacketQueryUndo.class, PacketQueryUndo::encode, PacketQueryUndo::decode, PacketQueryUndo.Handler::handle);
         HANDLER.registerMessage(packetIndex++, PacketWandOption.class, PacketWandOption::encode, PacketWandOption::decode, PacketWandOption.Handler::handle);
 
         ContainerRegistrar.register();

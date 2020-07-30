@@ -1,6 +1,9 @@
 package thetadev.constructionwand.basics;
 
-public enum EnumLock {
+import com.google.common.base.Enums;
+
+public enum EnumLock implements IEnumOption
+{
 	NORTHSOUTH(1),
 	VERTICAL(2),
 	VERTICALEASTWEST(3),
@@ -8,6 +11,8 @@ public enum EnumLock {
 	HORIZONTAL(5),
 	VERTICALNORTHSOUTH(6),
 	NOLOCK(7);
+
+	private static EnumLock[] vals = values();
 
 	public final int mask;
 
@@ -19,10 +24,28 @@ public enum EnumLock {
 		this.mask = mask;
 	}
 
-	public  static EnumLock fromMask(int inputMask) {
-		EnumLock locks[] = { NORTHSOUTH, VERTICAL, VERTICALEASTWEST, EASTWEST, HORIZONTAL, VERTICALNORTHSOUTH, NOLOCK };
-
+	public static EnumLock fromMask(int inputMask) {
 		int safeMask = inputMask & 7;
-		return locks[safeMask - 1];
+		return vals[safeMask - 1];
+	}
+
+	public IEnumOption fromName(String name) {
+		return Enums.getIfPresent(EnumLock.class, name.toUpperCase()).or(this);
+	}
+
+	public EnumLock next() {
+		return vals[(this.ordinal()+1) % vals.length];
+	}
+
+	public String getOptionKey() {
+		return "lock";
+	}
+
+	public String getValue() {
+		return this.name().toLowerCase();
+	}
+
+	public String getTranslationKey() {
+		return getOptionKey() + "." + getValue();
 	}
 }
