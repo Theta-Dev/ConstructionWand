@@ -1,4 +1,4 @@
-package thetadev.constructionwand.basics;
+package thetadev.constructionwand.basics.options;
 
 import com.google.common.base.Enums;
 
@@ -13,8 +13,15 @@ public enum EnumMode implements IEnumOption
 		return Enums.getIfPresent(EnumMode.class, name.toUpperCase()).or(this);
 	}
 
-	public EnumMode next() {
-		return vals[(this.ordinal()+1) % vals.length];
+	public EnumMode next(boolean dir) {
+		int i = this.ordinal() + (dir ? 1:-1);
+		if(i < 0) i += vals.length;
+
+		return vals[i % vals.length];
+	}
+
+	public int getOrdinal() {
+		return ordinal();
 	}
 
 	public String getOptionKey() {

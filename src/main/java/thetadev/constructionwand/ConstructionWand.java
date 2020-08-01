@@ -12,18 +12,18 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import thetadev.constructionwand.basics.ConfigHandler;
+import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.client.KeyEvents;
 import thetadev.constructionwand.client.RenderBlockPreview;
-import thetadev.constructionwand.client.RenderCache;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
 import thetadev.constructionwand.job.JobHistory;
-import thetadev.constructionwand.job.SubstitutionManager;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 import thetadev.constructionwand.network.PacketWandOption;
 
-// The value here should match an entry in the META-INF/mods.toml file
+
 @Mod(ConstructionWand.MODID)
 public class ConstructionWand
 {
@@ -34,18 +34,16 @@ public class ConstructionWand
     public SimpleChannel HANDLER;
 
     public ContainerManager containerManager;
-    public SubstitutionManager substitutionManager;
     public JobHistory jobHistory;
-    public RenderCache renderCache;
+    public RenderBlockPreview renderBlockPreview;
 
     public ConstructionWand() {
         instance = this;
 
         containerManager = new ContainerManager();
-        substitutionManager = new SubstitutionManager();
         jobHistory = new JobHistory();
 
-        // Register the setup method for modloading
+        // Register setup methods for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
         MinecraftForge.EVENT_BUS.register(this);
@@ -56,20 +54,26 @@ public class ConstructionWand
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
+        LOGGER.info("ConstructionWand says hello - may the odds be ever in your favor.");
+
+        // Register packets
         HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, "main"), ()->PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
         int packetIndex = 0;
         HANDLER.registerMessage(packetIndex++, PacketUndoBlocks.class, PacketUndoBlocks::encode, PacketUndoBlocks::decode, PacketUndoBlocks.Handler::handle);
         HANDLER.registerMessage(packetIndex++, PacketQueryUndo.class, PacketQueryUndo::encode, PacketQueryUndo::decode, PacketQueryUndo.Handler::handle);
         HANDLER.registerMessage(packetIndex++, PacketWandOption.class, PacketWandOption::encode, PacketWandOption::decode, PacketWandOption.Handler::handle);
 
+        // Container registry
         ContainerRegistrar.register();
-        substitutionManager.register();
+
+        // Stats
+        ModStats.register();
     }
 
     private void clientSetup(final FMLClientSetupEvent event)
     {
-        MinecraftForge.EVENT_BUS.register(new RenderBlockPreview());
+        renderBlockPreview = new RenderBlockPreview();
+        MinecraftForge.EVENT_BUS.register(renderBlockPreview);
         MinecraftForge.EVENT_BUS.register(new KeyEvents());
-        renderCache = new RenderCache();
     }
 }

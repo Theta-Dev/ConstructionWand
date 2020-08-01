@@ -7,10 +7,7 @@ import net.minecraft.item.*;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EntityPredicates;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -21,10 +18,10 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.IFluidBlock;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
+import thetadev.constructionwand.basics.options.*;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.ItemWand;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 public abstract class WandJob
@@ -40,7 +37,7 @@ public abstract class WandJob
 	protected boolean ignoreFluid;
 	protected boolean targetDirection;
 
-	protected LinkedHashMap<Item, Integer> placeItems;
+	protected BlockItem placeItem;
 	protected LinkedList<PlaceSnapshot> placeSnapshots;
 
 	public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand)
@@ -48,7 +45,6 @@ public abstract class WandJob
 		this.player = player;
 		this.world = world;
 		this.rayTraceResult = rayTraceResult;
-		placeItems = new LinkedHashMap<>();
 		placeSnapshots = new LinkedList<>();
 
 		// Get wand
@@ -62,31 +58,32 @@ public abstract class WandJob
 		ignoreFluid = options.getOption(EnumFluidLock.IGNORE) == EnumFluidLock.IGNORE;
 		targetDirection = options.getOption(EnumDirection.TARGET) == EnumDirection.TARGET;
 
-		// Target block + item
 		BlockPos targetPos = rayTraceResult.getPos();
 		BlockState targetState = world.getBlockState(targetPos);
 		Block targetBlock = targetState.getBlock();
-		Item item;
 		ItemStack offhandStack = player.getHeldItem(Hand.OFF_HAND);
 
+		// Get place item
+		Item item;
 		if(!offhandStack.isEmpty() && offhandStack.getItem() instanceof BlockItem) item = offhandStack.getItem();
-		else item = targetBlock.getBlock().getItem(world, targetPos, targetState).getItem();
-		if(item == Items.AIR) return;
-
-		placeItems.put(item, 0);
-
-		// Get substitutions (e.g. Grass -> Dirt)
-		SubstitutionManager substitutionManager = ConstructionWand.instance.substitutionManager;
-		for(Item it : substitutionManager.getSubstitutions(item)) {
-			placeItems.put(it, 0);
+		else {
+			item = targetBlock.getBlock().getItem(world, targetPos, targetState).getItem();
 		}
+		if(!(item instanceof BlockItem)) return;
+		placeItem = (BlockItem) item;
 
 		// Get inventory supply
 		maxBlocks = Math.min(countItems(), wandItem.getLimit(player, wand));
-		ConstructionWand.LOGGER.info("MaxBlocks: "+maxBlocks);
 		if(maxBlocks == 0) return;
 
 		getBlockPositionList();
+	}
+
+	public static WandJob getJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack itemStack) {
+		IEnumOption mode = new WandOptions(itemStack).getOption(EnumMode.DEFAULT);
+
+		if(mode == EnumMode.ANGEL) return new TransductionJob(player, world, rayTraceResult, itemStack);
+		else return new ConstructionJob(player, world, rayTraceResult, itemStack);
 	}
 
 	public LinkedList<BlockPos> getBlockPositions() {
@@ -112,23 +109,24 @@ public abstract class WandJob
 
 	public ItemStack getWand() { return wand; }
 
-	private int countItem(Item item)
+	protected int countItems()
 	{
-		int total = 0;
-
 		if(player.inventory == null || player.inventory.mainInventory == null) return 0;
 		if(player.isCreative()) return Integer.MAX_VALUE;
 
+		int total = 0;
 		ContainerManager containerManager = ConstructionWand.instance.containerManager;
+		LinkedList<ItemStack> inventory = new LinkedList<>(player.inventory.offHandInventory);
+		inventory.addAll(player.inventory.mainInventory);
 
-		for(ItemStack stack : player.inventory.mainInventory) {
+		for(ItemStack stack : inventory) {
 			if(stack == null) continue;
 
-			if(WandUtil.stackEquals(stack, item)) {
+			if(WandUtil.stackEquals(stack, placeItem)) {
 				total += Math.max(0, stack.getCount());
 			}
 			else {
-				int amount = containerManager.countItems(player, new ItemStack(item), stack);
+				int amount = containerManager.countItems(player, new ItemStack(placeItem), stack);
 				if(amount == Integer.MAX_VALUE) return Integer.MAX_VALUE;
 				total += amount;
 			}
@@ -136,170 +134,145 @@ public abstract class WandJob
 		return total;
 	}
 
-	protected int countItems()
+	// Attempts to take specified number of items, returns number of missing items
+	protected int takeItems(int count)
 	{
-		int total = 0;
+		if(player.inventory == null || player.inventory.mainInventory == null) return count;
+		if(player.isCreative()) return 0;
 
-		if(placeItems.size() == 0 || player.inventory == null || player.inventory.mainInventory == null) return 0;
-		if(player.isCreative()) return Integer.MAX_VALUE;
+		LinkedList<ItemStack> hotbar = new LinkedList<>(player.inventory.mainInventory.subList(0, 9));
+		hotbar.addAll(player.inventory.offHandInventory);
+		LinkedList<ItemStack> mainInv = new LinkedList<>(player.inventory.mainInventory.subList(9, player.inventory.mainInventory.size()));
 
-		for(Item item : placeItems.keySet()) {
-			int amount = countItem(item);
-			if(amount == Integer.MAX_VALUE) return Integer.MAX_VALUE;
-			total += amount;
-		}
+		// Take items from main inv, loose items first
+		count = takeItemsInvList(count, mainInv, false);
+		count = takeItemsInvList(count, mainInv, true);
 
-		return total;
+		// Take items from hotbar, containers first
+		count = takeItemsInvList(count, hotbar, true);
+		count = takeItemsInvList(count, hotbar, false);
+
+		return count;
 	}
 
-	// Attempts to take specified number of items, returns number of items taken
-	private int takeItem(Item item, int count)
-	{
-		int total = 0;
-
-		if(player.inventory == null || player.inventory.mainInventory == null) return 0;
-		if(player.isCreative()) return count;
-
+	private int takeItemsInvList(int count, LinkedList<ItemStack> inv, boolean container) {
 		ContainerManager containerManager = ConstructionWand.instance.containerManager;
 
-		for(int i = player.inventory.mainInventory.size()- 1; i >= 0; i--) {
+		for(ItemStack stack : inv) {
 			if(count == 0) break;
 
-			ItemStack stack = player.inventory.mainInventory.get(i);
+			if(container) {
+				int nCount = containerManager.useItems(player, new ItemStack(placeItem), stack, count);
+				count = nCount;
+			}
 
-			if(WandUtil.stackEquals(stack, item)) {
+			if(!container && WandUtil.stackEquals(stack, placeItem)) {
 				int toTake = Math.min(count, stack.getCount());
 				stack.shrink(toTake);
 				count -= toTake;
-				total += toTake;
 				player.inventory.markDirty();
 			}
-			else {
-				int nCount = containerManager.useItems(player, new ItemStack(item), stack, count);
-				total += (count - nCount);
-				count = nCount;
-			}
 		}
-		return total;
-	}
-
-	protected int takeItems(int count)
-	{
-		int total = 0;
-		if(placeItems.size() == 0 || player.inventory == null || player.inventory.mainInventory == null) return 0;
-
-		for(Item item : placeItems.keySet()) {
-			if(count == 0) break;
-
-			int amount = takeItem(item, count);
-			placeItems.put(item, amount);
-			total += amount;
-			count -= amount;
-		}
-		return total;
+		return count;
 	}
 
 	protected abstract void getBlockPositionList();
 
-	protected boolean shouldContinue(BlockPos currentCandidate, BlockState targetBlock, BlockState candidateSupportingBlock) {
-		// Can place block on currentCandidate position?
-		if(!world.isBlockPresent(currentCandidate)) return false;
+	protected boolean canPlace(BlockPos pos) {
+		// Is position out of world?
+		if(!world.isBlockPresent(pos)) return false;
 
-		if(!world.isAirBlock(currentCandidate)){
-			Block currrentCandidateBlock = world.getBlockState(currentCandidate).getBlock();
+		// Is there space?
+		if(!world.isAirBlock(pos)){
+			Block currrentCandidateBlock = world.getBlockState(pos).getBlock();
 			if(!(ignoreFluid && (currrentCandidateBlock instanceof IFluidBlock || currrentCandidateBlock instanceof FlowingFluidBlock))) return false;
 		};
 
-		// Is supporting block equal to target block?
-		if(!targetBlock.getBlock().equals(candidateSupportingBlock.getBlock())) return false;
-
 		// Can block be placed?
-		BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), currentCandidate, false)));
+		BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), pos, false)));
 		if(!ctx.canPlace()) return false;
 
-		BlockState blockState = targetBlock.getBlock().getStateForPlacement(ctx);
+		BlockState blockState = placeItem.getBlock().getStateForPlacement(ctx);
 		if(blockState == null) return false;
-		if(!targetBlock.isValidPosition(world, currentCandidate)) return false;
+		blockState = Block.getValidBlockForPosition(blockState, world, pos);
+		if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) return false;
 
 		// No entities in area?
-		AxisAlignedBB blockBB = new AxisAlignedBB(currentCandidate);
+		AxisAlignedBB blockBB = new AxisAlignedBB(pos);
 		return world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty();
 	}
 
 	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
-		Item blockItem = placeSnapshot.item;
 		BlockPos blockPos = placeSnapshot.pos;
 
 		BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), blockPos, false)));
 		if(!ctx.canPlace()) return false;
-		BlockState placeBlock = Block.getBlockFromItem(blockItem).getStateForPlacement(ctx);
+		BlockState placeBlock = Block.getBlockFromItem(placeItem).getStateForPlacement(ctx);
 		if(placeBlock == null) return false;
+		placeBlock = Block.getValidBlockForPosition(placeBlock, world, blockPos);
+		if(placeBlock.getBlock() == Blocks.AIR) return false;
 
 		BlockState supportingBlock = placeSnapshot.supportingBlock;
 
 		if(targetDirection && placeBlock.getBlock() == supportingBlock.getBlock()) {
-
 			// Block properties to be copied (alignment/rotation properties)
 			for(IProperty property : new IProperty[] {
-					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP, BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS})
+					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
+					BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
 			{
 				if(supportingBlock.has(property)) {
 					placeBlock = placeBlock.with(property, supportingBlock.get(property));
 				}
 			}
 		}
-
+		// Abort if placeEvent is canceled
 		BlockSnapshot snapshot = new BlockSnapshot(world, blockPos, placeBlock);
 		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
 		MinecraftForge.EVENT_BUS.post(placeEvent);
 		if(placeEvent.isCanceled()) return false;
 
-		if(!world.setBlockState(blockPos, placeBlock)) return false;
+		// Place the block
+		if(!world.setBlockState(blockPos, placeBlock)) {
+			ConstructionWand.LOGGER.info("Block could not be placed");
+			return false;
+		}
 		world.notifyNeighbors(blockPos, placeBlock.getBlock());
 
-		player.addStat(Stats.ITEM_USED.get(blockItem));
-		SoundType sound = placeBlock.getSoundType();
-		world.playSound(player, blockPos, sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
+		// Update stats
+		player.addStat(Stats.ITEM_USED.get(placeItem));
+		player.addStat(ModStats.USE_WAND);
 
 		placeSnapshot.block = placeBlock;
 		return true;
 	}
 
 	public boolean doIt() {
-		takeItems(placeSnapshots.size());
-		int iB = 0;
+		LinkedList<PlaceSnapshot> placed = new LinkedList<>();
 
-		place_items:
-		for(Item item : placeItems.keySet()) {
-			for(int i=0; i<placeItems.get(item); i++) {
-				ItemWand wandItem = (ItemWand) wand.getItem();
-				if(iB >= placeSnapshots.size() || wand.isEmpty() || wandItem.getLimit(player, wand) == 0) break place_items;
+		for(PlaceSnapshot snapshot : placeSnapshots) {
+			if(wand.isEmpty() || wandItem.getLimit(player, wand) == 0) continue;
 
-				PlaceSnapshot snapshot = placeSnapshots.get(iB);
-				BlockPos pos = snapshot.pos;
-				snapshot.item = item;
+			BlockPos pos = snapshot.pos;
 
-				if(placeBlock(snapshot)) {
-					wand.damageItem(1, player, (e) -> e.sendBreakAnimation(player.swingingHand));
+			if(placeBlock(snapshot)) {
+				wand.damageItem(1, player, (e) -> e.sendBreakAnimation(player.swingingHand));
+
+				// If the item cant be taken, undo the placement
+				if(takeItems(1) == 0) placed.add(snapshot);
+				else {
+					ConstructionWand.LOGGER.info("[CWand] Item take error. Remove block: "+placeItem.toString());
+					world.removeBlock(pos, false);
 				}
-				else if(!player.isCreative()) {
-					ConstructionWand.LOGGER.info("[CWand] Place error. Return item: "+item.toString());
-					ItemStack stack = new ItemStack(item);
-					if(!player.inventory.addItemStackToInventory(stack)) {
-						player.dropItem(stack, false);
-					}
-					player.inventory.markDirty();
-					placeSnapshots.remove(snapshot);
-				}
-
-				iB++;
 			}
 		}
-
-		// Remove snapshots that were not placed
-		while(iB < placeSnapshots.size()) placeSnapshots.remove(iB);
+		// Play place sound
+		if(!placeSnapshots.isEmpty()) {
+			SoundType sound = placeSnapshots.getFirst().block.getSoundType();
+			world.playSound(null, player.getPosition(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
+		}
 
 		// Add to job history for undo
+		placeSnapshots = placed;
 		if(placeSnapshots.size() > 1) ConstructionWand.instance.jobHistory.add(this);
 
 		return !placeSnapshots.isEmpty();
@@ -310,17 +283,18 @@ public abstract class WandJob
 			BlockState currentBlock = world.getBlockState(snapshot.pos);
 
 			// If placed block is still present and can be broken, break it and return item
-			if(currentBlock.getBlock() == snapshot.block.getBlock() && world.isBlockModifiable(player, snapshot.pos) &&
-					(player.isCreative() || (currentBlock.getBlockHardness(world, snapshot.pos) > -1 && world.getTileEntity(snapshot.pos) == null))) {
+			if(world.isBlockModifiable(player, snapshot.pos) &&
+					(player.isCreative() ||
+					(currentBlock.getBlockHardness(world, snapshot.pos) > -1 && world.getTileEntity(snapshot.pos) == null && currentBlock.getBlock() == snapshot.block.getBlock())))
+			{
 				BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, snapshot.pos, currentBlock, player);
 				MinecraftForge.EVENT_BUS.post(breakEvent);
 				if(breakEvent.isCanceled()) continue;
 
-				if(!world.setBlockState(snapshot.pos, Blocks.AIR.getDefaultState())) continue;
-				world.notifyNeighbors(snapshot.pos, Blocks.AIR);
+				world.removeBlock(snapshot.pos, false);
 
 				if(!player.isCreative()) {
-					ItemStack stack = new ItemStack(snapshot.item);
+					ItemStack stack = new ItemStack(placeItem);
 					if(!player.inventory.addItemStackToInventory(stack)) {
 						player.dropItem(stack, false);
 					}
@@ -328,6 +302,11 @@ public abstract class WandJob
 			}
 		}
 		player.inventory.markDirty();
+
+		// Play teleport sound
+		SoundEvent sound = SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT;
+		world.playSound(null, player.getPosition(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
+
 		return true;
 	}
 }

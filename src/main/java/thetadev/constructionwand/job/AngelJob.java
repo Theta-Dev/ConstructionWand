@@ -1,16 +1,14 @@
 package thetadev.constructionwand.job;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import thetadev.constructionwand.basics.EnumMode;
+import thetadev.constructionwand.basics.ConfigHandler;
+import thetadev.constructionwand.basics.options.EnumMode;
 
 public class AngelJob extends WandJob
 {
@@ -26,15 +24,14 @@ public class AngelJob extends WandJob
 	protected void getBlockPositionList() {
 		if(options.getOption(EnumMode.DEFAULT) != EnumMode.ANGEL) return;
 
-		BlockItem item = (BlockItem) placeItems.keySet().iterator().next();
-		BlockState supportingBlock = item.getBlock().getDefaultState();
+		if(!player.isCreative() && !ConfigHandler.ANGEL_FALLING.get() && player.fallDistance > 10) return;
 
 		BlockPos currentPos = rayTraceResult.getPos();
 
 		for(int i=0; i<3; i++) {
 			currentPos = currentPos.offset(rayTraceResult.getFace());
-			if(shouldContinue(currentPos, supportingBlock, supportingBlock)) {
-				placeSnapshots.add(new PlaceSnapshot(currentPos, supportingBlock));
+			if(canPlace(currentPos)) {
+				placeSnapshots.add(new PlaceSnapshot(currentPos, placeItem.getBlock().getDefaultState()));
 				break;
 			}
 		}

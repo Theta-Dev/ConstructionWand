@@ -1,18 +1,23 @@
 package thetadev.constructionwand.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
+import thetadev.constructionwand.basics.options.EnumDirection;
+import thetadev.constructionwand.basics.options.EnumFluidLock;
+import thetadev.constructionwand.basics.options.EnumLock;
+import thetadev.constructionwand.basics.options.IEnumOption;
 import thetadev.constructionwand.network.PacketWandOption;
-
-import java.util.Arrays;
 
 
 public class KeyEvents
@@ -22,14 +27,14 @@ public class KeyEvents
 
 	public final KeyBinding[] keys = {
 			//new KeyBinding(langPrefix+"mode", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
-			new KeyBinding(langPrefix+"lock", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
-			new KeyBinding(langPrefix+"direction", KeyConflictContext.IN_GAME, KeyModifier.SHIFT, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
-			new KeyBinding(langPrefix+"fluid", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory)
+			//new KeyBinding(langPrefix+"lock", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
+			new KeyBinding(langPrefix+"direction", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
+			new KeyBinding(langPrefix+"fluid", KeyConflictContext.IN_GAME, KeyModifier.SHIFT, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory)
 	};
 
 	public static final IEnumOption[] keyOptions = {
 			//EnumMode.DEFAULT,
-			EnumLock.NOLOCK,
+			//EnumLock.NOLOCK,
 			EnumDirection.TARGET,
 			EnumFluidLock.IGNORE
 	};
@@ -39,14 +44,28 @@ public class KeyEvents
 	}
 
 	@SubscribeEvent
-	public void KeyEvent(InputEvent e) {
+	public void KeyEvent(InputEvent.KeyInputEvent e) {
 		boolean sendPacket = false;
 
 		for(int i=0; i<keyOptions.length; i++) {
 			if(keys[i].isPressed()) {
-				PacketWandOption packet = new PacketWandOption(keyOptions[i]);
+				PacketWandOption packet = new PacketWandOption(keyOptions[i], true);
 				ConstructionWand.instance.HANDLER.sendToServer(packet);
 			}
 		}
+	}
+
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void MouseScrollEvent(InputEvent.MouseScrollEvent e) {
+		Minecraft minecraft = Minecraft.getInstance();
+		PlayerEntity player = minecraft.player;
+		double scroll = e.getScrollDelta();
+
+		if(player == null || !player.isSneaking() || scroll == 0 || WandUtil.holdingWand(player) == null) return;
+
+		PacketWandOption packet = new PacketWandOption(EnumLock.NOLOCK, scroll<0);
+
+		ConstructionWand.instance.HANDLER.sendToServer(packet);
+		e.setCanceled(true);
 	}
 }

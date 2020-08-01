@@ -35,8 +35,8 @@ public class PacketUndoBlocks
 		public static void handle(final PacketUndoBlocks msg, final Supplier<NetworkEvent.Context> ctx) {
 			if(!ctx.get().getDirection().getReceptionSide().isClient()) return;
 
-			ConstructionWand.LOGGER.info("[CWand]: PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
-			ConstructionWand.instance.renderCache.undoBlocks = msg.undoBlocks;
+			ConstructionWand.LOGGER.debug("PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
+			ConstructionWand.instance.renderBlockPreview.undoBlocks = msg.undoBlocks;
 
 			ctx.get().setPacketHandled(true);
 		}

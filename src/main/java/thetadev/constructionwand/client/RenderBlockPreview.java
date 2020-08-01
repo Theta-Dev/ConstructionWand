@@ -22,12 +22,15 @@ import java.util.LinkedList;
 
 public class RenderBlockPreview
 {
+	public WandJob wandJob;
+	public LinkedList<BlockPos> undoBlocks;
+
 	@SubscribeEvent
 	public void renderAdditionalBlockBounds(DrawHighlightEvent event)
 	{
 		if(event.getTarget().getType() != RayTraceResult.Type.BLOCK) return;
 
-		BlockRayTraceResult rtr = (BlockRayTraceResult)event.getTarget();
+		BlockRayTraceResult rtr = (BlockRayTraceResult) event.getTarget();
 		Entity entity = event.getInfo().getRenderViewEntity();
 		if(!(entity instanceof PlayerEntity)) return;
 		PlayerEntity player = (PlayerEntity) entity;
@@ -38,17 +41,14 @@ public class RenderBlockPreview
 		if(wand == null) return;
 
 		if(player.isSneaking()) {
-			blocks = ConstructionWand.instance.renderCache.undoBlocks;
-			if(blocks == null || blocks.isEmpty()) return;
+			blocks = undoBlocks;
 			colorG=1;
 		}
 		else {
-			WandJob cachedJob = ConstructionWand.instance.renderCache.wandJob;
-
-			if(cachedJob == null || !(cachedJob.getRayTraceResult().equals(rtr)) || !(cachedJob.getWand().equals(wand))) {
-				ConstructionWand.instance.renderCache.wandJob = WandUtil.getJob(player, player.getEntityWorld(), rtr, wand);
+			if(wandJob == null || !(wandJob.getRayTraceResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
+				wandJob = WandJob.getJob(player, player.getEntityWorld(), rtr, wand);
 			}
-			blocks = ConstructionWand.instance.renderCache.wandJob.getBlockPositions();
+			blocks = wandJob.getBlockPositions();
 		}
 
 		if(blocks == null || blocks.isEmpty()) return;

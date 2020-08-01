@@ -3,38 +3,42 @@ package thetadev.constructionwand.network;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.NetworkEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
+import thetadev.constructionwand.basics.options.IEnumOption;
+import thetadev.constructionwand.basics.options.WandOptions;
+import thetadev.constructionwand.items.ItemWand;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
 
 public class PacketWandOption
 {
-	public boolean[] options;
+	public byte[] options;
 
-	public PacketWandOption(boolean[] options) {
+	public PacketWandOption(byte[] options) {
 		this.options = options;
 	}
 
-	public PacketWandOption(IEnumOption option) {
-		options = new boolean[WandOptions.options.length];
+	public PacketWandOption(IEnumOption option, boolean dir) {
+		options = new byte[WandOptions.options.length];
 
 		for(int i=0; i<options.length; i++) {
-			options[i] = (WandOptions.options[i] == option);
+			if(WandOptions.options[i] == option) options[i] = (byte)(dir ? 2:1);
+			else options[i] = (byte)0;
 		}
 	}
 
 	public static void encode(PacketWandOption msg, PacketBuffer buffer) {
-		for(int i=0; i<WandOptions.options.length; i++) buffer.writeBoolean(msg.options[i]);
+		buffer.writeByteArray(msg.options);
 	}
 
 	public static PacketWandOption decode(PacketBuffer buffer) {
-		boolean[] options = new boolean[WandOptions.options.length];
-		for(int i=0; i<WandOptions.options.length; i++) options[i] = buffer.readBoolean();
-
+		byte[] options = buffer.readByteArray(WandOptions.options.length);
 		return new PacketWandOption(options);
 	}
 
@@ -50,20 +54,18 @@ public class PacketWandOption
 			if(wand == null) return;
 			WandOptions options = new WandOptions(wand);
 
-			String langPrefix = ConstructionWand.MODID + ".chat.";
+			String langPrefix = ConstructionWand.MODID + ".option.";
 
 			for(int i=0; i<WandOptions.options.length; i++) {
-				if(!msg.options[i]) continue;
+				if(msg.options[i] == 0) continue;
 
-				IEnumOption opt = WandOptions.options[i];
-				options.nextOption(opt);
-				player.sendStatusMessage(new TranslationTextComponent(langPrefix+options.getOption(opt).getOptionKey())
-						.appendSibling(new TranslationTextComponent(langPrefix + options.getOption(opt).getTranslationKey())), true);
+				IEnumOption opt = options.nextOption(WandOptions.options[i], msg.options[i]>1);
+				ItemWand.optionMessage(player, opt);
 			}
 
 			player.inventory.markDirty();
 
-			ConstructionWand.LOGGER.info("Keys: "+ Arrays.toString(msg.options));
+			ConstructionWand.LOGGER.debug("Keys: "+ Arrays.toString(msg.options));
 		}
 	}
 }

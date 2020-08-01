@@ -23,7 +23,7 @@ public class TransductionJob extends WandJob
 
 		for(int i=0; i<wandItem.angelDistance; i++) {
 			currentPos = currentPos.offset(placeDirection.getOpposite());
-			if(shouldContinue(currentPos, supportingBlock, supportingBlock)) {
+			if(canPlace(currentPos)) {
 				placeSnapshots.add(new PlaceSnapshot(currentPos, supportingBlock));
 				break;
 			}

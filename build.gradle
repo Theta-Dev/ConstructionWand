@@ -127,21 +127,6 @@ dependencies {
 
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
-jar {
-    manifest {
-        attributes([
-            "Specification-Title": "constructionwand",
-            "Specification-Vendor": "constructionwand",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": "constructionwand",
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"constructionwand",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-}
-
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
 jar.finalizedBy('reobfJar') 

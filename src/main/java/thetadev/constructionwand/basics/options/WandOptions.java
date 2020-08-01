@@ -1,4 +1,4 @@
-package thetadev.constructionwand.basics;
+package thetadev.constructionwand.basics.options;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -31,9 +31,14 @@ public class WandOptions
 		tag.putString(option.getOptionKey(), option.getValue());
 	}
 
-	public void nextOption(IEnumOption option) {
-		IEnumOption nextOption = getOption(option).next();
+	public IEnumOption nextOption(IEnumOption option, boolean dir) {
+		IEnumOption nextOption = getOption(option).next(dir);
 		if(nextOption == EnumMode.ANGEL && item.angelDistance == 0) nextOption = EnumMode.DEFAULT;
 		setOption(nextOption);
+		return nextOption;
+	}
+
+	public IEnumOption nextOption(IEnumOption option) {
+		return nextOption(option, true);
 	}
 }

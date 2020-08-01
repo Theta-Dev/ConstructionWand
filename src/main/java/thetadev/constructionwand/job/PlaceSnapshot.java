@@ -10,7 +10,6 @@ public class PlaceSnapshot
 	public BlockState block;
 	public BlockState supportingBlock;
 	public BlockPos pos;
-	public Item item;
 
 	public PlaceSnapshot(BlockPos pos, BlockState supportingBlock)
 	{

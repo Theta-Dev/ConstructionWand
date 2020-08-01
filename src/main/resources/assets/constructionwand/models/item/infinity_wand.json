@@ -2,5 +2,11 @@
     "parent": "item/handheld",
     "textures": {
         "layer0": "constructionwand:items/infinity_wand"
-    }
+    },
+    "overrides": [{
+        "predicate": {
+            "constructionwand:wand_mode": 1
+        },
+        "model": "constructionwand:item/infinity_wand_angel"
+    }]
 }

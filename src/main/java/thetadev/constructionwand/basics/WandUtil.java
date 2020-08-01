@@ -9,7 +9,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
+import thetadev.constructionwand.basics.options.EnumMode;
+import thetadev.constructionwand.basics.options.IEnumOption;
+import thetadev.constructionwand.basics.options.WandOptions;
 import thetadev.constructionwand.items.ItemWand;
 import thetadev.constructionwand.job.ConstructionJob;
 import thetadev.constructionwand.job.TransductionJob;
@@ -34,20 +36,5 @@ public class WandUtil
 			return player.getHeldItem(Hand.OFF_HAND);
 		}
 		return null;
-	}
-
-	public static int range(int in, int min, int max) {
-		return Math.min(Math.max(in, min), max);
-	}
-
-	public static Ingredient ingFromTag(String tag) {
-		return Ingredient.fromTag(new ItemTags.Wrapper(new ResourceLocation(tag)));
-	}
-
-	public static WandJob getJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack itemStack) {
-		IEnumOption mode = new WandOptions(itemStack).getOption(EnumMode.DEFAULT);
-
-		if(mode == EnumMode.ANGEL) return new TransductionJob(player, world, rayTraceResult, itemStack);
-		else return new ConstructionJob(player, world, rayTraceResult, itemStack);
 	}
 }
