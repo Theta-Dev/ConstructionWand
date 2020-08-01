@@ -67,7 +67,8 @@ public abstract class WandJob
 		Item item;
 		if(!offhandStack.isEmpty() && offhandStack.getItem() instanceof BlockItem) item = offhandStack.getItem();
 		else {
-			item = targetBlock.getBlock().getItem(world, targetPos, targetState).getItem();
+			//item = targetBlock.getBlock().getItem(world, targetPos, targetState).getItem();
+			item = targetBlock.getPickBlock(targetState, rayTraceResult, world, targetPos, player).getItem();
 		}
 		if(!(item instanceof BlockItem)) return;
 		placeItem = (BlockItem) item;
