@@ -65,7 +65,7 @@ public class PacketWandOption
 
 			player.inventory.markDirty();
 
-			ConstructionWand.LOGGER.debug("Keys: "+ Arrays.toString(msg.options));
+			//ConstructionWand.LOGGER.debug("Keys: "+ Arrays.toString(msg.options));
 		}
 	}
 }

@@ -25,7 +25,7 @@ public class PacketQueryUndo
 
 			ConstructionWand.instance.jobHistory.updateClient(player);
 
-			ConstructionWand.LOGGER.debug("Undo queried");
+			//ConstructionWand.LOGGER.debug("Undo queried");
 		}
 	}
 }

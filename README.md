@@ -22,7 +22,7 @@ There are basic wands made from stone, iron and diamond and the Infinity wand.
 ![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/master/images/crafting4.png)
 
 ## Modes
-There are two wand modes: Default and Angel mode. You can switch modes by SHIFT+Right clicking.
+There are four wand tiers: Stone, Iron, Diamond and Infinity.
 
 **Default mode:** Extends your build on the side facing you. Maximum number of blocks depends on wand tier. SHIFT+Scroll to change the placement mode (Horizontal, Vertical, Top/Bottom, No lock).
 

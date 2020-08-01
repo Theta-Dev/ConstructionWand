@@ -260,7 +260,7 @@ public abstract class WandJob
 				// If the item cant be taken, undo the placement
 				if(takeItems(1) == 0) placed.add(snapshot);
 				else {
-					ConstructionWand.LOGGER.info("[CWand] Item take error. Remove block: "+placeItem.toString());
+					ConstructionWand.LOGGER.info("Item could not be taken. Remove block: "+placeItem.toString());
 					world.removeBlock(pos, false);
 				}
 			}

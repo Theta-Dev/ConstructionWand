@@ -62,7 +62,7 @@ public abstract class ItemWand extends Item
 		if(player.isSneaking()) {
 			WandJob job = ConstructionWand.instance.jobHistory.getForUndo(player, world, context.getPos());
 			if(job == null) return ActionResultType.FAIL;
-			ConstructionWand.LOGGER.debug("Starting Undo");
+			//ConstructionWand.LOGGER.debug("Starting Undo");
 			return job.undo() ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 		}
 		else {
@@ -83,7 +83,7 @@ public abstract class ItemWand extends Item
 			IEnumOption opt = EnumMode.DEFAULT;
 			opt = options.nextOption(opt);
 
-			ConstructionWand.LOGGER.debug("Wand mode: " + options.getOption(EnumLock.NOLOCK));
+			//ConstructionWand.LOGGER.debug("Wand mode: " + options.getOption(EnumLock.NOLOCK));
 
 			optionMessage(player, opt);
 
@@ -92,7 +92,7 @@ public abstract class ItemWand extends Item
 		}
 		else {
 			// Right click: Place angel block
-			ConstructionWand.LOGGER.debug("Place angel block");
+			//ConstructionWand.LOGGER.debug("Place angel block");
 			WandJob job = new AngelJob(player, world, stack);
 			return job.doIt() ? ActionResult.resultSuccess(stack) : ActionResult.resultFail(stack);
 		}

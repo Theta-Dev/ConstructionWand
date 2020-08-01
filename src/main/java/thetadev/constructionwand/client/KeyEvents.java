@@ -5,6 +5,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -17,6 +18,7 @@ import thetadev.constructionwand.basics.options.EnumDirection;
 import thetadev.constructionwand.basics.options.EnumFluidLock;
 import thetadev.constructionwand.basics.options.EnumLock;
 import thetadev.constructionwand.basics.options.IEnumOption;
+import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketWandOption;
 
 
@@ -67,5 +69,17 @@ public class KeyEvents
 
 		ConstructionWand.instance.HANDLER.sendToServer(packet);
 		e.setCanceled(true);
+	}
+
+	// Send undo blocks to player sneaking with wand
+	@SubscribeEvent
+	public void sneak(InputUpdateEvent e) {
+		if(e.getMovementInput().sneaking) {
+			PlayerEntity player = e.getPlayer();
+			if(WandUtil.holdingWand(player) == null) return;
+
+			PacketQueryUndo packet = new PacketQueryUndo();
+			ConstructionWand.instance.HANDLER.sendToServer(packet);
+		}
 	}
 }

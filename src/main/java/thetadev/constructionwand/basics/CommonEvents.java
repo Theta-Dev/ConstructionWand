@@ -10,24 +10,11 @@ import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.network.PacketQueryUndo;
 
 @Mod.EventBusSubscriber(modid = ConstructionWand.MODID)
-public class Events
+public class CommonEvents
 {
-	// Send undo blocks to player sneaking with wand
-	@SubscribeEvent
-	public static void sneak(InputUpdateEvent e) {
-		if(e.getMovementInput().sneaking) {
-			PlayerEntity player = e.getPlayer();
-			if(WandUtil.holdingWand(player) == null) return;
-
-			PacketQueryUndo packet = new PacketQueryUndo();
-			ConstructionWand.instance.HANDLER.sendToServer(packet);
-		}
-	}
-
 	// Prevent block interactions while holding wand
 	@SubscribeEvent
 	public static void rightClickBlock(PlayerInteractEvent.RightClickBlock e) {
-		//if(e.getWorld().isRemote) return;
 		PlayerEntity player = e.getPlayer();
 		if(WandUtil.holdingWand(player) == null) return;
 
