@@ -44,9 +44,9 @@ public class ConfigHandler
 		LIMIT_STONE = BUILDER.defineInRange("StoneWand", 9, 1, Integer.MAX_VALUE);
 		LIMIT_IRON = BUILDER.defineInRange("IronWand", 27, 1, Integer.MAX_VALUE);
 		LIMIT_DIAMOND = BUILDER.defineInRange("DiamondWand", 128, 1, Integer.MAX_VALUE);
-		LIMIT_INFINITY = BUILDER.defineInRange("InfinityWand", 512, 1, Integer.MAX_VALUE);
+		LIMIT_INFINITY = BUILDER.defineInRange("InfinityWand", 1024, 1, Integer.MAX_VALUE);
 		BUILDER.comment("Infinity Wand used in creative mode");
-		LIMIT_CREATIVE = BUILDER.defineInRange("InfinityWandCreative", 1024, 1, Integer.MAX_VALUE);
+		LIMIT_CREATIVE = BUILDER.defineInRange("InfinityWandCreative", 2048, 1, Integer.MAX_VALUE);
 		BUILDER.pop();
 
 		BUILDER.comment("Max placement distance with angel mode (0 to disable angel mode)");
