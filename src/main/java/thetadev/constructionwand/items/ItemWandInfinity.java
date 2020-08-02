@@ -8,9 +8,9 @@ import thetadev.constructionwand.basics.ConfigHandler;
 
 public class ItemWandInfinity extends ItemWand
 {
-	public ItemWandInfinity(Ingredient material, int maxBlocks, int angelDistance)
+	public ItemWandInfinity(int maxBlocks, int angelDistance)
 	{
-		super(new Item.Properties().maxStackSize(1), material, maxBlocks, angelDistance);
+		super(new Item.Properties().maxStackSize(1), maxBlocks, angelDistance);
 	}
 
 	@Override

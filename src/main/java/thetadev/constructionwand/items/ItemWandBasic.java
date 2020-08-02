@@ -1,6 +1,7 @@
 package thetadev.constructionwand.items;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.IItemTier;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemStack;
@@ -8,9 +9,11 @@ import net.minecraft.item.crafting.Ingredient;
 
 public class ItemWandBasic extends ItemWand
 {
-	public ItemWandBasic(Ingredient material, int durability, int maxBlocks, int angelDistance)
-	{
-		super(new Properties().maxDamage(durability), material, maxBlocks, angelDistance);
+	private final IItemTier tier;
+
+	public ItemWandBasic(IItemTier tier, int durability, int maxBlocks, int angelDistance) {
+		super(new Properties().maxDamage(durability), maxBlocks, angelDistance);
+		this.tier = tier;
 	}
 
 	@Override
@@ -20,6 +23,6 @@ public class ItemWandBasic extends ItemWand
 
 	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-		return material.test(repair);
+		return this.tier.getRepairMaterial().test(repair);
 	}
 }

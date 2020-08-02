@@ -37,11 +37,9 @@ public abstract class ItemWand extends Item
 {
 	public final int maxBlocks;
 	public final int angelDistance;
-	public final Ingredient material;
 
-	public ItemWand(Item.Properties properties, Ingredient material, int maxBlocks, int angelDistance) {
+	public ItemWand(Item.Properties properties, int maxBlocks, int angelDistance) {
 		super(properties.group(ItemGroup.TOOLS));
-		this.material = material;
 		this.maxBlocks = maxBlocks;
 		this.angelDistance = angelDistance;
 		addPropertyOverride(new ResourceLocation(ConstructionWand.MODID, "wand_mode"),
