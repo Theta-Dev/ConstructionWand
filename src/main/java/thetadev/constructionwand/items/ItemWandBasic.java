@@ -6,6 +6,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ResourceLocation;
 
 public class ItemWandBasic extends ItemWand
 {
