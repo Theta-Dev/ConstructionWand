@@ -1,8 +1,5 @@
 package thetadev.constructionwand.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,11 +8,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.client.event.DrawHighlightEvent;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.WandUtil;
-import thetadev.constructionwand.job.ConstructionJob;
 import thetadev.constructionwand.job.WandJob;
 
 import java.util.LinkedList;
@@ -26,7 +21,7 @@ public class RenderBlockPreview
 	public LinkedList<BlockPos> undoBlocks;
 
 	@SubscribeEvent
-	public void renderAdditionalBlockBounds(DrawHighlightEvent event)
+	public void renderAdditionalBlockBounds(DrawBlockHighlightEvent event)
 	{
 		if(event.getTarget().getType() != RayTraceResult.Type.BLOCK) return;
 
@@ -53,22 +48,16 @@ public class RenderBlockPreview
 
 		if(blocks == null || blocks.isEmpty()) return;
 
-		MatrixStack ms = event.getMatrix();
-		IRenderTypeBuffer buffer = event.getBuffers();
-		ms.push();
-
 		for(BlockPos block : blocks) {
 
 			double partialTicks = event.getPartialTicks();
-			double d0 = player.lastTickPosX + (player.getPosX() - player.lastTickPosX) * partialTicks;
-			double d1 = player.lastTickPosY + player.getEyeHeight() + (player.getPosY() - player.lastTickPosY) * partialTicks;
-			double d2 = player.lastTickPosZ + (player.getPosZ() - player.lastTickPosZ) * partialTicks;
+			double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+			double d1 = player.lastTickPosY + player.getEyeHeight() + (player.posY - player.lastTickPosY) * partialTicks;
+			double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
 
 			AxisAlignedBB aabb = new AxisAlignedBB(block).offset(-d0, -d1, -d2);
-			IVertexBuilder lineBuilder = buffer.getBuffer(RenderTypes.TRANSLUCENT_LINES);
-			WorldRenderer.drawBoundingBox(ms, lineBuilder, aabb, colorR, colorG, colorB, 0.4F);
+			WorldRenderer.drawSelectionBoundingBox(aabb, colorR, colorG, colorB, 0.4F);
 		}
-		ms.pop();
 
 		event.setCanceled(true);
 	}
