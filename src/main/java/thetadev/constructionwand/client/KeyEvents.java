@@ -29,7 +29,7 @@ public class KeyEvents
 
 	public final KeyBinding[] keys = {
 			new KeyBinding(langPrefix+"direction", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
-			new KeyBinding(langPrefix+"fluid", KeyConflictContext.IN_GAME, KeyModifier.SHIFT, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory)
+			new KeyBinding(langPrefix+"replace", KeyConflictContext.IN_GAME, KeyModifier.SHIFT, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory)
 	};
 
 	public static final IEnumOption[] keyOptions = {
@@ -43,8 +43,6 @@ public class KeyEvents
 
 	@SubscribeEvent
 	public void KeyEvent(InputEvent.KeyInputEvent e) {
-		boolean sendPacket = false;
-
 		for(int i=0; i<keyOptions.length; i++) {
 			if(keys[i].isPressed()) {
 				PacketWandOption packet = new PacketWandOption(keyOptions[i], true);
