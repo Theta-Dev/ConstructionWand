@@ -7,6 +7,7 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.options.EnumMode;
@@ -36,5 +37,9 @@ public class WandUtil
 			return player.getHeldItem(Hand.OFF_HAND);
 		}
 		return null;
+	}
+
+	public static BlockPos playerPos(PlayerEntity player) {
+		return new BlockPos(player.getPositionVec());
 	}
 }
