@@ -15,7 +15,7 @@ import org.lwjgl.glfw.GLFW;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
 import thetadev.constructionwand.basics.options.EnumDirection;
-import thetadev.constructionwand.basics.options.EnumFluidLock;
+import thetadev.constructionwand.basics.options.EnumReplace;
 import thetadev.constructionwand.basics.options.EnumLock;
 import thetadev.constructionwand.basics.options.IEnumOption;
 import thetadev.constructionwand.network.PacketQueryUndo;
@@ -28,17 +28,13 @@ public class KeyEvents
 	private final String langCategory = langPrefix + "category";
 
 	public final KeyBinding[] keys = {
-			//new KeyBinding(langPrefix+"mode", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
-			//new KeyBinding(langPrefix+"lock", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
 			new KeyBinding(langPrefix+"direction", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
 			new KeyBinding(langPrefix+"fluid", KeyConflictContext.IN_GAME, KeyModifier.SHIFT, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory)
 	};
 
 	public static final IEnumOption[] keyOptions = {
-			//EnumMode.DEFAULT,
-			//EnumLock.NOLOCK,
 			EnumDirection.TARGET,
-			EnumFluidLock.IGNORE
+			EnumReplace.YES
 	};
 
 	public KeyEvents() {

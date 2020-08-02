@@ -15,7 +15,7 @@ public class WandOptions
 			EnumMode.DEFAULT,
 			EnumLock.NOLOCK,
 			EnumDirection.TARGET,
-			EnumFluidLock.IGNORE
+			EnumReplace.YES
 	};
 
 	public WandOptions(ItemStack stack) {

@@ -2,18 +2,18 @@ package thetadev.constructionwand.basics.options;
 
 import com.google.common.base.Enums;
 
-public enum EnumFluidLock implements IEnumOption
+public enum EnumReplace implements IEnumOption
 {
-	IGNORE,
-	STOPAT;
+	YES,
+	NO;
 
-	private static EnumFluidLock[] vals = values();
+	private static EnumReplace[] vals = values();
 
 	public IEnumOption fromName(String name) {
-		return Enums.getIfPresent(EnumFluidLock.class, name.toUpperCase()).or(this);
+		return Enums.getIfPresent(EnumReplace.class, name.toUpperCase()).or(this);
 	}
 
-	public EnumFluidLock next(boolean dir) {
+	public EnumReplace next(boolean dir) {
 		int i = this.ordinal() + (dir ? 1:-1);
 		if(i < 0) i += vals.length;
 
@@ -25,7 +25,7 @@ public enum EnumFluidLock implements IEnumOption
 	}
 
 	public String getOptionKey() {
-		return "fluid";
+		return "replace";
 	}
 
 	public String getValue() {
