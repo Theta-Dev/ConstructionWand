@@ -13,8 +13,7 @@ public class ItemWandBasic extends ItemWand
 {
 	private final IItemTier tier;
 
-	public ItemWandBasic(IItemTier tier, int durability, int maxBlocks, int angelDistance)
-	{
+	public ItemWandBasic(IItemTier tier, int durability, int maxBlocks, int angelDistance) {
 		super(new Properties().maxDamage(durability), maxBlocks, angelDistance);
 		this.tier = tier;
 	}

@@ -19,7 +19,7 @@ public class ModItems
 	public static final Item WAND_DIAMOND = new ItemWandBasic(ItemTier.DIAMOND, ConfigHandler.DURABILITY_DIAMOND.get(), ConfigHandler.LIMIT_DIAMOND.get(), ConfigHandler.ANGEL_DIAMOND.get());
 	public static final Item WAND_INFINITY = new ItemWandInfinity(ConfigHandler.LIMIT_INFINITY.get(), ConfigHandler.ANGEL_INFINITY.get());
 
-	public static final Item[] WANDS = {WAND_STONE, WAND_IRON, WAND_DIAMOND, WAND_INFINITY};
+  public static final Item[] WANDS = {WAND_STONE, WAND_IRON, WAND_DIAMOND, WAND_INFINITY};
 
 	@SubscribeEvent
 	public static void onRegisterItems(RegistryEvent.Register<Item> event)

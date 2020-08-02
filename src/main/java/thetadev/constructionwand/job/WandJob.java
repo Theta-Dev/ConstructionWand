@@ -15,7 +15,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fluids.IFluidBlock;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
 import thetadev.constructionwand.basics.options.*;
@@ -34,7 +33,7 @@ public abstract class WandJob
 	protected WandOptions options;
 
 	protected int maxBlocks;
-	protected boolean ignoreFluid;
+	protected boolean doReplace;
 	protected boolean targetDirection;
 
 	protected BlockItem placeItem;
@@ -55,7 +54,7 @@ public abstract class WandJob
 
 		// Get options
 		options = new WandOptions(wand);
-		ignoreFluid = options.getOption(EnumFluidLock.IGNORE) == EnumFluidLock.IGNORE;
+		doReplace = options.getOption(EnumReplace.YES) == EnumReplace.YES;
 		targetDirection = options.getOption(EnumDirection.TARGET) == EnumDirection.TARGET;
 
 		BlockPos targetPos = rayTraceResult.getPos();
@@ -183,16 +182,14 @@ public abstract class WandJob
 		// Is position out of world?
 		if(!world.isBlockPresent(pos)) return false;
 
-		// Is there space?
-		if(!world.isAirBlock(pos)){
-			Block currrentCandidateBlock = world.getBlockState(pos).getBlock();
-			if(!(ignoreFluid && (currrentCandidateBlock instanceof IFluidBlock || currrentCandidateBlock instanceof FlowingFluidBlock))) return false;
-		};
-
-		// Can block be placed?
-		BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), pos, false)));
+		// Is block at pos replaceable?
+		BlockItemUseContext ctx = new WandItemUseContext(world, player, new ItemStack(placeItem),  new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), pos, false));
 		if(!ctx.canPlace()) return false;
 
+		// If replace mode is off, target has to be air
+		if(!doReplace && !world.isAirBlock(pos)) return false;
+
+		// Can block be placed?
 		BlockState blockState = placeItem.getBlock().getStateForPlacement(ctx);
 		if(blockState == null) return false;
 		blockState = Block.getValidBlockForPosition(blockState, world, pos);
@@ -206,7 +203,7 @@ public abstract class WandJob
 	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
 		BlockPos blockPos = placeSnapshot.pos;
 
-		BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), blockPos, false)));
+		BlockItemUseContext ctx = new WandItemUseContext(world, player, new ItemStack(placeItem),  new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), blockPos, false));
 		if(!ctx.canPlace()) return false;
 		BlockState placeBlock = Block.getBlockFromItem(placeItem).getStateForPlacement(ctx);
 		if(placeBlock == null) return false;
@@ -273,6 +270,8 @@ public abstract class WandJob
 				}
 			}
 		}
+		placeSnapshots = placed;
+
 		// Play place sound
 		if(!placeSnapshots.isEmpty()) {
 			SoundType sound = placeSnapshots.getFirst().block.getSoundType();
@@ -280,7 +279,6 @@ public abstract class WandJob
 		}
 
 		// Add to job history for undo
-		placeSnapshots = placed;
 		if(placeSnapshots.size() > 1) ConstructionWand.instance.jobHistory.add(this);
 
 		return !placeSnapshots.isEmpty();
