@@ -103,7 +103,7 @@ dependencies {
     //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.15.2-1.2-32.160")
     //runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.15.2-2.0.2.4")
 
-    compileOnly fg.deobf("vazkii.botania:Botania:r1.15-387.455:api")
+    compileOnly fg.deobf("vazkii.botania:Botania:r1.11-379.354:api")
 
     //runtimeOnly fg.deobf("vazkii.botania:Botania:r1.15-387.455")
 
