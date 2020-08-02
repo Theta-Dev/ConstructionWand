@@ -27,9 +27,11 @@ public class KeyEvents
 	private final String langPrefix = ConstructionWand.MODID + ".key.";
 	private final String langCategory = langPrefix + "category";
 
-	public final KeyBinding[] keys = {
-			new KeyBinding(langPrefix+"direction", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory),
-			new KeyBinding(langPrefix+"fluid", KeyConflictContext.IN_GAME, KeyModifier.SHIFT, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory)
+	public final KeyBinding WAND_KEY = new KeyBinding(langPrefix+"wand", KeyConflictContext.IN_GAME, InputMappings.getInputByCode(GLFW.GLFW_KEY_N, 0), langCategory);
+
+	public static final KeyModifier[] keyModifiers = {
+			KeyModifier.NONE,
+			KeyModifier.SHIFT
 	};
 
 	public static final IEnumOption[] keyOptions = {
@@ -38,17 +40,17 @@ public class KeyEvents
 	};
 
 	public KeyEvents() {
-		for(KeyBinding key : keys) ClientRegistry.registerKeyBinding(key);
+		ClientRegistry.registerKeyBinding(WAND_KEY);
 	}
 
 	@SubscribeEvent
 	public void KeyEvent(InputEvent.KeyInputEvent e) {
-		boolean sendPacket = false;
-
-		for(int i=0; i<keyOptions.length; i++) {
-			if(keys[i].isPressed()) {
-				PacketWandOption packet = new PacketWandOption(keyOptions[i], true);
-				ConstructionWand.instance.HANDLER.sendToServer(packet);
+		if(WAND_KEY.isPressed()) {
+			for(int i=0; i<keyOptions.length; i++) {
+				if(keyModifiers[i].isActive(null)) {
+					PacketWandOption packet = new PacketWandOption(keyOptions[i], true);
+					ConstructionWand.instance.HANDLER.sendToServer(packet);
+				}
 			}
 		}
 	}

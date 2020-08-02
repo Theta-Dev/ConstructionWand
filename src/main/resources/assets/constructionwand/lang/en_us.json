@@ -5,6 +5,7 @@
   "item.constructionwand.infinity_wand": "Infinity Wand",
 
   "constructionwand.key.category": "Construction Wand",
+  "constructionwand.key.wand": "Place direction (+SHIFT: Replacement mode)",
   "constructionwand.key.direction": "Place direction",
   "constructionwand.key.replace": "Replacement mode",
 
