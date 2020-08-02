@@ -70,7 +70,7 @@ public class KeyEvents
 	// Send undo blocks to player sneaking with wand
 	@SubscribeEvent
 	public void sneak(InputUpdateEvent e) {
-		if(e.getMovementInput().sneaking) {
+		if(e.getMovementInput().sneak) {
 			PlayerEntity player = e.getPlayer();
 			if(WandUtil.holdingWand(player) == null) return;
 

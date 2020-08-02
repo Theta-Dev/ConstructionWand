@@ -73,7 +73,7 @@ public abstract class ItemWand extends Item
 	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
 		ItemStack stack = player.getHeldItem(hand);
 
-		if(world.isRemote) return ActionResult.resultFail(stack);
+		if(world.isRemote) return new ActionResult<>(ActionResultType.FAIL, stack);
 
 		if(player.isSneaking()) {
 			// SHIFT + Right click: Change wand mode
@@ -86,13 +86,13 @@ public abstract class ItemWand extends Item
 			optionMessage(player, opt);
 
 			player.inventory.markDirty();
-			return ActionResult.resultSuccess(stack);
+			return new ActionResult<>(ActionResultType.SUCCESS, stack);
 		}
 		else {
 			// Right click: Place angel block
 			//ConstructionWand.LOGGER.debug("Place angel block");
 			WandJob job = new AngelJob(player, world, stack);
-			return job.doIt() ? ActionResult.resultSuccess(stack) : ActionResult.resultFail(stack);
+			return new ActionResult<>(job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL, stack);
 		}
 	}
 
