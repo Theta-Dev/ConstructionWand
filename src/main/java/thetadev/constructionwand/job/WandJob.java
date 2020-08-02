@@ -217,12 +217,12 @@ public abstract class WandJob
 
 		if(targetDirection && placeBlock.getBlock() == supportingBlock.getBlock()) {
 			// Block properties to be copied (alignment/rotation properties)
-			for(Property<T> property : new Property<T>[] {
+			for(Property property : new Property[] {
 					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
 					BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
 			{
-
-				if(supportingBlock.has(property)) {
+				// supportingBlock.has(property)
+				if(supportingBlock.func_235901_b_(property)) {
 					placeBlock = placeBlock.with(property, supportingBlock.get(property));
 				}
 			}

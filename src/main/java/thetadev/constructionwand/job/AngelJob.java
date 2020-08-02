@@ -5,18 +5,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.ConfigHandler;
+import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.options.EnumMode;
 
 public class AngelJob extends WandJob
 {
 	public AngelJob(PlayerEntity player, World world, ItemStack wand) {
-		super(player, world, new BlockRayTraceResult(player.getLookVec(), fromVector(player.getLookVec()), player.getPosition(), false), wand);
+		super(player, world, new BlockRayTraceResult(player.getLookVec(), fromVector(player.getLookVec()), WandUtil.playerPos(player), false), wand);
 	}
 
-	private static Direction fromVector(Vec3d vector) {
+	private static Direction fromVector(Vector3d vector) {
 		return Direction.getFacingFromVector(vector.x, vector.y, vector.z);
 	}
 

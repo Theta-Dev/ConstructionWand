@@ -38,7 +38,7 @@ With a Construction Wand you can place multiple blocks (up to 1024) at once, ext
 Sneak+Right click to activate angel mode which allows you to place a block at the opposite side of the block facing you.
 If you concentrate enough, you can even conjure a block in mid air!
 
-This is my first minecraft mod. May the odds be ever in your favor!
+This is my first minecraft mod. May the odds be ever in your favor.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.examplemod]] #optional

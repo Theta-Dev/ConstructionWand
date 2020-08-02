@@ -100,12 +100,12 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.16.1-32.0.98'
 
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16-39")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.16.1-3.0")
+    //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16-39")
+    //runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.16.1-3.0")
 
     compileOnly fg.deobf("vazkii.botania:Botania:1.16-398:api")
 
-    runtimeOnly fg.deobf("vazkii.botania:Botania:1.16-398")
+    //runtimeOnly fg.deobf("vazkii.botania:Botania:1.16-398")
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"

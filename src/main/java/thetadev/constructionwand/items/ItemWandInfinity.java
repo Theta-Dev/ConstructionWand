@@ -4,13 +4,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.ResourceLocation;
 import thetadev.constructionwand.basics.ConfigHandler;
 
 public class ItemWandInfinity extends ItemWand
 {
-	public ItemWandInfinity(Ingredient material, int maxBlocks, int angelDistance)
+	public ItemWandInfinity(int maxBlocks, int angelDistance)
 	{
-		super(new Item.Properties().maxStackSize(1), material, maxBlocks, angelDistance);
+		super(new Item.Properties().maxStackSize(1), maxBlocks, angelDistance);
 	}
 
 	@Override
