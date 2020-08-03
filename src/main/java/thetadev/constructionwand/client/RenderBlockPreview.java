@@ -24,7 +24,7 @@ public class RenderBlockPreview
 	public LinkedList<BlockPos> undoBlocks;
 
 	@SubscribeEvent
-	public void renderAdditionalBlockBounds(DrawBlockHighlightEvent event)
+	public void renderBlockHighlight(DrawHighlightEvent event)
 	{
 		if(event.getTarget().getType() != RayTraceResult.Type.BLOCK) return;
 
@@ -38,15 +38,16 @@ public class RenderBlockPreview
 		ItemStack wand = WandUtil.holdingWand(player);
 		if(wand == null) return;
 
-		if(player.isSneaking()) {
-			blocks = undoBlocks;
-			colorG=1;
-		}
-		else {
+		if(!(player.isSneaking() && Screen.hasControlDown())) {
 			if(wandJob == null || !(wandJob.getRayTraceResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
 				wandJob = WandJob.getJob(player, player.getEntityWorld(), rtr, wand);
 			}
+
 			blocks = wandJob.getBlockPositions();
+		}
+		else {
+			blocks = undoBlocks;
+			colorG = 1;
 		}
 
 		if(blocks == null || blocks.isEmpty()) return;
