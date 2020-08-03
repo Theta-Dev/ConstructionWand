@@ -40,7 +40,8 @@ public class RenderBlockPreview
 		ItemStack wand = WandUtil.holdingWand(player);
 		if(wand == null) return;
 
-		if(!(player.isSneaking() && Screen.hasControlDown())) {
+		//Screen.func_231172_r_(): Screen.hasControlDown()
+		if(!(player.isSneaking() && Screen.func_231172_r_())) {
 			if(wandJob == null || !(wandJob.getRayTraceResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
 				wandJob = WandJob.getJob(player, player.getEntityWorld(), rtr, wand);
 			}

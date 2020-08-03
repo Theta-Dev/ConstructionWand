@@ -59,7 +59,8 @@ public class KeyEvents
 			}
 		}
 
-		boolean ctrlState = Screen.hasControlDown();
+		// Screen.hasControlDown()
+		boolean ctrlState = Screen.func_231172_r_();
 		if(ctrlPressed != ctrlState) {
 			ctrlPressed = ctrlState;
 			PacketQueryUndo packet = new PacketQueryUndo(ctrlPressed);
