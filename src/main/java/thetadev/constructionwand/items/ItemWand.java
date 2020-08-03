@@ -136,7 +136,7 @@ public abstract class ItemWand extends Item
 			IEnumOption opt = WandOptions.options[0];
 			lines.add(new TranslationTextComponent(langTooltip + "blocks", wand.maxBlocks).applyTextStyle(TextFormatting.GRAY));
 			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).applyTextStyle(TextFormatting.AQUA)
-					.appendSibling(new TranslationTextComponent(langPrefix+opt.getTranslationKey()).applyTextStyle(TextFormatting.WHITE)));
+					.appendSibling(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).applyTextStyle(TextFormatting.WHITE)));
 			lines.add(new TranslationTextComponent(langTooltip + "shift").applyTextStyle(TextFormatting.AQUA));
 		}
 	}
