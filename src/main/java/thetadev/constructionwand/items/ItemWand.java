@@ -29,6 +29,7 @@ import thetadev.constructionwand.basics.options.EnumMode;
 import thetadev.constructionwand.basics.options.IEnumOption;
 import thetadev.constructionwand.basics.options.WandOptions;
 import thetadev.constructionwand.job.AngelJob;
+import thetadev.constructionwand.job.JobHistory;
 import thetadev.constructionwand.job.WandJob;
 
 import java.util.List;
@@ -57,7 +58,7 @@ public abstract class ItemWand extends Item
 
 		ItemStack stack = player.getHeldItem(hand);
 
-		if(player.isSneaking()) {
+		if(player.isSneaking() && ConstructionWand.instance.jobHistory.isUndoActive(player)) {
 			WandJob job = ConstructionWand.instance.jobHistory.getForUndo(player, world, context.getPos());
 			if(job == null) return ActionResultType.FAIL;
 			//ConstructionWand.LOGGER.debug("Starting Undo");

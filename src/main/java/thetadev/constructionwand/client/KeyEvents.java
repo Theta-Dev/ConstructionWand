@@ -1,6 +1,7 @@
 package thetadev.constructionwand.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
@@ -8,6 +9,7 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -37,17 +39,32 @@ public class KeyEvents
 			EnumReplace.YES
 	};
 
+	private boolean ctrlPressed;
+
 	public KeyEvents() {
 		for(KeyBinding key : keys) ClientRegistry.registerKeyBinding(key);
+		ctrlPressed = false;
 	}
 
 	@SubscribeEvent
 	public void KeyEvent(InputEvent.KeyInputEvent e) {
+		PlayerEntity player = Minecraft.getInstance().player;
+		if(player == null) return;
+		if(WandUtil.holdingWand(player) == null) return;
+
 		for(int i=0; i<keyOptions.length; i++) {
 			if(keys[i].isPressed()) {
 				PacketWandOption packet = new PacketWandOption(keyOptions[i], true);
 				ConstructionWand.instance.HANDLER.sendToServer(packet);
 			}
+		}
+
+		boolean ctrlState = Screen.hasControlDown();
+		if(ctrlPressed != ctrlState) {
+			ctrlPressed = ctrlState;
+			PacketQueryUndo packet = new PacketQueryUndo(ctrlPressed);
+			ConstructionWand.instance.HANDLER.sendToServer(packet);
+			//ConstructionWand.LOGGER.debug("CTRL key update: "+ctrlPressed);
 		}
 	}
 
@@ -66,6 +83,7 @@ public class KeyEvents
 	}
 
 	// Send undo blocks to player sneaking with wand
+	/*
 	@SubscribeEvent
 	public void sneak(InputUpdateEvent e) {
 		if(e.getMovementInput().sneaking) {
@@ -75,5 +93,5 @@ public class KeyEvents
 			PacketQueryUndo packet = new PacketQueryUndo();
 			ConstructionWand.instance.HANDLER.sendToServer(packet);
 		}
-	}
+	}*/
 }
