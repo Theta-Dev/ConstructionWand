@@ -1,11 +1,9 @@
 package thetadev.constructionwand.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -13,7 +11,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.client.event.DrawHighlightEvent;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.job.WandJob;
@@ -54,24 +52,48 @@ public class RenderBlockPreview
 
 		if(blocks == null || blocks.isEmpty()) return;
 
-		renderBlockList(blocks, event.getMatrix(), event.getBuffers(), colorR, colorG, colorB);
+		for(BlockPos block : blocks) {
+
+			double partialTicks = event.getPartialTicks();
+			double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+			double d1 = player.lastTickPosY + player.getEyeHeight() + (player.posY - player.lastTickPosY) * partialTicks;
+			double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+
+			AxisAlignedBB aabb = new AxisAlignedBB(block).offset(-d0, -d1, -d2);
+			//WorldRenderer.drawSelectionBoundingBox(aabb, colorR, colorG, colorB, 0.4F);
+			drawBoundingBox(aabb, colorR, colorG, colorB, 0.4F);
+		}
 
 		event.setCanceled(true);
 	}
 
-	private void renderBlockList(LinkedList<BlockPos> blocks, MatrixStack ms, IRenderTypeBuffer buffer, float red, float green, float blue) {
-		double renderPosX = Minecraft.getInstance().getRenderManager().info.getProjectedView().getX();
-		double renderPosY = Minecraft.getInstance().getRenderManager().info.getProjectedView().getY();
-		double renderPosZ = Minecraft.getInstance().getRenderManager().info.getProjectedView().getZ();
+	private static void drawBoundingBox(AxisAlignedBB box, float red, float green, float blue, float alpha) {
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder buffer = tessellator.getBuffer();
+		buffer.begin(3, DefaultVertexFormats.POSITION_COLOR);
 
-		ms.push();
-		ms.translate(-renderPosX, -renderPosY, -renderPosZ);
+		//Base
+		buffer.pos(box.minX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.maxX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.maxX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.minX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.minX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
+		//Side1
+		buffer.pos(box.minX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.minX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.minX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
+		//Side2
+		buffer.pos(box.minX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.maxX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
+		//Side3
+		buffer.pos(box.maxX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.maxX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
+		//Side4
+		buffer.pos(box.maxX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
+		buffer.pos(box.minX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
 
-		for(BlockPos block : blocks) {
-			AxisAlignedBB aabb = new AxisAlignedBB(block);
-			IVertexBuilder lineBuilder = buffer.getBuffer(RenderTypes.TRANSLUCENT_LINES);
-			WorldRenderer.drawBoundingBox(ms, lineBuilder, aabb, red, green, blue, 0.4F);
-		}
-		ms.pop();
+		tessellator.draw();
 	}
 }
