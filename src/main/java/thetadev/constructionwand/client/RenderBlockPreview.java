@@ -1,8 +1,8 @@
 package thetadev.constructionwand.client;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,7 +24,7 @@ public class RenderBlockPreview
 	public LinkedList<BlockPos> undoBlocks;
 
 	@SubscribeEvent
-	public void renderBlockHighlight(DrawHighlightEvent event)
+	public void renderBlockHighlight(DrawBlockHighlightEvent event)
 	{
 		if(event.getTarget().getType() != RayTraceResult.Type.BLOCK) return;
 
