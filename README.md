@@ -1,5 +1,5 @@
 # Construction Wand
-With a Construction Wand you can place multiple blocks (up to 1024) at once, extending you build on the side you're facing.
+With a Construction Wand you can place multiple blocks (up to 1024) at once, extending your build on the side you're facing.
 Sneak+Right click to activate angel mode which allows you to place a block at the opposite side of the block facing you.
 If you concentrate enough, you can even conjure a block in mid air!
 
@@ -24,7 +24,7 @@ There are basic wands made from stone, iron and diamond and the Infinity wand.
 ## Modes
 There are four wand tiers: Stone, Iron, Diamond and Infinity.
 
-**Default mode:** Extends your build on the side facing you. Maximum number of blocks depends on wand tier. SHIFT+Scroll to change the placement mode (Horizontal, Vertical, Top/Bottom, No lock).
+**Default mode:** Extends your build on the side facing you. Maximum number of blocks depends on wand tier. SHIFT+scroll to change the placement mode (Horizontal, Vertical, North/South, East/West, No lock).
 
 **Angel mode:** Places a block on the opposite side of the block (or row of blocks) you are facing. Maximum distance depends on wand tier. Right click empty space to place a block in midair (similar to angel blocks, hence the name). To do that, you'll need to have the block you want to place in your offhand. You can't place a block in midair if you've fallen more than 10 blocks deep (no easy rescue tool from falling into the void).
 
