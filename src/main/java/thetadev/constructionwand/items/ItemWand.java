@@ -54,7 +54,7 @@ public abstract class ItemWand extends Item
 		Hand hand = context.getHand();
 		World world = context.getWorld();
 
-		if(world.isRemote) return ActionResultType.FAIL;
+		if(world.isRemote || player == null) return ActionResultType.FAIL;
 
 		ItemStack stack = player.getHeldItem(hand);
 
