@@ -23,7 +23,7 @@ public class AngelJob extends WandJob
 
 	@Override
 	protected void getBlockPositionList() {
-		if(options.getOption(EnumMode.DEFAULT) != EnumMode.ANGEL) return;
+		if(options.getOption(EnumMode.DEFAULT) != EnumMode.ANGEL || wandItem.angelDistance == 0) return;
 
 		if(!player.isCreative() && !ConfigHandler.ANGEL_FALLING.get() && player.fallDistance > 10) return;
 

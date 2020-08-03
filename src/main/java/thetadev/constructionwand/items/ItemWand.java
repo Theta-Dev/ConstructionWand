@@ -51,7 +51,7 @@ public abstract class ItemWand extends Item
 		Hand hand = context.getHand();
 		World world = context.getWorld();
 
-		if(world.isRemote) return ActionResultType.FAIL;
+		if(world.isRemote || player == null) return ActionResultType.FAIL;
 
 		ItemStack stack = player.getHeldItem(hand);
 
@@ -134,7 +134,7 @@ public abstract class ItemWand extends Item
 			IEnumOption opt = WandOptions.options[0];
 			lines.add(new TranslationTextComponent(langTooltip + "blocks", wand.maxBlocks).func_240699_a_(TextFormatting.GRAY));
 			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).func_240699_a_(TextFormatting.AQUA)
-					.func_230529_a_(new TranslationTextComponent(langPrefix+opt.getTranslationKey()).func_240699_a_(TextFormatting.WHITE)));
+					.func_230529_a_(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).func_240699_a_(TextFormatting.WHITE)));
 			lines.add(new TranslationTextComponent(langTooltip + "shift").func_240699_a_(TextFormatting.AQUA));
 		}
 	}
