@@ -29,6 +29,8 @@ There are four wand tiers: Stone, Iron, Diamond and Infinity.
 **Angel mode:** Places a block on the opposite side of the block (or row of blocks) you are facing. Maximum distance depends on wand tier. Right click empty space to place a block in midair (similar to angel blocks, hence the name). To do that, you'll need to have the block you want to place in your offhand. You can't place a block in midair if you've fallen more than 10 blocks deep (no easy rescue tool from falling into the void).
 
 ## Options
+**Direction lock:** To change the direction lock, hold down SHIFT and scroll. With active direction lock the wand will only place blocks in one row or column (choose between North/South, East/West on a horizontal plane and Horizontal, Vertical on a vertical plane). If the direction lock is switched off, the wand will extend the entire face of the building it's pointed at. This option has no effect in Angel mode.
+
 Every wand has two additional options that can be changed using keys. (Standard: N / SHIFT+N)
 
 **Placement direction:** If set to "player" the wand places blocks in the same direction as if they were placed by yourself. Target mode places the blocks in the same direction as their supporting block. See the picture below:

@@ -31,8 +31,4 @@ public enum EnumReplace implements IEnumOption
 	public String getValue() {
 		return this.name().toLowerCase();
 	}
-
-	public String getTranslationKey() {
-		return getOptionKey() + "." + getValue();
-	}
 }

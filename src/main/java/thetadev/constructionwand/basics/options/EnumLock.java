@@ -35,10 +35,6 @@ public enum EnumLock implements IEnumOption
 		return this.name().toLowerCase();
 	}
 
-	public String getTranslationKey() {
-		return getOptionKey() + "." + getValue();
-	}
-
 	public boolean test(EnumLock lock) {
 		if(this == NOLOCK) return true;
 		return this == lock;
