@@ -1,5 +1,6 @@
 package thetadev.constructionwand.basics;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -9,6 +10,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.options.EnumMode;
 import thetadev.constructionwand.basics.options.IEnumOption;
@@ -41,5 +43,9 @@ public class WandUtil
 
 	public static BlockPos playerPos(PlayerEntity player) {
 		return new BlockPos(player.getPositionVec());
+	}
+	
+	public static Vec3d entityPositionVec(Entity entity) {
+		return new Vec3d(entity.getPosX(), entity.getPosY() - entity.getYOffset() + entity.getHeight()/2, entity.getPosZ());
 	}
 }
