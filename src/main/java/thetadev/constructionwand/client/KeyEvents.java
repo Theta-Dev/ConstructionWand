@@ -85,17 +85,4 @@ public class KeyEvents
 		ConstructionWand.instance.HANDLER.sendToServer(packet);
 		e.setCanceled(true);
 	}
-
-	// Send undo blocks to player sneaking with wand
-	/*
-	@SubscribeEvent
-	public void sneak(InputUpdateEvent e) {
-		if(e.getMovementInput().sneak) {
-			PlayerEntity player = e.getPlayer();
-			if(WandUtil.holdingWand(player) == null) return;
-
-			PacketQueryUndo packet = new PacketQueryUndo();
-			ConstructionWand.instance.HANDLER.sendToServer(packet);
-		}
-	}*/
 }

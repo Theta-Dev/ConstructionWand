@@ -5,7 +5,9 @@ public interface IEnumOption
 	public int getOrdinal();
 	public String getOptionKey();
 	public String getValue();
-	public String getTranslationKey();
+	default String getTranslationKey() {
+		return getOptionKey() + "." + getValue();
+	}
 	public IEnumOption next(boolean dir);
 	public IEnumOption fromName(String name);
 }

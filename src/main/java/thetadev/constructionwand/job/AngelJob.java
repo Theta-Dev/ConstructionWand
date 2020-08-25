@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.ConfigHandler;
+import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.options.EnumMode;
 
 public class AngelJob extends WandJob
@@ -26,14 +27,14 @@ public class AngelJob extends WandJob
 
 		if(!player.isCreative() && !ConfigHandler.ANGEL_FALLING.get() && player.fallDistance > 10) return;
 
-		BlockPos currentPos = rayTraceResult.getPos();
+		Vec3d playerVec = WandUtil.entityPositionVec(player);
+		Vec3d lookVec = player.getLookVec().mul(2, 2, 2);
+		Vec3d placeVec = playerVec.add(lookVec);
 
-		for(int i=0; i<3; i++) {
-			currentPos = currentPos.offset(rayTraceResult.getFace());
-			if(canPlace(currentPos)) {
-				placeSnapshots.add(new PlaceSnapshot(currentPos, placeItem.getBlock().getDefaultState()));
-				break;
-			}
+		BlockPos currentPos = new BlockPos(placeVec);
+
+		if(canPlace(currentPos)) {
+			placeSnapshots.add(new PlaceSnapshot(currentPos, placeItem.getBlock().getDefaultState()));
 		}
 	}
 }
