@@ -183,7 +183,8 @@ public abstract class WandJob
 		if(!world.isBlockPresent(pos)) return false;
 
 		// Is block at pos replaceable?
-		BlockItemUseContext ctx = new WandItemUseContext(world, player, new ItemStack(placeItem),  new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), pos, false));
+		//BlockItemUseContext ctx = new WandItemUseContext(world, player, new ItemStack(placeItem),  new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), pos, false));
+		BlockItemUseContext ctx = new WandItemUseContext(this, pos);
 		if(!ctx.canPlace()) return false;
 
 		// If replace mode is off, target has to be air
@@ -203,8 +204,10 @@ public abstract class WandJob
 	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
 		BlockPos blockPos = placeSnapshot.pos;
 
-		BlockItemUseContext ctx = new WandItemUseContext(world, player, new ItemStack(placeItem),  new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), blockPos, false));
+		//BlockItemUseContext ctx = new WandItemUseContext(world, player, new ItemStack(placeItem),  new BlockRayTraceResult(rayTraceResult.getHitVec(), rayTraceResult.getFace(), blockPos, false));
+		BlockItemUseContext ctx = new WandItemUseContext(this, blockPos);
 		if(!ctx.canPlace()) return false;
+
 		BlockState placeBlock = Block.getBlockFromItem(placeItem).getStateForPlacement(ctx);
 		if(placeBlock == null) return false;
 		placeBlock = Block.getValidBlockForPosition(placeBlock, world, blockPos);
