@@ -219,7 +219,7 @@ public abstract class WandJob
 
 		BlockState supportingBlock = placeSnapshot.supportingBlock;
 
-		if(targetDirection && placeBlock.getBlock() == supportingBlock.getBlock()) {
+		if(targetDirection) {
 			// Block properties to be copied (alignment/rotation properties)
 			for(IProperty property : new IProperty[] {
 					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,

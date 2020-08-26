@@ -1,10 +1,10 @@
 modLoader="javafml"
-loaderVersion="[31,)"
+loaderVersion="[28,)"
 [[mods]]
 modId="constructionwand"
 version="${file.jarVersion}"
 displayName="Construction Wand"
-displayURL="https://github.com/Theta-Dev/ConstructionWand"
+displayURL="https://github.com/Theta-Dev/ConstructionWand" #optional
 logoFile="logo.png"
 authors="ThetaDev"
 description='''
@@ -19,12 +19,12 @@ This is my first minecraft mod. May the odds be ever in your favor.
 [[dependencies.constructionwand]]
     modId="forge"
     mandatory=true
-    versionRange="[31,)"
+    versionRange="[28,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.constructionwand]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15.2]"
+    versionRange="[1.14.4]"
     ordering="NONE"
     side="BOTH"
