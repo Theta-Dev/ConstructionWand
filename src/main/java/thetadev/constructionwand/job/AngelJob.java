@@ -27,9 +27,9 @@ public class AngelJob extends WandJob
 
 		if(!player.isCreative() && !ConfigHandler.ANGEL_FALLING.get() && player.fallDistance > 10) return;
 
-		Vec3d playerVec = WandUtil.entityPositionVec(player);
-		Vec3d lookVec = player.getLookVec().mul(2, 2, 2);
-		Vec3d placeVec = playerVec.add(lookVec);
+		Vector3d playerVec = WandUtil.entityPositionVec(player);
+		Vector3d lookVec = player.getLookVec().mul(2, 2, 2);
+		Vector3d placeVec = playerVec.add(lookVec);
 
 		BlockPos currentPos = new BlockPos(placeVec);
 

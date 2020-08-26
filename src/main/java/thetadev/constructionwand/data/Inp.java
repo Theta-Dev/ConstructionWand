@@ -3,7 +3,7 @@ package thetadev.constructionwand.data;
 import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.IItemProvider;
 
 public class Inp
@@ -21,7 +21,7 @@ public class Inp
 	public static Inp fromItem(IItemProvider in) {
 		return new Inp(in.asItem().getRegistryName().getPath(), Ingredient.fromItems(in), ItemPredicate.Builder.create().item(in).build());
 	}
-	public static Inp fromTag(Tag<Item> in) {
-		return new Inp(in.getId().getPath(), Ingredient.fromTag(in), ItemPredicate.Builder.create().tag(in).build());
+	public static Inp fromTag(ITag.INamedTag<Item> in) {
+		return new Inp(in.getName().getPath(), Ingredient.fromTag(in), ItemPredicate.Builder.create().tag(in).build());
 	}
 }

@@ -122,21 +122,20 @@ public abstract class ItemWand extends Item
 		String langPrefix = ConstructionWand.MODID + ".option.";
 		String langTooltip = ConstructionWand.MODID + ".tooltip.";
 
-		// Screen.hasShiftDown()
-		if(Screen.func_231173_s_()) {
+		if(Screen.hasShiftDown()) {
 			for(int i=1; i<WandOptions.options.length; i++) {
 				IEnumOption opt = WandOptions.options[i];
-				lines.add(new TranslationTextComponent(langPrefix + opt.getOptionKey()).func_240699_a_(TextFormatting.AQUA) //.applyTextStyle()
-						.func_230529_a_(new TranslationTextComponent(langPrefix + options.getOption(opt).getTranslationKey()).func_240699_a_(TextFormatting.GRAY)) //.appendSibling()
+				lines.add(new TranslationTextComponent(langPrefix + opt.getOptionKey()).mergeStyle(TextFormatting.AQUA)
+						.append(new TranslationTextComponent(langPrefix + options.getOption(opt).getTranslationKey()).mergeStyle(TextFormatting.GRAY))
 				);
 			}
 		}
 		else {
 			IEnumOption opt = WandOptions.options[0];
-			lines.add(new TranslationTextComponent(langTooltip + "blocks", wand.maxBlocks).func_240699_a_(TextFormatting.GRAY));
-			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).func_240699_a_(TextFormatting.AQUA)
-					.func_230529_a_(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).func_240699_a_(TextFormatting.WHITE)));
-			lines.add(new TranslationTextComponent(langTooltip + "shift").func_240699_a_(TextFormatting.AQUA));
+			lines.add(new TranslationTextComponent(langTooltip + "blocks", wand.maxBlocks).mergeStyle(TextFormatting.GRAY));
+			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).mergeStyle(TextFormatting.AQUA)
+					.append(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).mergeStyle(TextFormatting.WHITE)));
+			lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));
 		}
 	}
 
@@ -144,10 +143,10 @@ public abstract class ItemWand extends Item
 		String langPrefix = ConstructionWand.MODID + ".option.";
 
 		player.sendStatusMessage(
-				new TranslationTextComponent(langPrefix+option.getOptionKey()).func_240699_a_(TextFormatting.AQUA)
-						.func_230529_a_(new TranslationTextComponent(langPrefix+option.getTranslationKey()).func_240699_a_(TextFormatting.WHITE))
-						.func_230529_a_(new StringTextComponent(" - ").func_240699_a_(TextFormatting.GRAY))
-						.func_230529_a_(new TranslationTextComponent(langPrefix+option.getTranslationKey()+".desc").func_240699_a_(TextFormatting.WHITE))
+				new TranslationTextComponent(langPrefix+option.getOptionKey()).mergeStyle(TextFormatting.AQUA)
+						.append(new TranslationTextComponent(langPrefix+option.getTranslationKey()).mergeStyle(TextFormatting.WHITE))
+						.append(new StringTextComponent(" - ").mergeStyle(TextFormatting.GRAY))
+						.append(new TranslationTextComponent(langPrefix+option.getTranslationKey()+".desc").mergeStyle(TextFormatting.WHITE))
 				, true);
 	}
 }

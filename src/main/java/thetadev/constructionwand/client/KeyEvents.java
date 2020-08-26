@@ -58,9 +58,8 @@ public class KeyEvents
 				ConstructionWand.instance.HANDLER.sendToServer(packet);
 			}
 		}
-
-		// Screen.hasControlDown()
-		boolean ctrlState = Screen.func_231172_r_();
+		
+		boolean ctrlState = Screen.hasControlDown();
 		if(ctrlPressed != ctrlState) {
 			ctrlPressed = ctrlState;
 			PacketQueryUndo packet = new PacketQueryUndo(ctrlPressed);

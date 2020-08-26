@@ -12,7 +12,7 @@ public class ItemWandInfinity extends ItemWand
 	public ItemWandInfinity(int maxBlocks, int angelDistance)
 	{
 		//func_234689_a_(): Dont burn like Netherite
-		super(new Item.Properties().maxStackSize(1).func_234689_a_(), maxBlocks, angelDistance);
+		super(new Item.Properties().maxStackSize(1).isBurnable(), maxBlocks, angelDistance);
 	}
 
 	@Override

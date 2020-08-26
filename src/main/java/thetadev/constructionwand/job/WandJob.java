@@ -221,8 +221,7 @@ public abstract class WandJob
 					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
 					BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
 			{
-				// supportingBlock.has(property)
-				if(supportingBlock.func_235901_b_(property)) {
+				if(supportingBlock.hasProperty(property)) {
 					placeBlock = placeBlock.with(property, supportingBlock.get(property));
 				}
 			}

@@ -4,21 +4,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import thetadev.constructionwand.basics.options.EnumMode;
-import thetadev.constructionwand.basics.options.IEnumOption;
-import thetadev.constructionwand.basics.options.WandOptions;
+import net.minecraft.util.math.vector.Vector3d;
 import thetadev.constructionwand.items.ItemWand;
-import thetadev.constructionwand.job.ConstructionJob;
-import thetadev.constructionwand.job.TransductionJob;
-import thetadev.constructionwand.job.WandJob;
 
 public class WandUtil
 {
@@ -45,7 +34,11 @@ public class WandUtil
 		return new BlockPos(player.getPositionVec());
 	}
 	
-	public static Vec3d entityPositionVec(Entity entity) {
-		return new Vec3d(entity.getPosX(), entity.getPosY() - entity.getYOffset() + entity.getHeight()/2, entity.getPosZ());
+	public static Vector3d entityPositionVec(Entity entity) {
+		return new Vector3d(entity.getPosX(), entity.getPosY() - entity.getYOffset() + entity.getHeight()/2, entity.getPosZ());
+	}
+
+	public static Vector3d blockPosVec(BlockPos pos) {
+		return new Vector3d(pos.getX(), pos.getY(), pos.getZ());
 	}
 }
