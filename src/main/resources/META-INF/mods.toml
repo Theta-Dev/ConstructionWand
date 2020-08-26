@@ -17,9 +17,9 @@ If you concentrate enough, you can even conjure a block in mid air!
 This is my first minecraft mod. May the odds be ever in your favor.
 '''
 [[dependencies.constructionwand]]
-    modId="forge" #mandatory
-    mandatory=true #mandatory
-    versionRange="[31,)" #mandatory
+    modId="forge"
+    mandatory=true
+    versionRange="[31,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.constructionwand]]
