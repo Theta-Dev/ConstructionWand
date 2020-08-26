@@ -12,6 +12,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -197,8 +198,10 @@ public abstract class WandJob
 		blockState = Block.getValidBlockForPosition(blockState, world, pos);
 		if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) return false;
 
-		// No entities in area?
-		AxisAlignedBB blockBB = blockState.getCollisionShape(world, pos).getBoundingBox().offset(pos);
+		// No entities colliding?
+		VoxelShape shape = blockState.getCollisionShape(world, pos);
+		if(shape.isEmpty()) return true;
+		AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
 		return world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty();
 	}
 
