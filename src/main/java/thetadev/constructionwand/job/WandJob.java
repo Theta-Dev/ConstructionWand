@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.state.properties.SlabType;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -197,7 +198,7 @@ public abstract class WandJob
 		if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) return false;
 
 		// No entities in area?
-		AxisAlignedBB blockBB = new AxisAlignedBB(pos);
+		AxisAlignedBB blockBB = blockState.getCollisionShape(world, pos).getBoundingBox().offset(pos);
 		return world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty();
 	}
 
@@ -224,6 +225,12 @@ public abstract class WandJob
 				if(supportingBlock.has(property)) {
 					placeBlock = placeBlock.with(property, supportingBlock.get(property));
 				}
+			}
+
+			// Dont dupe double slabs
+			if(supportingBlock.has(BlockStateProperties.SLAB_TYPE)) {
+				SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
+				if(slabType != SlabType.DOUBLE) placeBlock = placeBlock.with(BlockStateProperties.SLAB_TYPE, slabType);
 			}
 		}
 		// Abort if placeEvent is canceled
