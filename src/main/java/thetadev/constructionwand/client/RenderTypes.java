@@ -17,7 +17,7 @@ public class RenderTypes
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 	}, RenderSystem::disableBlend);
-	protected static final RenderState.DepthTestState DEPTH_ALWAYS = new RenderState.DepthTestState(GL11.GL_ALWAYS);
+	protected static final RenderState.DepthTestState DEPTH_ALWAYS = new RenderState.DepthTestState("always", GL11.GL_ALWAYS);
 
 	static {
 		RenderType.State translucentNoDepthState = RenderType.State.getBuilder().transparency(TRANSLUCENT_TRANSPARENCY)

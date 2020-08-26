@@ -4,8 +4,9 @@ import net.minecraft.block.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.state.properties.SlabType;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -197,7 +198,7 @@ public abstract class WandJob
 		if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) return false;
 
 		// No entities in area?
-		AxisAlignedBB blockBB = new AxisAlignedBB(pos);
+		AxisAlignedBB blockBB = blockState.getCollisionShape(world, pos).getBoundingBox().offset(pos);
 		return world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty();
 	}
 
@@ -215,29 +216,41 @@ public abstract class WandJob
 
 		BlockState supportingBlock = placeSnapshot.supportingBlock;
 
-		if(targetDirection && placeBlock.getBlock() == supportingBlock.getBlock()) {
+		if(targetDirection) {
 			// Block properties to be copied (alignment/rotation properties)
-			for(IProperty property : new IProperty[] {
+			for(Property property : new Property[] {
 					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
 					BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
 			{
-				if(supportingBlock.has(property)) {
+				if(supportingBlock.hasProperty(property)) {
 					placeBlock = placeBlock.with(property, supportingBlock.get(property));
 				}
 			}
+
+			// Dont dupe double slabs
+			if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE)) {
+				SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
+				if(slabType != SlabType.DOUBLE) placeBlock = placeBlock.with(BlockStateProperties.SLAB_TYPE, slabType);
+			}
 		}
-		// Abort if placeEvent is canceled
-		BlockSnapshot snapshot = new BlockSnapshot(world, blockPos, placeBlock);
-		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
-		MinecraftForge.EVENT_BUS.post(placeEvent);
-		if(placeEvent.isCanceled()) return false;
 
 		// Place the block
 		if(!world.setBlockState(blockPos, placeBlock)) {
 			ConstructionWand.LOGGER.info("Block could not be placed");
 			return false;
 		}
-		world.notifyNeighbors(blockPos, placeBlock.getBlock());
+
+		// Remove block if placeEvent is canceled
+		BlockSnapshot snapshot = BlockSnapshot.create(world, blockPos);
+		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
+		MinecraftForge.EVENT_BUS.post(placeEvent);
+		if(placeEvent.isCanceled()) {
+			world.removeBlock(blockPos, false);
+			return false;
+		}
+
+		// Update neighbor block states
+		world.notifyNeighborsOfStateChange(blockPos, placeBlock.getBlock());
 
 		// Update stats
 		player.addStat(Stats.ITEM_USED.get(placeItem));
@@ -271,7 +284,7 @@ public abstract class WandJob
 		// Play place sound
 		if(!placeSnapshots.isEmpty()) {
 			SoundType sound = placeSnapshots.getFirst().block.getSoundType();
-			world.playSound(null, player.getPosition(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
+			world.playSound(null, WandUtil.playerPos(player), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
 		}
 
 		// Add to job history for undo
@@ -307,7 +320,7 @@ public abstract class WandJob
 
 		// Play teleport sound
 		SoundEvent sound = SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT;
-		world.playSound(null, player.getPosition(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
+		world.playSound(null, WandUtil.playerPos(player), sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
 		return true;
 	}

@@ -58,7 +58,7 @@ public class KeyEvents
 				ConstructionWand.instance.HANDLER.sendToServer(packet);
 			}
 		}
-
+		
 		boolean ctrlState = Screen.hasControlDown();
 		if(ctrlPressed != ctrlState) {
 			ctrlPressed = ctrlState;
