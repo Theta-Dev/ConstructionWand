@@ -18,7 +18,6 @@ import thetadev.constructionwand.client.KeyEvents;
 import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
-import thetadev.constructionwand.items.ModItems;
 import thetadev.constructionwand.job.JobHistory;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketUndoBlocks;
@@ -76,6 +75,5 @@ public class ConstructionWand
         renderBlockPreview = new RenderBlockPreview();
         MinecraftForge.EVENT_BUS.register(renderBlockPreview);
         MinecraftForge.EVENT_BUS.register(new KeyEvents());
-        ModItems.registerModelProperties();
     }
 }
