@@ -43,6 +43,8 @@ public abstract class ItemWand extends Item
 		super(properties.group(ItemGroup.TOOLS));
 		this.maxBlocks = maxBlocks;
 		this.angelDistance = angelDistance;
+		addPropertyOverride(new ResourceLocation(ConstructionWand.MODID, "wand_mode"),
+				(stack, worldIn, entityIn) -> getWandMode(stack));
 	}
 
 	@Override
@@ -125,17 +127,17 @@ public abstract class ItemWand extends Item
 		if(Screen.hasShiftDown()) {
 			for(int i=1; i<WandOptions.options.length; i++) {
 				IEnumOption opt = WandOptions.options[i];
-				lines.add(new TranslationTextComponent(langPrefix + opt.getOptionKey()).mergeStyle(TextFormatting.AQUA)
-						.append(new TranslationTextComponent(langPrefix + options.getOption(opt).getTranslationKey()).mergeStyle(TextFormatting.GRAY))
+				lines.add(new TranslationTextComponent(langPrefix + opt.getOptionKey()).applyTextStyle(TextFormatting.AQUA)
+						.appendSibling(new TranslationTextComponent(langPrefix + options.getOption(opt).getTranslationKey()).applyTextStyle(TextFormatting.GRAY))
 				);
 			}
 		}
 		else {
 			IEnumOption opt = WandOptions.options[0];
-			lines.add(new TranslationTextComponent(langTooltip + "blocks", wand.maxBlocks).mergeStyle(TextFormatting.GRAY));
-			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).mergeStyle(TextFormatting.AQUA)
-					.append(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).mergeStyle(TextFormatting.WHITE)));
-			lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));
+			lines.add(new TranslationTextComponent(langTooltip + "blocks", wand.maxBlocks).applyTextStyle(TextFormatting.GRAY));
+			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).applyTextStyle(TextFormatting.AQUA)
+					.appendSibling(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).applyTextStyle(TextFormatting.WHITE)));
+			lines.add(new TranslationTextComponent(langTooltip + "shift").applyTextStyle(TextFormatting.AQUA));
 		}
 	}
 
@@ -143,10 +145,10 @@ public abstract class ItemWand extends Item
 		String langPrefix = ConstructionWand.MODID + ".option.";
 
 		player.sendStatusMessage(
-				new TranslationTextComponent(langPrefix+option.getOptionKey()).mergeStyle(TextFormatting.AQUA)
-						.append(new TranslationTextComponent(langPrefix+option.getTranslationKey()).mergeStyle(TextFormatting.WHITE))
-						.append(new StringTextComponent(" - ").mergeStyle(TextFormatting.GRAY))
-						.append(new TranslationTextComponent(langPrefix+option.getTranslationKey()+".desc").mergeStyle(TextFormatting.WHITE))
+				new TranslationTextComponent(langPrefix+option.getOptionKey()).applyTextStyle(TextFormatting.AQUA)
+						.appendSibling(new TranslationTextComponent(langPrefix+option.getTranslationKey()).applyTextStyle(TextFormatting.WHITE))
+						.appendSibling(new StringTextComponent(" - ").applyTextStyle(TextFormatting.GRAY))
+						.appendSibling(new TranslationTextComponent(langPrefix+option.getTranslationKey()+".desc").applyTextStyle(TextFormatting.WHITE))
 				, true);
 	}
 }

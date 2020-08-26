@@ -1,13 +1,12 @@
 modLoader="javafml"
-loaderVersion="[32,)"
-license="MIT License"
+loaderVersion="[31,)"
 [[mods]]
 modId="constructionwand"
 version="${file.jarVersion}"
 displayName="Construction Wand"
-displayURL="https://github.com/Theta-Dev/ConstructionWand" #optional
-logoFile="logo.png" #optional
-authors="ThetaDev" #optional
+displayURL="https://github.com/Theta-Dev/ConstructionWand"
+logoFile="logo.png"
+authors="ThetaDev"
 description='''
 Construction Wands make building easier!
 
@@ -18,14 +17,14 @@ If you concentrate enough, you can even conjure a block in mid air!
 This is my first minecraft mod. May the odds be ever in your favor.
 '''
 [[dependencies.constructionwand]]
-    modId="forge"
-    mandatory=true
-    versionRange="[32,)"
+    modId="forge" #mandatory
+    mandatory=true #mandatory
+    versionRange="[31,)" #mandatory
     ordering="NONE"
     side="BOTH"
 [[dependencies.constructionwand]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1]"
+    versionRange="[1.15.2]"
     ordering="NONE"
     side="BOTH"
