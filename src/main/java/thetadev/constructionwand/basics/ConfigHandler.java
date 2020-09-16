@@ -4,6 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.Items;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModList;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +31,7 @@ public class ConfigHandler
 
 	public static final ForgeConfigSpec.IntValue UNDO_HISTORY;
 	public static final ForgeConfigSpec.BooleanValue ANGEL_FALLING;
+	public static final ForgeConfigSpec.EnumValue<EnumShovelTrowel> SHOVEL_AS_TROWEL;
 
 	static {
 		BUILDER.comment("Wand durability");
@@ -62,8 +64,25 @@ public class ConfigHandler
 		UNDO_HISTORY = BUILDER.defineInRange("UndoHistory", 3, 0, Integer.MAX_VALUE);
 		BUILDER.comment("Place blocks below you while falling > 10 blocks with angel mode (Can be used to save you from drops/the void)");
 		ANGEL_FALLING = BUILDER.define("AngelFalling", false);
+		BUILDER.comment("Use shovels like trowels (Holding in offhand will make wand use random blocks from your hotbar). Default: Only when Quark is not installed.");
+		SHOVEL_AS_TROWEL = BUILDER.defineEnum("ShovelAsTrowel", EnumShovelTrowel.NOQUARK);
 		BUILDER.pop();
 	}
 
 	public static final ForgeConfigSpec SPEC = BUILDER.build();
+
+	public enum EnumShovelTrowel {
+		TRUE,
+		FALSE,
+		NOQUARK;
+
+		public boolean isEn() {
+			switch(this) {
+				case TRUE: return true;
+				case FALSE: return false;
+				case NOQUARK: return !ModList.get().isLoaded("quark");
+			}
+			return false;
+		}
+	}
 }

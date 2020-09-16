@@ -7,7 +7,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
-import thetadev.constructionwand.items.ItemWand;
 
 public class TransductionJob extends WandJob
 {
@@ -23,8 +22,10 @@ public class TransductionJob extends WandJob
 
 		for(int i=0; i<wandItem.angelDistance; i++) {
 			currentPos = currentPos.offset(placeDirection.getOpposite());
-			if(canPlace(currentPos)) {
-				placeSnapshots.add(new PlaceSnapshot(currentPos, supportingBlock));
+
+			PlaceSnapshot snapshot = getPlaceSnapshot(currentPos, supportingBlock);
+			if(snapshot != null) {
+				placeSnapshots.add(snapshot);
 				break;
 			}
 		}

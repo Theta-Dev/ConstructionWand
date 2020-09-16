@@ -9,9 +9,7 @@ import thetadev.constructionwand.basics.ConfigHandler;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 public class JobHistory
 {
@@ -48,13 +46,13 @@ public class JobHistory
 		entry.undoActive = ctrlDown;
 
 		LinkedList<WandJob> jobs = entry.jobs;
-		LinkedList<BlockPos> positions;
+		Set<BlockPos> positions;
 
 		// Send block positions of most recent job to client
-		if(jobs.isEmpty()) positions = new LinkedList<>();
+		if(jobs.isEmpty()) positions = Collections.emptySet();
 		else {
 			WandJob job = jobs.getLast();
-			if(job == null || !job.getWorld().equals(world)) positions = new LinkedList<>();
+			if(job == null || !job.getWorld().equals(world)) positions = Collections.emptySet();
 			else positions = job.getBlockPositions();
 		}
 

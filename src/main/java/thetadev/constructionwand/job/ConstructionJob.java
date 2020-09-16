@@ -7,7 +7,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
-import thetadev.constructionwand.ConstructionWand;
+import thetadev.constructionwand.basics.ReplacementRegistry;
 import thetadev.constructionwand.basics.options.EnumLock;
 
 import java.util.HashSet;
@@ -43,8 +43,10 @@ public class ConstructionJob extends WandJob
 				BlockPos supportingPoint = currentCandidate.offset(placeDirection.getOpposite());
 				BlockState candidateSupportingBlock = world.getBlockState(supportingPoint);
 
-				if (targetBlock.getBlock().equals(candidateSupportingBlock.getBlock()) && canPlace(currentCandidate) && allCandidates.add(currentCandidate)) {
-					placeSnapshots.add(new PlaceSnapshot(currentCandidate, candidateSupportingBlock));
+				if(ReplacementRegistry.matchBlocks(targetBlock.getBlock(), candidateSupportingBlock.getBlock()) && allCandidates.add(currentCandidate)) {
+					PlaceSnapshot snapshot = getPlaceSnapshot(currentCandidate, candidateSupportingBlock);
+					if(snapshot == null) continue;
+					placeSnapshots.add(snapshot);
 
 					switch(placeDirection) {
 						case DOWN:

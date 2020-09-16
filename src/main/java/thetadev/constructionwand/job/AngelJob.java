@@ -1,5 +1,6 @@
 package thetadev.constructionwand.job;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -33,8 +34,9 @@ public class AngelJob extends WandJob
 
 		BlockPos currentPos = new BlockPos(placeVec);
 
-		if(canPlace(currentPos)) {
-			placeSnapshots.add(new PlaceSnapshot(currentPos, placeItem.getBlock().getDefaultState()));
+		PlaceSnapshot snapshot = getPlaceSnapshot(currentPos, Blocks.AIR.getDefaultState());
+		if(snapshot != null) {
+			placeSnapshots.add(snapshot);
 		}
 	}
 }
