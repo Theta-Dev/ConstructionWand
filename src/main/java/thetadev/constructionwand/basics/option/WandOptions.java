@@ -53,7 +53,7 @@ public class WandOptions
 
 		mode = new OptionEnum<>(tag, "mode", MODE.class, MODE.DEFAULT, ConfigServer.getWandProperties(wand).getAngel() > 0);
 		lock = new OptionEnum<>(tag, "lock", LOCK.class, LOCK.NOLOCK);
-		direction = new OptionEnum<>(tag, "direction", DIRECTION.class, DIRECTION.PLAYER);
+		direction = new OptionEnum<>(tag, "direction", DIRECTION.class, DIRECTION.TARGET);
 		replace = new OptionBoolean(tag, "replace", true);
 		match = new OptionEnum<>(tag, "match", MATCH.class, MATCH.SIMILAR);
 		random = new OptionBoolean(tag, "random", false);
