@@ -302,7 +302,7 @@ public abstract class WandJob
 		}
 
 		// Remove block if placeEvent is canceled
-		BlockSnapshot snapshot = BlockSnapshot.create(world.func_234923_W_(), world, blockPos);
+		BlockSnapshot snapshot = BlockSnapshot.create(world, blockPos);
 		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
 		MinecraftForge.EVENT_BUS.post(placeEvent);
 		if(placeEvent.isCanceled()) {
