@@ -19,7 +19,7 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.world.BlockEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
-import thetadev.constructionwand.basics.options.*;
+import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.ItemWand;
 
@@ -34,14 +34,11 @@ public abstract class WandJob
 	protected BlockRayTraceResult rayTraceResult;
 	protected ItemStack wand;
 	protected ItemWand wandItem;
-	protected WandOptions options;
 
 	// Wand options
+	protected WandOptions options;
 	protected int maxBlocks;
-	protected boolean doReplace;
-	protected boolean targetDirection;
-	protected boolean randomMode;
-	protected EnumMatch matchMode;
+	protected boolean doRandomize;
 
 	protected LinkedHashMap<BlockItem, Integer> itemCounts;
 	protected HashMap<BlockItem, Integer> itemWeights;
@@ -64,10 +61,7 @@ public abstract class WandJob
 
 		// Get options
 		options = new WandOptions(wand);
-		doReplace = options.getOption(EnumReplace.YES) == EnumReplace.YES;
-		targetDirection = options.getOption(EnumDirection.TARGET) == EnumDirection.TARGET;
-		randomMode = options.getOption(EnumRandom.NO) == EnumRandom.YES;
-		matchMode = (EnumMatch) options.getOption(EnumMatch.SIMILAR);
+		doRandomize = options.random.get();
 
 		// Get place item
 		addBlockItems();
@@ -91,10 +85,10 @@ public abstract class WandJob
 	}
 
 	public static WandJob getJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack itemStack) {
-		IEnumOption mode = new WandOptions(itemStack).getOption(EnumMode.DEFAULT);
+		WandOptions options = new WandOptions(itemStack);
 
-		if(mode == EnumMode.ANGEL) return new TransductionJob(player, world, rayTraceResult, itemStack);
-		else return new ConstructionJob(player, world, rayTraceResult, itemStack);
+		if(options.mode.get() == WandOptions.MODE.ANGEL) return new TransductionJob(player, world, rayTraceResult, itemStack);
+		return new ConstructionJob(player, world, rayTraceResult, itemStack);
 	}
 
 	public Set<BlockPos> getBlockPositions() {
@@ -129,8 +123,8 @@ public abstract class WandJob
 		Block targetBlock = targetState.getBlock();
 		ItemStack offhandStack = player.getHeldItem(Hand.OFF_HAND);
 
-		if(randomMode) {
-			for(ItemStack stack : WandUtil.getHotbar(player)) {
+		if(doRandomize) {
+			for(ItemStack stack : WandUtil.getHotbarWithOffhand(player)) {
 				if(stack.getItem() instanceof BlockItem) {
 					BlockItem item = (BlockItem) stack.getItem();
 					addBlockItem(item);
@@ -145,18 +139,18 @@ public abstract class WandJob
 
 		// Otherwise use target block
 		if(itemCounts.isEmpty()) {
-			Item item = targetBlock.getPickBlock(targetState, rayTraceResult, world, targetPos, player).getItem();
+			Item item = targetBlock.asItem();
 			if(item instanceof BlockItem) {
 				addBlockItem((BlockItem) item);
 
 				// Add replacement items
-				if(matchMode != EnumMatch.EXACT) {
+				if(options.match.get() != WandOptions.MATCH.EXACT) {
 					for(Item it : ReplacementRegistry.getMatchingSet(item)) {
 						if(it instanceof BlockItem) addBlockItem((BlockItem) it);
 					}
 				}
 			}
-			randomMode = false;
+			doRandomize = false;
 		}
 	}
 
@@ -236,7 +230,7 @@ public abstract class WandJob
 		if(!ctx.canPlace()) return null;
 
 		// If replace mode is off, target has to be air
-		if(!doReplace && !world.isAirBlock(pos)) return null;
+		if(!options.replace.get() && !world.isAirBlock(pos)) return null;
 
 		// Can block be placed?
 		BlockState placeBlock = Block.getBlockFromItem(item).getStateForPlacement(ctx);
@@ -252,7 +246,7 @@ public abstract class WandJob
 		}
 
 		// Copy certain properties of supporting block (save the effort when running preview on client)
-		if(targetDirection && !world.isRemote) {
+		if(options.direction.get() == WandOptions.DIRECTION.TARGET && !world.isRemote) {
 			// Block properties to be copied (alignment/rotation properties)
 			for(Property property : new Property[] {
 					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
@@ -275,7 +269,7 @@ public abstract class WandJob
 	@Nullable
 	protected PlaceSnapshot getPlaceSnapshot(BlockPos pos, BlockState supportingBlock) {
 		ArrayList<BlockItem> items = new ArrayList<>(itemCounts.keySet());
-		if(randomMode) {
+		if(doRandomize) {
 			for(BlockItem item : itemWeights.keySet()) {
 				int weight = itemWeights.get(item);
 				for(int i=0; i<weight-1; i++) items.add(item);
@@ -327,7 +321,7 @@ public abstract class WandJob
 	}
 
 	protected boolean matchBlocks(Block b1, Block b2) {
-		switch(matchMode) {
+		switch(options.match.get()) {
 			case EXACT: return b1 == b2;
 			case SIMILAR: return ReplacementRegistry.matchBlocks(b1, b2);
 			case ANY: return b1 != Blocks.AIR && b2 != Blocks.AIR;

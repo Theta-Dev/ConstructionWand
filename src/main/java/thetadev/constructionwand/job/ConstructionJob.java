@@ -7,8 +7,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
-import thetadev.constructionwand.basics.ReplacementRegistry;
-import thetadev.constructionwand.basics.options.EnumLock;
+import thetadev.constructionwand.basics.option.WandOptions;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,8 +20,6 @@ public class ConstructionJob extends WandJob
 
 	@Override
 	protected void getBlockPositionList() {
-		EnumLock lock = (EnumLock) options.getOption(EnumLock.NOLOCK);
-
 		LinkedList<BlockPos> candidates = new LinkedList<>();
 		HashSet<BlockPos> allCandidates = new HashSet<>();
 
@@ -32,9 +29,9 @@ public class ConstructionJob extends WandJob
 
 		// Is place direction allowed by lock?
 		if(placeDirection == Direction.UP || placeDirection == Direction.DOWN) {
-			if(lock.test(EnumLock.NORTHSOUTH) || lock.test(EnumLock.EASTWEST)) candidates.add(startingPoint);
+			if(options.testLock(WandOptions.LOCK.NORTHSOUTH) || options.testLock(WandOptions.LOCK.EASTWEST)) candidates.add(startingPoint);
 		}
-		else if(lock.test(EnumLock.HORIZONTAL) || lock.test(EnumLock.VERTICAL)) candidates.add(startingPoint);
+		else if(options.testLock(WandOptions.LOCK.HORIZONTAL) || options.testLock(WandOptions.LOCK.VERTICAL)) candidates.add(startingPoint);
 
 		while(!candidates.isEmpty() && placeSnapshots.size() < maxBlocks)
 		{
@@ -51,15 +48,15 @@ public class ConstructionJob extends WandJob
 					switch(placeDirection) {
 						case DOWN:
 						case UP:
-							if(lock.test(EnumLock.NORTHSOUTH)) {
+							if(options.testLock(WandOptions.LOCK.NORTHSOUTH)) {
 								candidates.add(currentCandidate.offset(Direction.NORTH));
 								candidates.add(currentCandidate.offset(Direction.SOUTH));
 							}
-							if(lock.test(EnumLock.EASTWEST)) {
+							if(options.testLock(WandOptions.LOCK.EASTWEST)) {
 								candidates.add(currentCandidate.offset(Direction.EAST));
 								candidates.add(currentCandidate.offset(Direction.WEST));
 							}
-							if(lock.test(EnumLock.NORTHSOUTH) && lock.test(EnumLock.EASTWEST)) {
+							if(options.testLock(WandOptions.LOCK.NORTHSOUTH) && options.testLock(WandOptions.LOCK.EASTWEST)) {
 								candidates.add(currentCandidate.offset(Direction.NORTH).offset(Direction.EAST));
 								candidates.add(currentCandidate.offset(Direction.NORTH).offset(Direction.WEST));
 								candidates.add(currentCandidate.offset(Direction.SOUTH).offset(Direction.EAST));
@@ -68,15 +65,15 @@ public class ConstructionJob extends WandJob
 							break;
 						case NORTH:
 						case SOUTH:
-							if(lock.test(EnumLock.HORIZONTAL)) {
+							if(options.testLock(WandOptions.LOCK.HORIZONTAL)) {
 								candidates.add(currentCandidate.offset(Direction.EAST));
 								candidates.add(currentCandidate.offset(Direction.WEST));
 							}
-							if(lock.test(EnumLock.VERTICAL)) {
+							if(options.testLock(WandOptions.LOCK.VERTICAL)) {
 								candidates.add(currentCandidate.offset(Direction.UP));
 								candidates.add(currentCandidate.offset(Direction.DOWN));
 							}
-							if(lock.test(EnumLock.HORIZONTAL) && lock.test(EnumLock.VERTICAL)) {
+							if(options.testLock(WandOptions.LOCK.HORIZONTAL) && options.testLock(WandOptions.LOCK.VERTICAL)) {
 								candidates.add(currentCandidate.offset(Direction.UP).offset(Direction.EAST));
 								candidates.add(currentCandidate.offset(Direction.UP).offset(Direction.WEST));
 								candidates.add(currentCandidate.offset(Direction.DOWN).offset(Direction.EAST));
@@ -85,15 +82,15 @@ public class ConstructionJob extends WandJob
 							break;
 						case EAST:
 						case WEST:
-							if(lock.test(EnumLock.HORIZONTAL)) {
+							if(options.testLock(WandOptions.LOCK.HORIZONTAL)) {
 								candidates.add(currentCandidate.offset(Direction.NORTH));
 								candidates.add(currentCandidate.offset(Direction.SOUTH));
 							}
-							if(lock.test(EnumLock.VERTICAL)) {
+							if(options.testLock(WandOptions.LOCK.VERTICAL)) {
 								candidates.add(currentCandidate.offset(Direction.UP));
 								candidates.add(currentCandidate.offset(Direction.DOWN));
 							}
-							if(lock.test(EnumLock.HORIZONTAL) && lock.test(EnumLock.VERTICAL)) {
+							if(options.testLock(WandOptions.LOCK.HORIZONTAL) && options.testLock(WandOptions.LOCK.VERTICAL)) {
 								candidates.add(currentCandidate.offset(Direction.UP).offset(Direction.NORTH));
 								candidates.add(currentCandidate.offset(Direction.UP).offset(Direction.SOUTH));
 								candidates.add(currentCandidate.offset(Direction.DOWN).offset(Direction.NORTH));

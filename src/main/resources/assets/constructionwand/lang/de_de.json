@@ -4,10 +4,6 @@
   "item.constructionwand.diamond_wand": "Diamantener Stab",
   "item.constructionwand.infinity_wand": "Stab der Unendlichkeit",
 
-  "constructionwand.key.category": "Construction Wand",
-  "constructionwand.key.direction": "Ausrichtung",
-  "constructionwand.key.replace": "Ersetzungsmodus",
-
   "constructionwand.tooltip.blocks": "Max. %d Blöcke",
   "constructionwand.tooltip.shift": "Drücke [SHIFT]",
 

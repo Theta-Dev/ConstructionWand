@@ -12,7 +12,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
-import thetadev.constructionwand.basics.options.*;
+import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.ItemWand;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketWandOption;
@@ -37,6 +37,7 @@ public class ClientEvents
 		}
 	}
 
+	// SHIFT+(CTRL)+Scroll to change direction lock
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void MouseScrollEvent(InputEvent.MouseScrollEvent event) {
 		PlayerEntity player = Minecraft.getInstance().player;
@@ -48,10 +49,12 @@ public class ClientEvents
 		if(wand == null) return;
 
 		WandOptions wandOptions = new WandOptions(wand);
-		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.nextOption(EnumLock.NOLOCK, scroll<0), true));
+		wandOptions.lock.next(scroll<0);
+		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.lock, true));
 		event.setCanceled(true);
 	}
 
+	// SHIFT+(CTRL)+Left click wand to change mode
 	@SubscribeEvent
 	public static void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
 		PlayerEntity player = event.getPlayer();
@@ -62,13 +65,15 @@ public class ClientEvents
 		if(!(wand.getItem() instanceof ItemWand)) return;
 
 		WandOptions wandOptions = new WandOptions(wand);
-		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.nextOption(EnumMode.DEFAULT), true));
+		wandOptions.mode.next();
+		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.mode, true));
 	}
 
+	// SHIFT+Right click wand to open GUI
 	@SubscribeEvent
 	public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
 		PlayerEntity player = event.getPlayer();
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL.get())) return;
+		if(player == null || !player.isSneaking()) return;
 
 		ItemStack wand = event.getItemStack();
 		if(!(wand.getItem() instanceof ItemWand)) return;

@@ -10,7 +10,7 @@ public class ConfigClient
 
 	static {
 		BUILDER.push("keys");
-		BUILDER.comment("Press SHIFT+CTRL to show wand options / scroll to change direction lock");
+		BUILDER.comment("Press SHIFT+CTRL instead of SHIFT for changing wand mode/direction lock");
 		SHIFTCTRL = BUILDER.define("ShiftCtrl", false);
 		BUILDER.pop();
 	}

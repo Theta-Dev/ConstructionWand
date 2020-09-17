@@ -22,9 +22,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigServer;
-import thetadev.constructionwand.basics.options.EnumMode;
-import thetadev.constructionwand.basics.options.IEnumOption;
-import thetadev.constructionwand.basics.options.WandOptions;
+import thetadev.constructionwand.basics.option.IOption;
+import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.job.AngelJob;
 import thetadev.constructionwand.job.WandJob;
 
@@ -95,7 +94,7 @@ public abstract class ItemWand extends Item
 
 	public static int getWandMode(ItemStack stack) {
 		WandOptions options = new WandOptions(stack);
-		return options.getOption(EnumMode.DEFAULT).getOrdinal();
+		return options.mode.get().ordinal();
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -103,34 +102,31 @@ public abstract class ItemWand extends Item
 		ItemWand wand = (ItemWand) itemstack.getItem();
 		WandOptions options = new WandOptions(itemstack);
 
-		String langPrefix = ConstructionWand.MODID + ".option.";
 		String langTooltip = ConstructionWand.MODID + ".tooltip.";
 
 		if(Screen.hasShiftDown()) {
-			for(int i=1; i<WandOptions.options.length; i++) {
-				IEnumOption opt = WandOptions.options[i];
-				lines.add(new TranslationTextComponent(langPrefix + opt.getOptionKey()).mergeStyle(TextFormatting.AQUA)
-						.append(new TranslationTextComponent(langPrefix + options.getOption(opt).getTranslationKey()).mergeStyle(TextFormatting.GRAY))
+			for(int i=1; i<options.allOptions.length; i++) {
+				IOption<?> opt = options.allOptions[i];
+				lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
+						.append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.GRAY))
 				);
 			}
 		}
 		else {
-			IEnumOption opt = WandOptions.options[0];
+			IOption<?> opt = options.allOptions[0];
 			lines.add(new TranslationTextComponent(langTooltip + "blocks", getLimit()).mergeStyle(TextFormatting.GRAY));
-			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).mergeStyle(TextFormatting.AQUA)
-					.append(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).mergeStyle(TextFormatting.WHITE)));
+			lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
+					.append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.WHITE)));
 			lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));
 		}
 	}
 
-	public static void optionMessage(PlayerEntity player, IEnumOption option) {
-		String langPrefix = ConstructionWand.MODID + ".option.";
-
+	public static void optionMessage(PlayerEntity player, IOption<?> option) {
 		player.sendStatusMessage(
-				new TranslationTextComponent(langPrefix+option.getOptionKey()).mergeStyle(TextFormatting.AQUA)
-						.append(new TranslationTextComponent(langPrefix+option.getTranslationKey()).mergeStyle(TextFormatting.WHITE))
+				new TranslationTextComponent(option.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
+						.append(new TranslationTextComponent(option.getValueTranslation()).mergeStyle(TextFormatting.WHITE))
 						.append(new StringTextComponent(" - ").mergeStyle(TextFormatting.GRAY))
-						.append(new TranslationTextComponent(langPrefix+option.getTranslationKey()+".desc").mergeStyle(TextFormatting.WHITE))
+						.append(new TranslationTextComponent(option.getDescTranslation()).mergeStyle(TextFormatting.WHITE))
 				, true);
 	}
 }

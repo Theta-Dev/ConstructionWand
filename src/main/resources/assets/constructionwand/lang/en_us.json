@@ -4,10 +4,6 @@
   "item.constructionwand.diamond_wand": "Diamond Wand",
   "item.constructionwand.infinity_wand": "Infinity Wand",
 
-  "constructionwand.key.category": "Construction Wand",
-  "constructionwand.key.direction": "Place direction",
-  "constructionwand.key.replace": "Replacement mode",
-
   "constructionwand.tooltip.blocks": "Max. %d blocks",
   "constructionwand.tooltip.shift": "Press [SHIFT]",
 

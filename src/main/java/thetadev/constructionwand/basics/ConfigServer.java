@@ -20,7 +20,7 @@ public class ConfigServer
 
 	public static final ForgeConfigSpec.ConfigValue<List<?>> SIMILAR_BLOCKS;
 	private static final String[] SIMILAR_BLOCKS_DEFAULT = {
-			"minecraft:dirt;minecraft:grass_block;minecraft:coarse_dirt;minecraft:podzol;minecraft:mycelium"
+			"minecraft:dirt;minecraft:grass_block;minecraft:coarse_dirt;minecraft:podzol;minecraft:mycelium;minecraft:farmland;minecraft:grass_path"
 	};
 
 	private static final HashMap<Item, WandProperties> wandProperties = new HashMap<>();
