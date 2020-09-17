@@ -7,7 +7,7 @@
   ],
   "key": {
     "X": {
-      "tag": "minecraft:stone_tool_materials"
+      "tag": "forge:cobblestone"
     },
     "#": {
       "tag": "forge:rods/wooden"

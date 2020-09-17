@@ -37,7 +37,7 @@ Every wand has two additional options that can be changed using keys. (Standard:
 
 ![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.15/images/placedir.png)
 
-**Fluid lock:** Enables/disables the replacement of fluid blocks (both source + flowing).
+**Replacement:** Enables/disables the replacement of replaceable blocks (snow, tallgrass and fluids).
 
 ## Additional features
 - If you have shulker boxes in your inventory filled with blocks, the wand can pull them out and place them
