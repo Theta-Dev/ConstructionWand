@@ -1,6 +1,5 @@
 package thetadev.constructionwand.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -13,10 +12,13 @@ import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.network.PacketWandOption;
 
+import java.util.HashMap;
+
 public class ScreenWand extends Screen
 {
 	private final ItemStack wand;
 	private final WandOptions wandOptions;
+	private final HashMap<IOption<?>, Button> optionButtons;
 
 	private static final int BUTTON_WIDTH = 160;
 	private static final int BUTTON_HEIGHT = 20;
@@ -32,11 +34,13 @@ public class ScreenWand extends Screen
 		super(new StringTextComponent("ScreenWand"));
 		this.wand = wand;
 		wandOptions = new WandOptions(wand);
+		optionButtons = new HashMap<>();
 	}
 
 	@Override
 	public void init(Minecraft minecraft, int width, int height) {
 		super.init(minecraft, width, height);
+		optionButtons.clear();
 
 		createButton(0, 0, wandOptions.mode);
 		createButton(0, 1, wandOptions.lock);
@@ -47,33 +51,35 @@ public class ScreenWand extends Screen
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-		renderBackground(matrixStack);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		drawCenteredString(matrixStack, font, wand.getDisplayName(), width/2, height/2 - FIELD_HEIGHT/2 - SPACING_HEIGHT, 16777215);
+	public void render(int mouseX, int mouseY, float partialTicks) {
+		renderBackground();
+		super.render(mouseX, mouseY, partialTicks);
+		drawCenteredString(font, wand.getDisplayName().getFormattedText(), width/2, height/2 - FIELD_HEIGHT/2 - SPACING_HEIGHT, 16777215);
+		optionButtons.forEach((opt, but) -> drawTooltip(mouseX, mouseY, opt, but));
 	}
 
 	@Override
 	public boolean charTyped(char character, int code) {
-		if(character == 'e') closeScreen();
+		if(character == 'e') onClose();
 		return super.charTyped(character, code);
 	}
 
 	private void createButton(int cx, int cy, IOption<?> option) {
-		Button button = new Button(getX(cx), getY(cy), BUTTON_WIDTH, BUTTON_HEIGHT, getButtonLabel(option), bt -> clickButton(bt, option), (bt, ms, x, y) -> drawTooltip(ms, x, y, option));
+		Button button = new Button(getX(cx), getY(cy), BUTTON_WIDTH, BUTTON_HEIGHT, getButtonLabel(option).getFormattedText(), bt -> clickButton(bt, option));
 		button.active = option.isEnabled();
 		addButton(button);
+		optionButtons.put(option, button);
 	}
 
 	private void clickButton(Button button, IOption<?> option) {
 		option.next();
 		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(option, false));
-		button.setMessage(getButtonLabel(option));
+		button.setMessage(getButtonLabel(option).getFormattedText());
 	}
 
-	private void drawTooltip(MatrixStack matrixStack, int mouseX, int mouseY, IOption<?> option) {
-		if(isMouseOver(mouseX, mouseY)) {
-			renderTooltip(matrixStack, new TranslationTextComponent(option.getDescTranslation()), mouseX, mouseY);
+	private void drawTooltip(int mouseX, int mouseY, IOption<?> option, Button button) {
+		if(button.isHovered()) {
+			renderTooltip(new TranslationTextComponent(option.getDescTranslation()).getFormattedText(), mouseX, mouseY);
 		}
 	}
 
@@ -86,6 +92,6 @@ public class ScreenWand extends Screen
 	}
 
 	private ITextComponent getButtonLabel(IOption<?> option) {
-		return new TranslationTextComponent(option.getKeyTranslation()).append(new TranslationTextComponent(option.getValueTranslation()));
+		return new TranslationTextComponent(option.getKeyTranslation()).appendSibling(new TranslationTextComponent(option.getValueTranslation()));
 	}
 }
