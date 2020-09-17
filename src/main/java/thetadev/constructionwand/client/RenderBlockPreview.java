@@ -18,12 +18,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.job.WandJob;
 
-import java.util.LinkedList;
+import java.util.Set;
 
 public class RenderBlockPreview
 {
 	public WandJob wandJob;
-	public LinkedList<BlockPos> undoBlocks;
+	public Set<BlockPos> undoBlocks;
 
 	@SubscribeEvent
 	public void renderBlockHighlight(DrawHighlightEvent event)
@@ -34,7 +34,7 @@ public class RenderBlockPreview
 		Entity entity = event.getInfo().getRenderViewEntity();
 		if(!(entity instanceof PlayerEntity)) return;
 		PlayerEntity player = (PlayerEntity) entity;
-		LinkedList<BlockPos> blocks;
+		Set<BlockPos> blocks;
 		float colorR=0, colorG=0, colorB=0;
 
 		ItemStack wand = WandUtil.holdingWand(player);
@@ -59,7 +59,7 @@ public class RenderBlockPreview
 		event.setCanceled(true);
 	}
 
-	private void renderBlockList(LinkedList<BlockPos> blocks, MatrixStack ms, IRenderTypeBuffer buffer, float red, float green, float blue) {
+	private void renderBlockList(Set<BlockPos> blocks, MatrixStack ms, IRenderTypeBuffer buffer, float red, float green, float blue) {
 		double renderPosX = Minecraft.getInstance().getRenderManager().info.getProjectedView().getX();
 		double renderPosY = Minecraft.getInstance().getRenderManager().info.getProjectedView().getY();
 		double renderPosZ = Minecraft.getInstance().getRenderManager().info.getProjectedView().getZ();

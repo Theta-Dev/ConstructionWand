@@ -1,5 +1,6 @@
 package thetadev.constructionwand.job;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -7,9 +8,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import thetadev.constructionwand.basics.ConfigHandler;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.WandUtil;
-import thetadev.constructionwand.basics.options.EnumMode;
+import thetadev.constructionwand.basics.option.WandOptions;
 
 public class AngelJob extends WandJob
 {
@@ -23,9 +24,9 @@ public class AngelJob extends WandJob
 
 	@Override
 	protected void getBlockPositionList() {
-		if(options.getOption(EnumMode.DEFAULT) != EnumMode.ANGEL || wandItem.angelDistance == 0) return;
+		if(options.mode.get() != WandOptions.MODE.ANGEL || ConfigServer.getWandProperties(wandItem).getAngel() == 0) return;
 
-		if(!player.isCreative() && !ConfigHandler.ANGEL_FALLING.get() && player.fallDistance > 10) return;
+		if(!player.isCreative() && !ConfigServer.ANGEL_FALLING.get() && player.fallDistance > 10) return;
 
 		Vec3d playerVec = WandUtil.entityPositionVec(player);
 		Vec3d lookVec = player.getLookVec().mul(2, 2, 2);
@@ -33,8 +34,9 @@ public class AngelJob extends WandJob
 
 		BlockPos currentPos = new BlockPos(placeVec);
 
-		if(canPlace(currentPos)) {
-			placeSnapshots.add(new PlaceSnapshot(currentPos, placeItem.getBlock().getDefaultState()));
+		PlaceSnapshot snapshot = getPlaceSnapshot(currentPos, Blocks.AIR.getDefaultState());
+		if(snapshot != null) {
+			placeSnapshots.add(snapshot);
 		}
 	}
 }

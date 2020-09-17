@@ -5,14 +5,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 import thetadev.constructionwand.ConstructionWand;
 
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class PacketUndoBlocks
 {
-	public LinkedList<BlockPos> undoBlocks;
+	public HashSet<BlockPos> undoBlocks;
 
-	public PacketUndoBlocks(LinkedList<BlockPos> undoBlocks) {
+	public PacketUndoBlocks(Set<BlockPos> undoBlocks) {
+		this.undoBlocks = new HashSet<>(undoBlocks);
+	}
+	private PacketUndoBlocks(HashSet<BlockPos> undoBlocks) {
 		this.undoBlocks = undoBlocks;
 	}
 
@@ -23,7 +28,7 @@ public class PacketUndoBlocks
 	}
 
 	public static PacketUndoBlocks decode(PacketBuffer buffer) {
-		LinkedList<BlockPos> undoBlocks = new LinkedList<>();
+		HashSet<BlockPos> undoBlocks = new HashSet<>();
 
 		while(buffer.isReadable()) {
 			undoBlocks.add(buffer.readBlockPos());
