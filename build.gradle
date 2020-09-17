@@ -107,15 +107,6 @@ dependencies {
             version: "${project.botania}",
             classifier: "api"
     ])
-    /*
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16-41")
-    runtimeOnly fg.deobf("curse.maven:Curios:3042479")
-    runtimeOnly fg.deobf([
-            group: "vazkii.botania",
-            name: "Botania",
-            version: "${project.botania}",
-            classifier: ""
-    ])*/
 }
 
 jar {
