@@ -41,5 +41,19 @@
   "constructionwand.option.replace.no": "§cNein",
   "constructionwand.option.replace.no.desc": "Ersetzt keine Blöcke",
 
+  "constructionwand.option.match": "Vergleich: ",
+  "constructionwand.option.match.exact": "§aExakt",
+  "constructionwand.option.match.exact.desc": "Erweitert nur Blöcke, die gleich dem Startblock sind",
+  "constructionwand.option.match.similar": "§6Ähnlich",
+  "constructionwand.option.match.similar.desc": "Behandle ähnliche Blöcke (Erde/Gras) gleich",
+  "constructionwand.option.match.any": "§cAlle",
+  "constructionwand.option.match.any.desc": "Erweitert alle Blöcke",
+
+  "constructionwand.option.random": "Zufall: ",
+  "constructionwand.option.random.yes": "§aJa",
+  "constructionwand.option.random.yes.desc": "Platziere zufällige Blöcke aus der Hotbar",
+  "constructionwand.option.random.no": "§cNein",
+  "constructionwand.option.random.no.desc": "Platziere Blöcke nicht zufällig",
+
   "stat.constructionwand.use_wand": "Blöcke mithilfe des Stabs platziert"
 }

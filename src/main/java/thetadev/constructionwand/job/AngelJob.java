@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import thetadev.constructionwand.basics.ConfigHandler;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.options.EnumMode;
 
@@ -24,9 +24,9 @@ public class AngelJob extends WandJob
 
 	@Override
 	protected void getBlockPositionList() {
-		if(options.getOption(EnumMode.DEFAULT) != EnumMode.ANGEL || wandItem.angelDistance == 0) return;
+		if(options.getOption(EnumMode.DEFAULT) != EnumMode.ANGEL || ConfigServer.getWandProperties(wandItem).getAngel() == 0) return;
 
-		if(!player.isCreative() && !ConfigHandler.ANGEL_FALLING.get() && player.fallDistance > 10) return;
+		if(!player.isCreative() && !ConfigServer.ANGEL_FALLING.get() && player.fallDistance > 10) return;
 
 		Vector3d playerVec = WandUtil.entityPositionVec(player);
 		Vector3d lookVec = player.getLookVec().mul(2, 2, 2);

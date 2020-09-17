@@ -43,7 +43,7 @@ public class ConstructionJob extends WandJob
 				BlockPos supportingPoint = currentCandidate.offset(placeDirection.getOpposite());
 				BlockState candidateSupportingBlock = world.getBlockState(supportingPoint);
 
-				if(ReplacementRegistry.matchBlocks(targetBlock.getBlock(), candidateSupportingBlock.getBlock()) && allCandidates.add(currentCandidate)) {
+				if(matchBlocks(targetBlock.getBlock(), candidateSupportingBlock.getBlock()) && allCandidates.add(currentCandidate)) {
 					PlaceSnapshot snapshot = getPlaceSnapshot(currentCandidate, candidateSupportingBlock);
 					if(snapshot == null) continue;
 					placeSnapshots.add(snapshot);

@@ -9,11 +9,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -23,26 +21,20 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.basics.*;
-import thetadev.constructionwand.basics.options.EnumLock;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.options.EnumMode;
 import thetadev.constructionwand.basics.options.IEnumOption;
 import thetadev.constructionwand.basics.options.WandOptions;
 import thetadev.constructionwand.job.AngelJob;
-import thetadev.constructionwand.job.JobHistory;
 import thetadev.constructionwand.job.WandJob;
 
 import java.util.List;
 
 public abstract class ItemWand extends Item
 {
-	public final int maxBlocks;
-	public final int angelDistance;
-
-	public ItemWand(Item.Properties properties, int maxBlocks, int angelDistance) {
+	public ItemWand(String name, Item.Properties properties) {
 		super(properties.group(ItemGroup.TOOLS));
-		this.maxBlocks = maxBlocks;
-		this.angelDistance = angelDistance;
+		setRegistryName(ConstructionWand.loc(name));
 	}
 
 	@Override
@@ -72,27 +64,15 @@ public abstract class ItemWand extends Item
 	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
 		ItemStack stack = player.getHeldItem(hand);
 
-		if(world.isRemote) return ActionResult.resultFail(stack);
+		if(!player.isSneaking()) {
+			if(world.isRemote) return ActionResult.resultFail(stack);
 
-		if(player.isSneaking()) {
-			// SHIFT + Right click: Change wand mode
-			WandOptions options = new WandOptions(stack);
-			IEnumOption opt = EnumMode.DEFAULT;
-			opt = options.nextOption(opt);
-
-			//ConstructionWand.LOGGER.debug("Wand mode: " + options.getOption(EnumLock.NOLOCK));
-
-			optionMessage(player, opt);
-
-			player.inventory.markDirty();
-			return ActionResult.resultSuccess(stack);
-		}
-		else {
 			// Right click: Place angel block
 			//ConstructionWand.LOGGER.debug("Place angel block");
 			WandJob job = new AngelJob(player, world, stack);
 			return job.doIt() ? ActionResult.resultSuccess(stack) : ActionResult.resultFail(stack);
 		}
+		return ActionResult.resultFail(stack);
 	}
 
 	@Override
@@ -106,7 +86,11 @@ public abstract class ItemWand extends Item
 	}
 
 	public int getLimit(PlayerEntity player, ItemStack stack) {
-		return maxBlocks;
+		return getLimit();
+	}
+
+	protected int getLimit() {
+		return ConfigServer.getWandProperties(this).getLimit();
 	}
 
 	public static int getWandMode(ItemStack stack) {
@@ -132,7 +116,7 @@ public abstract class ItemWand extends Item
 		}
 		else {
 			IEnumOption opt = WandOptions.options[0];
-			lines.add(new TranslationTextComponent(langTooltip + "blocks", wand.maxBlocks).mergeStyle(TextFormatting.GRAY));
+			lines.add(new TranslationTextComponent(langTooltip + "blocks", getLimit()).mergeStyle(TextFormatting.GRAY));
 			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).mergeStyle(TextFormatting.AQUA)
 					.append(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).mergeStyle(TextFormatting.WHITE)));
 			lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));

@@ -36,12 +36,15 @@ public abstract class WandJob
 	protected ItemWand wandItem;
 	protected WandOptions options;
 
+	// Wand options
 	protected int maxBlocks;
 	protected boolean doReplace;
 	protected boolean targetDirection;
+	protected boolean randomMode;
+	protected EnumMatch matchMode;
 
 	protected LinkedHashMap<BlockItem, Integer> itemCounts;
-	private boolean randomizeItems = false;
+	protected HashMap<BlockItem, Integer> itemWeights;
 
 	protected LinkedList<PlaceSnapshot> placeSnapshots;
 
@@ -63,13 +66,25 @@ public abstract class WandJob
 		options = new WandOptions(wand);
 		doReplace = options.getOption(EnumReplace.YES) == EnumReplace.YES;
 		targetDirection = options.getOption(EnumDirection.TARGET) == EnumDirection.TARGET;
+		randomMode = options.getOption(EnumRandom.NO) == EnumRandom.YES;
+		matchMode = (EnumMatch) options.getOption(EnumMatch.SIMILAR);
 
 		// Get place item
 		addBlockItems();
 		if(itemCounts.isEmpty()) return;
 
 		// Get inventory supply
-		maxBlocks = Math.min(itemCounts.values().stream().reduce(0, Integer::sum), wandItem.getLimit(player, wand));
+		for(int v : itemCounts.values()) {
+			try {
+				maxBlocks = Math.addExact(maxBlocks, v);
+			}
+			catch(ArithmeticException e) {
+				maxBlocks = Integer.MAX_VALUE;
+				break;
+			}
+		}
+
+		maxBlocks = Math.min(maxBlocks, wandItem.getLimit(player, wand));
 		if(maxBlocks == 0) return;
 
 		getBlockPositionList();
@@ -107,38 +122,41 @@ public abstract class WandJob
 
 	private void addBlockItems() {
 		itemCounts = new LinkedHashMap<>();
+		itemWeights = new HashMap<>();
+
 		BlockPos targetPos = rayTraceResult.getPos();
 		BlockState targetState = world.getBlockState(targetPos);
 		Block targetBlock = targetState.getBlock();
 		ItemStack offhandStack = player.getHeldItem(Hand.OFF_HAND);
 
-		if(!offhandStack.isEmpty()) {
-			Item offhandItem = offhandStack.getItem();
-			// Trovel in offhand -> randomize hotbar blocks
-			if(WandUtil.isTrowel(offhandStack)) {
-				randomizeItems = true;
-
-				for(ItemStack stack : WandUtil.getHotbar(player)) {
-					if(stack.getItem() instanceof BlockItem) addBlockItem((BlockItem) stack.getItem());
+		if(randomMode) {
+			for(ItemStack stack : WandUtil.getHotbar(player)) {
+				if(stack.getItem() instanceof BlockItem) {
+					BlockItem item = (BlockItem) stack.getItem();
+					addBlockItem(item);
+					itemWeights.compute(item, (k, v) -> (v == null) ? 1 : v+1);
 				}
-				return;
 			}
+		}
+		else if(!offhandStack.isEmpty() && offhandStack.getItem() instanceof BlockItem) {
 			// Block in offhand -> override
-			else if(offhandItem instanceof BlockItem) {
-				addBlockItem((BlockItem) offhandItem);
-				return;
-			}
+			addBlockItem((BlockItem) offhandStack.getItem());
 		}
 
 		// Otherwise use target block
-		Item item = targetBlock.getPickBlock(targetState, rayTraceResult, world, targetPos, player).getItem();
-		if(item instanceof BlockItem) {
-			addBlockItem((BlockItem) item);
+		if(itemCounts.isEmpty()) {
+			Item item = targetBlock.getPickBlock(targetState, rayTraceResult, world, targetPos, player).getItem();
+			if(item instanceof BlockItem) {
+				addBlockItem((BlockItem) item);
 
-			// Add replacement items
-			for(Item it : ReplacementRegistry.getMatchingSet(item)) {
-				if(it instanceof BlockItem) addBlockItem((BlockItem) it);
+				// Add replacement items
+				if(matchMode != EnumMatch.EXACT) {
+					for(Item it : ReplacementRegistry.getMatchingSet(item)) {
+						if(it instanceof BlockItem) addBlockItem((BlockItem) it);
+					}
+				}
 			}
+			randomMode = false;
 		}
 	}
 
@@ -224,13 +242,14 @@ public abstract class WandJob
 		BlockState placeBlock = Block.getBlockFromItem(item).getStateForPlacement(ctx);
 		if(placeBlock == null) return null;
 		placeBlock = Block.getValidBlockForPosition(placeBlock, world, pos);
-		if(placeBlock.getBlock() == Blocks.AIR) return null;
+		if(placeBlock.getBlock() == Blocks.AIR || !placeBlock.isValidPosition(world, pos)) return null;
 
 		// No entities colliding?
 		VoxelShape shape = placeBlock.getCollisionShape(world, pos);
-		if(shape.isEmpty()) return null;
-		AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
-		if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty()) return null;
+		if(!shape.isEmpty()) {
+			AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
+			if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty()) return null;
+		}
 
 		// Copy certain properties of supporting block (save the effort when running preview on client)
 		if(targetDirection && !world.isRemote) {
@@ -239,13 +258,13 @@ public abstract class WandJob
 					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
 					BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
 			{
-				if(supportingBlock.hasProperty(property)) {
+				if(supportingBlock.hasProperty(property) && placeBlock.hasProperty(property)) {
 					placeBlock = placeBlock.with(property, supportingBlock.get(property));
 				}
 			}
 
 			// Dont dupe double slabs
-			if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE)) {
+			if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE) && placeBlock.hasProperty(BlockStateProperties.SLAB_TYPE)) {
 				SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
 				if(slabType != SlabType.DOUBLE) placeBlock = placeBlock.with(BlockStateProperties.SLAB_TYPE, slabType);
 			}
@@ -256,15 +275,23 @@ public abstract class WandJob
 	@Nullable
 	protected PlaceSnapshot getPlaceSnapshot(BlockPos pos, BlockState supportingBlock) {
 		ArrayList<BlockItem> items = new ArrayList<>(itemCounts.keySet());
-		if(randomizeItems) Collections.shuffle(items, player.getRNG());
+		if(randomMode) {
+			for(BlockItem item : itemWeights.keySet()) {
+				int weight = itemWeights.get(item);
+				for(int i=0; i<weight-1; i++) items.add(item);
+			}
+
+			Collections.shuffle(items, player.getRNG());
+		}
 
 		for(BlockItem item : items) {
-			if(itemCounts.get(item) == 0) continue;
+			int count = itemCounts.get(item);
+			if(count == 0) continue;
 
 			BlockState placeBlock = getPlaceBlockstate(pos, item, supportingBlock);
 			if(placeBlock == null) continue;
 
-			itemCounts.merge(item, -1, Integer::sum);
+			if(count < Integer.MAX_VALUE) itemCounts.merge(item, -1, Integer::sum);
 			return new PlaceSnapshot(pos, placeBlock, item);
 		}
 		return null;
@@ -297,6 +324,15 @@ public abstract class WandJob
 		player.addStat(ModStats.USE_WAND);
 
 		return true;
+	}
+
+	protected boolean matchBlocks(Block b1, Block b2) {
+		switch(matchMode) {
+			case EXACT: return b1 == b2;
+			case SIMILAR: return ReplacementRegistry.matchBlocks(b1, b2);
+			case ANY: return b1 != Blocks.AIR && b2 != Blocks.AIR;
+		}
+		return false;
 	}
 
 	public boolean doIt() {

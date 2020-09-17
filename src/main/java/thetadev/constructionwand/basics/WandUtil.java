@@ -4,7 +4,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ShovelItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -36,14 +35,6 @@ public class WandUtil
 			return player.getHeldItem(Hand.OFF_HAND);
 		}
 		return null;
-	}
-
-	public static boolean isTrowel(ItemStack stack) {
-		if(stack.isEmpty()) return false;
-
-		if(stack.getItem().getTags().contains(TAG_TROWELS)) return true;
-		if(ConfigHandler.SHOVEL_AS_TROWEL.get().isEn() && stack.getItem() instanceof ShovelItem) return true;
-		return false;
 	}
 
 	public static BlockPos playerPos(PlayerEntity player) {

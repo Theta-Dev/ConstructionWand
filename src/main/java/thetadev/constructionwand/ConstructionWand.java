@@ -12,9 +12,10 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import thetadev.constructionwand.basics.ConfigHandler;
+import thetadev.constructionwand.basics.ConfigClient;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ModStats;
-import thetadev.constructionwand.client.KeyEvents;
+import thetadev.constructionwand.basics.ReplacementRegistry;
 import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
@@ -50,7 +51,8 @@ public class ConstructionWand
         MinecraftForge.EVENT_BUS.register(this);
 
         // Config setup
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.SPEC, MODID + ".toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ConfigServer.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ConfigClient.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -67,6 +69,9 @@ public class ConstructionWand
         // Container registry
         ContainerRegistrar.register();
 
+        //Replacement registry
+        ReplacementRegistry.init();
+
         // Stats
         ModStats.register();
     }
@@ -75,7 +80,10 @@ public class ConstructionWand
     {
         renderBlockPreview = new RenderBlockPreview();
         MinecraftForge.EVENT_BUS.register(renderBlockPreview);
-        MinecraftForge.EVENT_BUS.register(new KeyEvents());
         ModItems.registerModelProperties();
+    }
+
+    public static ResourceLocation loc(String name) {
+        return new ResourceLocation(MODID, name);
     }
 }

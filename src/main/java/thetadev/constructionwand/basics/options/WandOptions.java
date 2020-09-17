@@ -2,6 +2,7 @@ package thetadev.constructionwand.basics.options;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.items.ItemWand;
 
 public class WandOptions
@@ -15,7 +16,9 @@ public class WandOptions
 			EnumMode.DEFAULT,
 			EnumLock.NOLOCK,
 			EnumDirection.TARGET,
-			EnumReplace.YES
+			EnumReplace.YES,
+			EnumMatch.SIMILAR,
+			EnumRandom.NO
 	};
 
 	public WandOptions(ItemStack stack) {
@@ -33,12 +36,19 @@ public class WandOptions
 
 	public IEnumOption nextOption(IEnumOption option, boolean dir) {
 		IEnumOption nextOption = getOption(option).next(dir);
-		if(nextOption == EnumMode.ANGEL && item.angelDistance == 0) nextOption = EnumMode.DEFAULT;
+		if(nextOption == EnumMode.ANGEL && ConfigServer.getWandProperties(item).getAngel() == 0) nextOption = EnumMode.DEFAULT;
 		setOption(nextOption);
 		return nextOption;
 	}
 
 	public IEnumOption nextOption(IEnumOption option) {
 		return nextOption(option, true);
+	}
+
+	public static IEnumOption fromKey(String key) {
+		for(IEnumOption option : options) {
+			if(option.getOptionKey().equals(key)) return option;
+		}
+		return EnumMode.DEFAULT;
 	}
 }
