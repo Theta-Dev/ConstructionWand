@@ -3,43 +3,38 @@ package thetadev.constructionwand.network;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.NetworkEvent;
-import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.basics.*;
-import thetadev.constructionwand.basics.options.IEnumOption;
-import thetadev.constructionwand.basics.options.WandOptions;
+import thetadev.constructionwand.basics.WandUtil;
+import thetadev.constructionwand.basics.option.IOption;
+import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.ItemWand;
 
-import java.util.Arrays;
 import java.util.function.Supplier;
 
 public class PacketWandOption
 {
-	public byte[] options;
+	public final String key;
+	public final String value;
+	public final boolean notify;
 
-	public PacketWandOption(byte[] options) {
-		this.options = options;
+	public PacketWandOption(IOption<?> option, boolean notify) {
+		this(option.getKey(), option.getValueString(), notify);
 	}
 
-	public PacketWandOption(IEnumOption option, boolean dir) {
-		options = new byte[WandOptions.options.length];
-
-		for(int i=0; i<options.length; i++) {
-			if(WandOptions.options[i] == option) options[i] = (byte)(dir ? 2:1);
-			else options[i] = (byte)0;
-		}
+	private PacketWandOption(String key, String value, boolean notify) {
+		this.key = key;
+		this.value = value;
+		this.notify = notify;
 	}
 
 	public static void encode(PacketWandOption msg, PacketBuffer buffer) {
-		buffer.writeByteArray(msg.options);
+		buffer.writeString(msg.key);
+		buffer.writeString(msg.value);
+		buffer.writeBoolean(msg.notify);
 	}
 
 	public static PacketWandOption decode(PacketBuffer buffer) {
-		byte[] options = buffer.readByteArray(WandOptions.options.length);
-		return new PacketWandOption(options);
+		return new PacketWandOption(buffer.readString(100), buffer.readString(100), buffer.readBoolean());
 	}
 
 	public static class Handler
@@ -54,18 +49,12 @@ public class PacketWandOption
 			if(wand == null) return;
 			WandOptions options = new WandOptions(wand);
 
-			String langPrefix = ConstructionWand.MODID + ".option.";
+			IOption<?> option = options.get(msg.key);
+			if(option == null) return;
+			option.setValueString(msg.value);
 
-			for(int i=0; i<WandOptions.options.length; i++) {
-				if(msg.options[i] == 0) continue;
-
-				IEnumOption opt = options.nextOption(WandOptions.options[i], msg.options[i]>1);
-				ItemWand.optionMessage(player, opt);
-			}
-
+			if(msg.notify) ItemWand.optionMessage(player, option);
 			player.inventory.markDirty();
-
-			//ConstructionWand.LOGGER.debug("Keys: "+ Arrays.toString(msg.options));
 		}
 	}
 }

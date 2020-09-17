@@ -4,10 +4,6 @@
   "item.constructionwand.diamond_wand": "Diamond Wand",
   "item.constructionwand.infinity_wand": "Infinity Wand",
 
-  "constructionwand.key.category": "Construction Wand",
-  "constructionwand.key.direction": "Place direction",
-  "constructionwand.key.replace": "Replacement mode",
-
   "constructionwand.tooltip.blocks": "Max. %d blocks",
   "constructionwand.tooltip.shift": "Press [SHIFT]",
 
@@ -40,6 +36,20 @@
   "constructionwand.option.replace.yes.desc": "Replace certain blocks like fluids, snow and tallgrass",
   "constructionwand.option.replace.no": "§cNo",
   "constructionwand.option.replace.no.desc": "Don't replace blocks",
+
+  "constructionwand.option.match": "Matching: ",
+  "constructionwand.option.match.exact": "§aExact",
+  "constructionwand.option.match.exact.desc": "Only extend blocks that are exactly the same",
+  "constructionwand.option.match.similar": "§6Similar",
+  "constructionwand.option.match.similar.desc": "Treat similar blocks (dirt/grass types) equally",
+  "constructionwand.option.match.any": "§cAny",
+  "constructionwand.option.match.any.desc": "Extend any block",
+
+  "constructionwand.option.random": "Random: ",
+  "constructionwand.option.random.yes": "§aYes",
+  "constructionwand.option.random.yes.desc": "Place random blocks present in your hotbar",
+  "constructionwand.option.random.no": "§cNo",
+  "constructionwand.option.random.no.desc": "Don't randomize placed blocks",
 
   "stat.constructionwand.use_wand": "Blocks placed using Wand"
 }

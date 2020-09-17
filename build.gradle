@@ -13,14 +13,14 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.2-1.2'
-group = 'thetadev.constructionwand' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'constructionwand'
+version = "${mcversion}-${version_major}.${version_minor}"
+group = "${author}.${modid}"
+archivesBaseName = "${modid}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200723-1.16.1'
+    mappings channel: 'snapshot', version: project.mcp_mappings
 
     runs {
         client {
@@ -92,23 +92,29 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.2-33.0.21'
-    //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.16-39")
-    //runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.16.1-3.0")
+    minecraft([
+            group  : "net.minecraftforge",
+            name   : "forge",
+            version: "${project.mcversion}-${project.forgeversion}"
+    ])
 
-    compileOnly fg.deobf("vazkii.botania:Botania:1.16-398:api")
-    //runtimeOnly fg.deobf("vazkii.botania:Botania:1.16-398")
+    compileOnly fg.deobf([
+            group: "vazkii.botania",
+            name: "Botania",
+            version: "${project.botania}",
+            classifier: "api"
+    ])
 }
 
 jar {
     manifest {
         attributes([
                 "Specification-Title": archivesBaseName,
-                "Specification-Vendor": "thetadev",
+                "Specification-Vendor": "${author}",
                 "Specification-Version": "1", // We are version 1 of ourselves
                 "Implementation-Title": archivesBaseName,
                 "Implementation-Version": "${version}",
-                "Implementation-Vendor" : "thetadev",
+                "Implementation-Vendor" :"${author}",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
