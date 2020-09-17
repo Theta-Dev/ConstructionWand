@@ -65,14 +65,14 @@ public abstract class ItemWand extends Item
 		ItemStack stack = player.getHeldItem(hand);
 
 		if(!player.isSneaking()) {
-			if(world.isRemote) return ActionResult.resultFail(stack);
+			if(world.isRemote) return new ActionResult<>(ActionResultType.FAIL, stack);
 
 			// Right click: Place angel block
 			//ConstructionWand.LOGGER.debug("Place angel block");
 			WandJob job = new AngelJob(player, world, stack);
-			return job.doIt() ? ActionResult.resultSuccess(stack) : ActionResult.resultFail(stack);
+			return new ActionResult<>(job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL, stack);
 		}
-		return ActionResult.resultFail(stack);
+		return new ActionResult<>(ActionResultType.FAIL, stack);
 	}
 
 	@Override
