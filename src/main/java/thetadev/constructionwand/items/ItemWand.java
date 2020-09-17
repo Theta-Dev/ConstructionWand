@@ -1,7 +1,6 @@
 package thetadev.constructionwand.items;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,7 +8,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -23,28 +21,20 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.basics.*;
-import thetadev.constructionwand.basics.options.EnumLock;
-import thetadev.constructionwand.basics.options.EnumMode;
-import thetadev.constructionwand.basics.options.IEnumOption;
-import thetadev.constructionwand.basics.options.WandOptions;
+import thetadev.constructionwand.basics.ConfigServer;
+import thetadev.constructionwand.basics.option.IOption;
+import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.job.AngelJob;
-import thetadev.constructionwand.job.JobHistory;
 import thetadev.constructionwand.job.WandJob;
 
 import java.util.List;
 
 public abstract class ItemWand extends Item
 {
-	public final int maxBlocks;
-	public final int angelDistance;
-
-	public ItemWand(Item.Properties properties, int maxBlocks, int angelDistance) {
+	public ItemWand(String name, Item.Properties properties) {
 		super(properties.group(ItemGroup.TOOLS));
-		this.maxBlocks = maxBlocks;
-		this.angelDistance = angelDistance;
-		addPropertyOverride(new ResourceLocation(ConstructionWand.MODID, "wand_mode"),
-				(stack, worldIn, entityIn) -> getWandMode(stack));
+		setRegistryName(ConstructionWand.loc(name));
+		addPropertyOverride(new ResourceLocation(ConstructionWand.MODID, "wand_mode"), (stack, worldIn, entityIn) -> getWandMode(stack));
 	}
 
 	@Override
@@ -74,27 +64,15 @@ public abstract class ItemWand extends Item
 	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
 		ItemStack stack = player.getHeldItem(hand);
 
-		if(world.isRemote) return new ActionResult<>(ActionResultType.FAIL, stack);
+		if(!player.isSneaking()) {
+			if(world.isRemote) return new ActionResult<>(ActionResultType.FAIL, stack);
 
-		if(player.isSneaking()) {
-			// SHIFT + Right click: Change wand mode
-			WandOptions options = new WandOptions(stack);
-			IEnumOption opt = EnumMode.DEFAULT;
-			opt = options.nextOption(opt);
-
-			//ConstructionWand.LOGGER.debug("Wand mode: " + options.getOption(EnumLock.NOLOCK));
-
-			optionMessage(player, opt);
-
-			player.inventory.markDirty();
-			return new ActionResult<>(ActionResultType.SUCCESS, stack);
-		}
-		else {
 			// Right click: Place angel block
 			//ConstructionWand.LOGGER.debug("Place angel block");
 			WandJob job = new AngelJob(player, world, stack);
 			return new ActionResult<>(job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL, stack);
 		}
+		return new ActionResult<>(ActionResultType.FAIL, stack);
 	}
 
 	@Override
@@ -108,12 +86,16 @@ public abstract class ItemWand extends Item
 	}
 
 	public int getLimit(PlayerEntity player, ItemStack stack) {
-		return maxBlocks;
+		return getLimit();
+	}
+
+	protected int getLimit() {
+		return ConfigServer.getWandProperties(this).getLimit();
 	}
 
 	public static int getWandMode(ItemStack stack) {
 		WandOptions options = new WandOptions(stack);
-		return options.getOption(EnumMode.DEFAULT).getOrdinal();
+		return options.mode.get().ordinal();
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -121,34 +103,31 @@ public abstract class ItemWand extends Item
 		ItemWand wand = (ItemWand) itemstack.getItem();
 		WandOptions options = new WandOptions(itemstack);
 
-		String langPrefix = ConstructionWand.MODID + ".option.";
 		String langTooltip = ConstructionWand.MODID + ".tooltip.";
 
 		if(Screen.hasShiftDown()) {
-			for(int i=1; i<WandOptions.options.length; i++) {
-				IEnumOption opt = WandOptions.options[i];
-				lines.add(new TranslationTextComponent(langPrefix + opt.getOptionKey()).applyTextStyle(TextFormatting.AQUA)
-						.appendSibling(new TranslationTextComponent(langPrefix + options.getOption(opt).getTranslationKey()).applyTextStyle(TextFormatting.GRAY))
+			for(int i=1; i<options.allOptions.length; i++) {
+				IOption<?> opt = options.allOptions[i];
+				lines.add(new TranslationTextComponent(opt.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+						.appendSibling(new TranslationTextComponent(opt.getValueTranslation()).applyTextStyle(TextFormatting.GRAY))
 				);
 			}
 		}
 		else {
-			IEnumOption opt = WandOptions.options[0];
-			lines.add(new TranslationTextComponent(langTooltip + "blocks", wand.maxBlocks).applyTextStyle(TextFormatting.GRAY));
-			lines.add(new TranslationTextComponent(langPrefix+opt.getOptionKey()).applyTextStyle(TextFormatting.AQUA)
-					.appendSibling(new TranslationTextComponent(langPrefix+options.getOption(opt).getTranslationKey()).applyTextStyle(TextFormatting.WHITE)));
+			IOption<?> opt = options.allOptions[0];
+			lines.add(new TranslationTextComponent(langTooltip + "blocks", getLimit()).applyTextStyle(TextFormatting.GRAY));
+			lines.add(new TranslationTextComponent(opt.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+					.appendSibling(new TranslationTextComponent(opt.getValueTranslation()).applyTextStyle(TextFormatting.WHITE)));
 			lines.add(new TranslationTextComponent(langTooltip + "shift").applyTextStyle(TextFormatting.AQUA));
 		}
 	}
 
-	public static void optionMessage(PlayerEntity player, IEnumOption option) {
-		String langPrefix = ConstructionWand.MODID + ".option.";
-
+	public static void optionMessage(PlayerEntity player, IOption<?> option) {
 		player.sendStatusMessage(
-				new TranslationTextComponent(langPrefix+option.getOptionKey()).applyTextStyle(TextFormatting.AQUA)
-						.appendSibling(new TranslationTextComponent(langPrefix+option.getTranslationKey()).applyTextStyle(TextFormatting.WHITE))
+				new TranslationTextComponent(option.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+						.appendSibling(new TranslationTextComponent(option.getValueTranslation()).applyTextStyle(TextFormatting.WHITE))
 						.appendSibling(new StringTextComponent(" - ").applyTextStyle(TextFormatting.GRAY))
-						.appendSibling(new TranslationTextComponent(langPrefix+option.getTranslationKey()+".desc").applyTextStyle(TextFormatting.WHITE))
+						.appendSibling(new TranslationTextComponent(option.getDescTranslation()).applyTextStyle(TextFormatting.WHITE))
 				, true);
 	}
 }

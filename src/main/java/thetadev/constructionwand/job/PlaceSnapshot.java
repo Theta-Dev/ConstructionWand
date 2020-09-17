@@ -1,19 +1,19 @@
 package thetadev.constructionwand.job;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
+import net.minecraft.item.BlockItem;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class PlaceSnapshot
 {
-	public BlockState block;
-	public BlockState supportingBlock;
-	public BlockPos pos;
+	public final BlockState block;
+	public final BlockPos pos;
+	public final BlockItem item;
 
-	public PlaceSnapshot(BlockPos pos, BlockState supportingBlock)
+	public PlaceSnapshot(BlockPos pos, BlockState block, BlockItem item)
 	{
 		this.pos = pos;
-		this.supportingBlock = supportingBlock;
+		this.block = block;
+		this.item = item;
 	}
 }

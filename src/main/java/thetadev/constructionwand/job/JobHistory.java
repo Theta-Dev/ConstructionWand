@@ -5,13 +5,11 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
-import thetadev.constructionwand.basics.ConfigHandler;
 import thetadev.constructionwand.ConstructionWand;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 public class JobHistory
 {
@@ -32,7 +30,7 @@ public class JobHistory
 	public void add(WandJob job) {
 		LinkedList<WandJob> list = getJobsFromPlayer(job.getPlayer());
 		list.add(job);
-		while(list.size() > ConfigHandler.UNDO_HISTORY.get()) list.removeFirst();
+		while(list.size() > ConfigServer.UNDO_HISTORY.get()) list.removeFirst();
 	}
 
 	public void removePlayer(PlayerEntity player) {
@@ -48,13 +46,13 @@ public class JobHistory
 		entry.undoActive = ctrlDown;
 
 		LinkedList<WandJob> jobs = entry.jobs;
-		LinkedList<BlockPos> positions;
+		Set<BlockPos> positions;
 
 		// Send block positions of most recent job to client
-		if(jobs.isEmpty()) positions = new LinkedList<>();
+		if(jobs.isEmpty()) positions = Collections.emptySet();
 		else {
 			WandJob job = jobs.getLast();
-			if(job == null || !job.getWorld().equals(world)) positions = new LinkedList<>();
+			if(job == null || !job.getWorld().equals(world)) positions = Collections.emptySet();
 			else positions = job.getBlockPositions();
 		}
 
@@ -77,7 +75,7 @@ public class JobHistory
 		WandJob job = jobs.getLast();
 
 		if(job.getWorld().equals(world) && job.getBlockPositions().contains(pos)) {
-			// Update job player entity, they could have changed by rejoin/respawn
+			// Update job player entity, it could have changed by rejoin/respawn
 			job.setPlayer(player);
 
 			// Remove undo job, sent update to client and return it

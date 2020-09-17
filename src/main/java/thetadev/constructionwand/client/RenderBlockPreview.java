@@ -16,12 +16,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.job.WandJob;
 
-import java.util.LinkedList;
+import java.util.Set;
 
 public class RenderBlockPreview
 {
 	public WandJob wandJob;
-	public LinkedList<BlockPos> undoBlocks;
+	public Set<BlockPos> undoBlocks;
 
 	@SubscribeEvent
 	public void renderBlockHighlight(DrawBlockHighlightEvent event)
@@ -32,7 +32,7 @@ public class RenderBlockPreview
 		Entity entity = event.getInfo().getRenderViewEntity();
 		if(!(entity instanceof PlayerEntity)) return;
 		PlayerEntity player = (PlayerEntity) entity;
-		LinkedList<BlockPos> blocks;
+		Set<BlockPos> blocks;
 		float colorR=0, colorG=0, colorB=0;
 
 		ItemStack wand = WandUtil.holdingWand(player);
@@ -53,14 +53,12 @@ public class RenderBlockPreview
 		if(blocks == null || blocks.isEmpty()) return;
 
 		for(BlockPos block : blocks) {
-
 			double partialTicks = event.getPartialTicks();
 			double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
 			double d1 = player.lastTickPosY + player.getEyeHeight() + (player.posY - player.lastTickPosY) * partialTicks;
 			double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
 
 			AxisAlignedBB aabb = new AxisAlignedBB(block).offset(-d0, -d1, -d2);
-			//WorldRenderer.drawSelectionBoundingBox(aabb, colorR, colorG, colorB, 0.4F);
 			drawBoundingBox(aabb, colorR, colorG, colorB, 0.4F);
 		}
 

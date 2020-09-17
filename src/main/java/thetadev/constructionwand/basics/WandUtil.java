@@ -4,23 +4,19 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import thetadev.constructionwand.basics.options.EnumMode;
-import thetadev.constructionwand.basics.options.IEnumOption;
-import thetadev.constructionwand.basics.options.WandOptions;
+import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.items.ItemWand;
-import thetadev.constructionwand.job.ConstructionJob;
-import thetadev.constructionwand.job.TransductionJob;
-import thetadev.constructionwand.job.WandJob;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WandUtil
 {
+	public static ResourceLocation TAG_TROWELS = new ResourceLocation(ConstructionWand.MODID, "trowels");
+
 	public static boolean stackEquals(ItemStack stackA, ItemStack stackB) {
 		return ItemStack.areItemsEqual(stackA, stackB) && ItemStack.areItemStackTagsEqual(stackA, stackB);
 	}
@@ -42,5 +38,25 @@ public class WandUtil
 
 	public static Vec3d entityPositionVec(Entity entity) {
 		return new Vec3d(entity.posX, entity.posY - entity.getYOffset() + entity.getHeight()/2, entity.posZ);
+	}
+
+	public static List<ItemStack> getHotbar(PlayerEntity player) {
+		return player.inventory.mainInventory.subList(0, 9);
+	}
+
+	public static List<ItemStack> getHotbarWithOffhand(PlayerEntity player) {
+		ArrayList<ItemStack> inventory = new ArrayList<>(player.inventory.offHandInventory);
+		inventory.addAll(player.inventory.mainInventory.subList(0, 9));
+		return inventory;
+	}
+
+	public static List<ItemStack> getMainInv(PlayerEntity player) {
+		return player.inventory.mainInventory.subList(9, player.inventory.mainInventory.size());
+	}
+
+	public static List<ItemStack> getFullInv(PlayerEntity player) {
+		ArrayList<ItemStack> inventory = new ArrayList<>(player.inventory.offHandInventory);
+		inventory.addAll(player.inventory.mainInventory);
+		return inventory;
 	}
 }
