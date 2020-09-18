@@ -6,14 +6,15 @@ import net.minecraft.util.math.BlockPos;
 
 public class PlaceSnapshot
 {
-	public final BlockState block;
+	public BlockState block;
+	public final BlockState supportingBlock;
 	public final BlockPos pos;
 	public final BlockItem item;
 
-	public PlaceSnapshot(BlockPos pos, BlockState block, BlockItem item)
+	public PlaceSnapshot(BlockPos pos, BlockState supportingBlock, BlockItem item)
 	{
 		this.pos = pos;
-		this.block = block;
+		this.supportingBlock = supportingBlock;
 		this.item = item;
 	}
 }
