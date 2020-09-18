@@ -249,7 +249,9 @@ public abstract class WandJob
 
 			// Can block be placed?
 			BlockState blockState = item.getBlock().getStateForPlacement(ctx);
-			if(blockState == null || !blockState.isValidPosition(world, pos)) continue;
+			if(blockState == null) continue;
+			blockState = Block.getValidBlockForPosition(blockState, world, pos);
+			if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) continue;
 
 			// No entities colliding?
 			VoxelShape shape = blockState.getCollisionShape(world, pos);
@@ -276,19 +278,19 @@ public abstract class WandJob
 
 		BlockState supportingBlock = placeSnapshot.supportingBlock;
 
-		if(options.direction.get() == WandOptions.DIRECTION.TARGET && placeBlock.getBlock() == supportingBlock.getBlock()) {
+		if(options.direction.get() == WandOptions.DIRECTION.TARGET) {
 			// Block properties to be copied (alignment/rotation properties)
 			for(IProperty property : new IProperty[] {
 					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
 					BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
 			{
-				if(supportingBlock.has(property)) {
+				if(supportingBlock.has(property) && placeBlock.has(property)) {
 					placeBlock = placeBlock.with(property, supportingBlock.get(property));
 				}
 			}
 
 			// Dont dupe double slabs
-			if(supportingBlock.has(BlockStateProperties.SLAB_TYPE)) {
+			if(supportingBlock.has(BlockStateProperties.SLAB_TYPE) && placeBlock.has(BlockStateProperties.SLAB_TYPE)) {
 				SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
 				if(slabType != SlabType.DOUBLE) placeBlock = placeBlock.with(BlockStateProperties.SLAB_TYPE, slabType);
 			}
