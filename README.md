@@ -7,6 +7,7 @@ If you concentrate enough, you can even conjure a block in mid air!
 
 ## Wands
 There are basic wands made from stone, iron and diamond and the Infinity wand.
+Wand properties can be changed in the config.
 
 | Wand     | Durability  | Max. Blocks | Angel distance |
 |----------|-------------|-------------|----------------|
@@ -22,22 +23,30 @@ There are basic wands made from stone, iron and diamond and the Infinity wand.
 ![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.15/images/crafting4.png)
 
 ## Modes
-There are four wand tiers: Stone, Iron, Diamond and Infinity.
-
 **Default mode:** Extends your build on the side facing you. Maximum number of blocks depends on wand tier. SHIFT+scroll to change the placement mode (Horizontal, Vertical, North/South, East/West, No lock).
 
 **Angel mode:** Places a block on the opposite side of the block (or row of blocks) you are facing. Maximum distance depends on wand tier. Right click empty space to place a block in midair (similar to angel blocks, hence the name). To do that, you'll need to have the block you want to place in your offhand. You can't place a block in midair if you've fallen more than 10 blocks deep (no easy rescue tool from falling into the void).
 
+You can change the wand mode using the option screen or by SHIFT+Left clicking empty space.
+
 ## Options
-**Direction lock:** To change the direction lock, hold down SHIFT and scroll. With active direction lock the wand will only place blocks in one row or column (choose between North/South, East/West on a horizontal plane and Horizontal, Vertical on a vertical plane). If the direction lock is switched off, the wand will extend the entire face of the building it's pointed at. This option has no effect in Angel mode.
+SHIFT+Right clicking empty space opens the option screen of your wand.
 
-Every wand has two additional options that can be changed using keys. (Standard: N / SHIFT+N)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.15/images/options.png)
 
-**Placement direction:** If set to "player" the wand places blocks in the same direction as if they were placed by yourself. Target mode places the blocks in the same direction as their supporting block. See the picture below:
+**Restriction:** If restriction is enabled the wand will only place blocks in one row or column (choose between North/South, East/West on a horizontal plane and Horizontal, Vertical on a vertical plane). If the direction lock is switched off, the wand will extend the entire face of the building it's pointed at. This option has no effect in Angel mode.
+
+**Direction:** If set to "Player" the wand places blocks in the same direction as if they were placed by yourself. Target mode places the blocks in the same direction as their supporting block. See the picture below:
 
 ![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.15/images/placedir.png)
 
-**Fluid lock:** Enables/disables the replacement of fluid blocks (both source + flowing).
+**Replacement:** Enables/disables the replacement of replaceable blocks (Fluids, snow, tallgrass).
+
+**Matching:** Select which blocks are extended by the wand. If set to "EXACT" it will only extend blocks that are exactly the same as the selected block.
+"SIMILAR" will treat similar blocks equally (e.g. extend dirt and grass blocks).
+"ANY" will extend any block on the face of the building you're looking at.
+
+**Random:** If random mode is enabled, the wand places random blocks from your hotbar. ~~Shamelessly stolen~~ Inspired by the Trowel from Quark.
 
 ## Additional features
 - If you have shulker boxes in your inventory filled with blocks, the wand can pull them out and place them
@@ -50,4 +59,4 @@ Every wand has two additional options that can be changed using keys. (Standard:
 
 - Look at your statisics to see how many blocks you have placed using your wand
 
-- **1.16 only:** The Infinity Wand won't burn in lava just like netherite gear.
+- **1.16+ only:** The Infinity Wand won't burn in lava just like netherite gear.
