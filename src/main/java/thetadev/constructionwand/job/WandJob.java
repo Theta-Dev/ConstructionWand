@@ -220,33 +220,65 @@ public abstract class WandJob
 
 	protected abstract void getBlockPositionList();
 
+	// Get PlaceSnapshot, or null if no block can be placed
 	@Nullable
-	private BlockState getPlaceBlockstate(BlockPos pos, BlockItem item, BlockState supportingBlock) {
+	protected PlaceSnapshot getPlaceSnapshot(BlockPos pos, BlockState supportingBlock) {
 		// Is position out of world?
 		if(!world.isBlockPresent(pos)) return null;
-
-		// Is block at pos replaceable?
-		BlockItemUseContext ctx = new WandItemUseContext(this, pos, item);
-		if(!ctx.canPlace()) return null;
 
 		// If replace mode is off, target has to be air
 		if(!options.replace.get() && !world.isAirBlock(pos)) return null;
 
-		// Can block be placed?
-		BlockState placeBlock = Block.getBlockFromItem(item).getStateForPlacement(ctx);
-		if(placeBlock == null) return null;
-		placeBlock = Block.getValidBlockForPosition(placeBlock, world, pos);
-		if(placeBlock.getBlock() == Blocks.AIR || !placeBlock.isValidPosition(world, pos)) return null;
+		ArrayList<BlockItem> items = new ArrayList<>(itemCounts.keySet());
+		if(doRandomize) {
+			for(BlockItem item : itemWeights.keySet()) {
+				int weight = itemWeights.get(item);
+				for(int i=0; i<weight-1; i++) items.add(item);
+			}
 
-		// No entities colliding?
-		VoxelShape shape = placeBlock.getCollisionShape(world, pos);
-		if(!shape.isEmpty()) {
-			AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
-			if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty()) return null;
+			Collections.shuffle(items, player.getRNG());
 		}
 
-		// Copy certain properties of supporting block (save the effort when running preview on client)
-		if(options.direction.get() == WandOptions.DIRECTION.TARGET && !world.isRemote) {
+		for(BlockItem item : items) {
+			int count = itemCounts.get(item);
+			if(count == 0) continue;
+
+			// Is block at pos replaceable?
+			BlockItemUseContext ctx = new WandItemUseContext(this, pos, item);
+			if(!ctx.canPlace()) continue;
+
+			// Can block be placed?
+			BlockState blockState = item.getBlock().getStateForPlacement(ctx);
+			if(blockState == null) continue;
+			blockState = Block.getValidBlockForPosition(blockState, world, pos);
+			if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) continue;
+
+			// No entities colliding?
+			VoxelShape shape = blockState.getCollisionShape(world, pos);
+			if(!shape.isEmpty()) {
+				AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
+				if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty()) continue;
+			}
+
+			// Reduce item count
+			if(count < Integer.MAX_VALUE) itemCounts.merge(item, -1, Integer::sum);
+			return new PlaceSnapshot(pos, supportingBlock, item);
+		}
+		return null;
+	}
+
+	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
+		BlockPos blockPos = placeSnapshot.pos;
+
+		BlockItemUseContext ctx = new WandItemUseContext(this, blockPos, placeSnapshot.item);
+		if(!ctx.canPlace()) return false;
+
+		BlockState placeBlock = Block.getBlockFromItem(placeSnapshot.item).getStateForPlacement(ctx);
+		if(placeBlock == null) return false;
+
+		BlockState supportingBlock = placeSnapshot.supportingBlock;
+
+		if(options.direction.get() == WandOptions.DIRECTION.TARGET) {
 			// Block properties to be copied (alignment/rotation properties)
 			for(IProperty property : new IProperty[] {
 					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
@@ -263,38 +295,6 @@ public abstract class WandJob
 				if(slabType != SlabType.DOUBLE) placeBlock = placeBlock.with(BlockStateProperties.SLAB_TYPE, slabType);
 			}
 		}
-		return placeBlock;
-	}
-
-	@Nullable
-	protected PlaceSnapshot getPlaceSnapshot(BlockPos pos, BlockState supportingBlock) {
-		ArrayList<BlockItem> items = new ArrayList<>(itemCounts.keySet());
-		if(doRandomize) {
-			for(BlockItem item : itemWeights.keySet()) {
-				int weight = itemWeights.get(item);
-				for(int i=0; i<weight-1; i++) items.add(item);
-			}
-
-			Collections.shuffle(items, player.getRNG());
-		}
-
-		for(BlockItem item : items) {
-			int count = itemCounts.get(item);
-			if(count == 0) continue;
-
-			BlockState placeBlock = getPlaceBlockstate(pos, item, supportingBlock);
-			if(placeBlock == null) continue;
-
-			if(count < Integer.MAX_VALUE) itemCounts.merge(item, -1, Integer::sum);
-			return new PlaceSnapshot(pos, placeBlock, item);
-		}
-		return null;
-	}
-
-	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
-		BlockPos blockPos = placeSnapshot.pos;
-		BlockState placeBlock = placeSnapshot.block;
-
 		// Abort if placeEvent is canceled
 		BlockSnapshot snapshot = new BlockSnapshot(world, blockPos, placeBlock);
 		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
@@ -306,12 +306,12 @@ public abstract class WandJob
 			ConstructionWand.LOGGER.info("Block could not be placed");
 			return false;
 		}
-		world.notifyNeighbors(blockPos, placeBlock.getBlock());
 
 		// Update stats
 		player.addStat(Stats.ITEM_USED.get(placeSnapshot.item));
 		player.addStat(ModStats.USE_WAND);
 
+		placeSnapshot.block = placeBlock;
 		return true;
 	}
 
@@ -346,7 +346,6 @@ public abstract class WandJob
 		}
 		placeSnapshots = placed;
 
-		// Play place sound
 		if(!placeSnapshots.isEmpty()) {
 			SoundType sound = placeSnapshots.getFirst().block.getSoundType();
 			world.playSound(null, player.getPosition(), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
