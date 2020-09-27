@@ -13,6 +13,6 @@ public class CommonEvents
 	public static void logOut(PlayerEvent.PlayerLoggedOutEvent e) {
 		PlayerEntity player = e.getPlayer();
 		if(player.getEntityWorld().isRemote) return;
-		ConstructionWand.instance.jobHistory.removePlayer(player);
+		ConstructionWand.instance.undoHistory.removePlayer(player);
 	}
 }
