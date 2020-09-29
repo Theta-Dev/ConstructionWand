@@ -233,7 +233,7 @@ public abstract class WandJob
 			// Draw item from pool (returns null if none are left)
 			BlockItem item = itemPool.draw();
 			if(item == null) return null;
-
+      
 			int count = itemCounts.get(item);
 			if(count == 0) continue;
 
@@ -295,7 +295,7 @@ public abstract class WandJob
 		}
 
 		// Remove block if placeEvent is canceled
-		BlockSnapshot snapshot = BlockSnapshot.create(world.func_234923_W_(), world, blockPos);
+		BlockSnapshot snapshot = BlockSnapshot.create(world, blockPos);
 		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
 		MinecraftForge.EVENT_BUS.post(placeEvent);
 		if(placeEvent.isCanceled()) {
