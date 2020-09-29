@@ -80,7 +80,6 @@ public class ConstructionWand
     {
         renderBlockPreview = new RenderBlockPreview();
         MinecraftForge.EVENT_BUS.register(renderBlockPreview);
-        ModItems.registerModelProperties();
     }
 
     public static ResourceLocation loc(String name) {

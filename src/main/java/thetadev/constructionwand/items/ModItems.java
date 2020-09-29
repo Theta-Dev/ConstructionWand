@@ -1,7 +1,6 @@
 package thetadev.constructionwand.items;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemTier;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -25,14 +24,5 @@ public class ModItems
 	public static void onRegisterItems(RegistryEvent.Register<Item> event)
 	{
 		event.getRegistry().registerAll(WANDS);
-	}
-
-	public static void registerModelProperties() {
-		for(Item item : WANDS) {
-			ItemModelsProperties.func_239418_a_(
-					item, new ResourceLocation(ConstructionWand.MODID, "wand_mode"),
-					(stack, world, entity) -> entity == null || !(stack.getItem() instanceof ItemWand) ? 0 : ItemWand.getWandMode(stack)
-			);
-		}
 	}
 }

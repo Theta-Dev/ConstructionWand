@@ -6,8 +6,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.items.ItemWand;
 
@@ -37,16 +36,8 @@ public class WandUtil
 		return null;
 	}
 
-	public static BlockPos playerPos(PlayerEntity player) {
-		return new BlockPos(player.getPositionVec());
-	}
-	
-	public static Vector3d entityPositionVec(Entity entity) {
-		return new Vector3d(entity.getPosX(), entity.getPosY() - entity.getYOffset() + entity.getHeight()/2, entity.getPosZ());
-	}
-
-	public static Vector3d blockPosVec(BlockPos pos) {
-		return new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+	public static Vec3d entityPositionVec(Entity entity) {
+		return new Vec3d(entity.getPosX(), entity.getPosY() - entity.getYOffset() + entity.getHeight()/2, entity.getPosZ());
 	}
 
 	public static List<ItemStack> getHotbar(PlayerEntity player) {
