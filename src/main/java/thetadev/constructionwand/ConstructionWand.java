@@ -20,7 +20,7 @@ import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
 import thetadev.constructionwand.items.ModItems;
-import thetadev.constructionwand.job.JobHistory;
+import thetadev.constructionwand.job.UndoHistory;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 import thetadev.constructionwand.network.PacketWandOption;
@@ -36,14 +36,14 @@ public class ConstructionWand
     public SimpleChannel HANDLER;
 
     public ContainerManager containerManager;
-    public JobHistory jobHistory;
+    public UndoHistory undoHistory;
     public RenderBlockPreview renderBlockPreview;
 
     public ConstructionWand() {
         instance = this;
 
         containerManager = new ContainerManager();
-        jobHistory = new JobHistory();
+        undoHistory = new UndoHistory();
 
         // Register setup methods for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
