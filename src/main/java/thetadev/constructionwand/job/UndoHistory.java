@@ -140,7 +140,7 @@ public class UndoHistory
 
 			// Play teleport sound
 			SoundEvent sound = SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT;
-			world.playSound(null, WandUtil.playerPos(player), sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
+			world.playSound(null, player.getPosition(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
 			return true;
 		}
