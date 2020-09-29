@@ -218,8 +218,14 @@ public abstract class WandJob
 		// Is position out of world?
 		if(!world.isBlockPresent(pos)) return null;
 
+		// Is block modifiable?
+		if(!world.isBlockModifiable(player, pos)) return null;
+
 		// If replace mode is off, target has to be air
 		if(!options.replace.get() && !world.isAirBlock(pos)) return null;
+
+		// Limit placement range
+		if(ConfigServer.MAX_RANGE.get() > 0 && WandUtil.maxRange(rayTraceResult.getPos(), pos) > ConfigServer.MAX_RANGE.get()) return null;
 
 		itemPool.reset();
 
