@@ -37,7 +37,7 @@ public class WandUtil
 	}
 
 	public static Vec3d entityPositionVec(Entity entity) {
-		return new Vec3d(entity.getPosX(), entity.getPosY() - entity.getYOffset() + entity.getHeight()/2, entity.getPosZ());
+		return new Vec3d(entity.posX, entity.posY - entity.getYOffset() + entity.getHeight()/2, entity.posZ);
 	}
 
 	public static List<ItemStack> getHotbar(PlayerEntity player) {

@@ -97,17 +97,19 @@ dependencies {
             name   : "forge",
             version: "${project.mcversion}-${project.forgeversion}"
     ])
-
+    /*
     compileOnly fg.deobf([
             group: "vazkii.botania",
             name: "Botania",
             version: "${project.botania}",
             classifier: "api"
-    ])
-    
-    //runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.15.2-1.2-32.160")
-    //runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.15.2-2.0.2.4")
-    //runtimeOnly fg.deobf("vazkii.botania:Botania:r1.15-387.455")
+    ])*/
+
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.14.4-1.1-25.135")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.6.1")
+
+    compileOnly fg.deobf("vazkii.botania:Botania:r1.11-379.354:api")
+    runtimeOnly fg.deobf("vazkii.botania:Botania:r1.11-379.354")
 }
 
 jar {
