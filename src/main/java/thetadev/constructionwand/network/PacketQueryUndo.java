@@ -31,7 +31,7 @@ public class PacketQueryUndo
 			ServerPlayerEntity player = ctx.get().getSender();
 			if(player == null) return;
 
-			ConstructionWand.instance.jobHistory.updateClient(player, msg.undoPressed);
+			ConstructionWand.instance.undoHistory.updateClient(player, msg.undoPressed);
 
 			//ConstructionWand.LOGGER.debug("Undo queried");
 		}

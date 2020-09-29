@@ -59,4 +59,8 @@ public class WandUtil
 		inventory.addAll(player.inventory.mainInventory);
 		return inventory;
 	}
+
+	public static int maxRange(BlockPos p1, BlockPos p2) {
+		return Math.max(Math.abs(p1.getX() - p2.getX()), Math.abs(p1.getZ() - p2.getZ()));
+	}
 }

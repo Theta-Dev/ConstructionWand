@@ -43,7 +43,7 @@ public class ClientEvents
 		PlayerEntity player = Minecraft.getInstance().player;
 		double scroll = event.getScrollDelta();
 
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL.get()) || scroll == 0) return;
+		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL_MODE.get()) || scroll == 0) return;
 
 		ItemStack wand = WandUtil.holdingWand(player);
 		if(wand == null) return;
@@ -59,7 +59,7 @@ public class ClientEvents
 	public static void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
 		PlayerEntity player = event.getPlayer();
 
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL.get())) return;
+		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL_MODE.get())) return;
 
 		ItemStack wand = event.getItemStack();
 		if(!(wand.getItem() instanceof ItemWand)) return;
@@ -73,7 +73,7 @@ public class ClientEvents
 	@SubscribeEvent
 	public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
 		PlayerEntity player = event.getPlayer();
-		if(player == null || !player.isSneaking()) return;
+		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL_GUI.get())) return;
 
 		ItemStack wand = event.getItemStack();
 		if(!(wand.getItem() instanceof ItemWand)) return;
