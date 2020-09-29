@@ -20,6 +20,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
 import thetadev.constructionwand.basics.option.WandOptions;
+import thetadev.constructionwand.basics.pool.*;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.ItemWand;
 
@@ -29,24 +30,23 @@ import java.util.stream.Collectors;
 
 public abstract class WandJob
 {
-	protected PlayerEntity player;
-	protected World world;
-	protected BlockRayTraceResult rayTraceResult;
+	protected final PlayerEntity player;
+	protected final World world;
+	protected final BlockRayTraceResult rayTraceResult;
 	protected ItemStack wand;
 	protected ItemWand wandItem;
 
 	// Wand options
 	protected WandOptions options;
 	protected int maxBlocks;
-	protected boolean doRandomize;
 
-	protected LinkedHashMap<BlockItem, Integer> itemCounts;
-	protected HashMap<BlockItem, Integer> itemWeights;
+	protected HashMap<BlockItem, Integer> itemCounts;
+	protected IPool<BlockItem> itemPool;
 
 	protected LinkedList<PlaceSnapshot> placeSnapshots;
 
 
-	public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand)
+	protected WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand)
 	{
 		this.player = player;
 		this.world = world;
@@ -61,7 +61,6 @@ public abstract class WandJob
 
 		// Get options
 		options = new WandOptions(wand);
-		doRandomize = options.random.get();
 
 		// Get place item
 		addBlockItems();
@@ -97,60 +96,53 @@ public abstract class WandJob
 
 	public BlockRayTraceResult getRayTraceResult() { return rayTraceResult; }
 
-	public BlockPos getTargetPos() { return rayTraceResult.getPos(); }
-
-	public PlayerEntity getPlayer() { return player; }
-
-	public void setPlayer(PlayerEntity player) { this.player = player; }
-
-	public World getWorld() { return world; }
-
-	public void setWorld(World world) { this.world = world; }
-
 	public ItemStack getWand() { return wand; }
 
 	private void addBlockItem(BlockItem item) {
 		int count = countItem(item);
-		if(count > 0) itemCounts.put(item, count);
+		if(count > 0) {
+			itemCounts.put(item, count);
+			itemPool.add(item);
+		}
 	}
 
 	private void addBlockItems() {
 		itemCounts = new LinkedHashMap<>();
-		itemWeights = new HashMap<>();
 
 		BlockPos targetPos = rayTraceResult.getPos();
 		BlockState targetState = world.getBlockState(targetPos);
 		Block targetBlock = targetState.getBlock();
 		ItemStack offhandStack = player.getHeldItem(Hand.OFF_HAND);
 
-		if(doRandomize) {
+		// Random mode -> add all items from hotbar
+		if(options.random.get()) {
+			itemPool = new RandomPool<>(player.getRNG());
+
 			for(ItemStack stack : WandUtil.getHotbarWithOffhand(player)) {
-				if(stack.getItem() instanceof BlockItem) {
-					BlockItem item = (BlockItem) stack.getItem();
-					addBlockItem(item);
-					itemWeights.compute(item, (k, v) -> (v == null) ? 1 : v+1);
-				}
+				if(stack.getItem() instanceof BlockItem) addBlockItem((BlockItem) stack.getItem());
 			}
 		}
-		else if(!offhandStack.isEmpty() && offhandStack.getItem() instanceof BlockItem) {
+		else {
+			itemPool = new OrderedPool<>();
+
 			// Block in offhand -> override
-			addBlockItem((BlockItem) offhandStack.getItem());
-		}
+			if(!offhandStack.isEmpty() && offhandStack.getItem() instanceof BlockItem) {
+				addBlockItem((BlockItem) offhandStack.getItem());
+			}
+			// Otherwise use target block
+			else {
+				Item item = targetBlock.asItem();
+				if(item instanceof BlockItem) {
+					addBlockItem((BlockItem) item);
 
-		// Otherwise use target block
-		if(itemCounts.isEmpty()) {
-			Item item = targetBlock.asItem();
-			if(item instanceof BlockItem) {
-				addBlockItem((BlockItem) item);
-
-				// Add replacement items
-				if(options.match.get() != WandOptions.MATCH.EXACT) {
-					for(Item it : ReplacementRegistry.getMatchingSet(item)) {
-						if(it instanceof BlockItem) addBlockItem((BlockItem) it);
+					// Add replacement items
+					if(options.match.get() != WandOptions.MATCH.EXACT) {
+						for(Item it : ReplacementRegistry.getMatchingSet(item)) {
+							if(it instanceof BlockItem) addBlockItem((BlockItem) it);
+						}
 					}
 				}
 			}
-			doRandomize = false;
 		}
 	}
 
@@ -226,20 +218,22 @@ public abstract class WandJob
 		// Is position out of world?
 		if(!world.isBlockPresent(pos)) return null;
 
+		// Is block modifiable?
+		if(!world.isBlockModifiable(player, pos)) return null;
+
 		// If replace mode is off, target has to be air
 		if(!options.replace.get() && !world.isAirBlock(pos)) return null;
 
-		ArrayList<BlockItem> items = new ArrayList<>(itemCounts.keySet());
-		if(doRandomize) {
-			for(BlockItem item : itemWeights.keySet()) {
-				int weight = itemWeights.get(item);
-				for(int i=0; i<weight-1; i++) items.add(item);
-			}
+		// Limit placement range
+		if(ConfigServer.MAX_RANGE.get() > 0 && WandUtil.maxRange(rayTraceResult.getPos(), pos) > ConfigServer.MAX_RANGE.get()) return null;
 
-			Collections.shuffle(items, player.getRNG());
-		}
+		itemPool.reset();
 
-		for(BlockItem item : items) {
+		while(true) {
+			// Draw item from pool (returns null if none are left)
+			BlockItem item = itemPool.draw();
+			if(item == null) return null;
+      
 			int count = itemCounts.get(item);
 			if(count == 0) continue;
 
@@ -264,7 +258,6 @@ public abstract class WandJob
 			if(count < Integer.MAX_VALUE) itemCounts.merge(item, -1, Integer::sum);
 			return new PlaceSnapshot(pos, supportingBlock, item);
 		}
-		return null;
 	}
 
 	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
@@ -352,40 +345,8 @@ public abstract class WandJob
 		}
 
 		// Add to job history for undo
-		if(placeSnapshots.size() > 1) ConstructionWand.instance.jobHistory.add(this);
+		if(placeSnapshots.size() > 1) ConstructionWand.instance.undoHistory.add(player, world, placeSnapshots);
 
 		return !placeSnapshots.isEmpty();
-	}
-
-	public boolean undo() {
-		for(PlaceSnapshot snapshot : placeSnapshots) {
-			BlockState currentBlock = world.getBlockState(snapshot.pos);
-
-			// If placed block is still present and can be broken, break it and return item
-			if(world.isBlockModifiable(player, snapshot.pos) &&
-					(player.isCreative() ||
-					(currentBlock.getBlockHardness(world, snapshot.pos) > -1 && world.getTileEntity(snapshot.pos) == null && ReplacementRegistry.matchBlocks(currentBlock.getBlock(), snapshot.block.getBlock()))))
-			{
-				BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, snapshot.pos, currentBlock, player);
-				MinecraftForge.EVENT_BUS.post(breakEvent);
-				if(breakEvent.isCanceled()) continue;
-
-				world.removeBlock(snapshot.pos, false);
-
-				if(!player.isCreative()) {
-					ItemStack stack = new ItemStack(snapshot.item);
-					if(!player.inventory.addItemStackToInventory(stack)) {
-						player.dropItem(stack, false);
-					}
-				}
-			}
-		}
-		player.inventory.markDirty();
-
-		// Play teleport sound
-		SoundEvent sound = SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT;
-		world.playSound(null, player.getPosition(), sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
-
-		return true;
 	}
 }

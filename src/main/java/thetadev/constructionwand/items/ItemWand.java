@@ -48,11 +48,8 @@ public abstract class ItemWand extends Item
 
 		ItemStack stack = player.getHeldItem(hand);
 
-		if(player.isSneaking() && ConstructionWand.instance.jobHistory.isUndoActive(player)) {
-			WandJob job = ConstructionWand.instance.jobHistory.getForUndo(player, world, context.getPos());
-			if(job == null) return ActionResultType.FAIL;
-			//ConstructionWand.LOGGER.debug("Starting Undo");
-			return job.undo() ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+		if(player.isSneaking() && ConstructionWand.instance.undoHistory.isUndoActive(player)) {
+			return ConstructionWand.instance.undoHistory.undo(player, world, context.getPos()) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 		}
 		else {
 			WandJob job = WandJob.getJob(player, world, new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false), stack);
