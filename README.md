@@ -60,3 +60,8 @@ SHIFT+Right clicking empty space opens the option screen of your wand.
 - Look at your statisics to see how many blocks you have placed using your wand
 
 - **1.16+ only:** The Infinity Wand won't burn in lava just like netherite gear.
+
+## Contributions and #Hacktoberfest
+As #Hacktoberfest now requires repo owners to opt in, I added the tag to this repository.
+
+I'd really appreciate translations. Currently ConstructionWand only has English and German, so if you speak any other language you can help translate the mod and add a new language file under `src/main/resources/assets/constructionwand/lang/`.
