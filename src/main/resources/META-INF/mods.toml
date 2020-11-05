@@ -5,9 +5,9 @@ license="MIT License"
 modId="constructionwand"
 version="${file.jarVersion}"
 displayName="Construction Wand"
-displayURL="https://github.com/Theta-Dev/ConstructionWand" #optional
-logoFile="logo.png" #optional
-authors="ThetaDev" #optional
+displayURL="https://github.com/Theta-Dev/ConstructionWand"
+logoFile="logo.png"
+authors="ThetaDev"
 description='''
 Construction Wands make building easier!
 
@@ -26,6 +26,6 @@ This is my first minecraft mod. May the odds be ever in your favor.
 [[dependencies.constructionwand]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.2, 1.16.3]"
+    versionRange="[1.16.2, 1.16.4]"
     ordering="NONE"
     side="BOTH"
