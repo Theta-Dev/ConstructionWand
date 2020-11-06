@@ -1,24 +1,26 @@
 package thetadev.constructionwand.items;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.Nullable;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.option.IOption;
@@ -30,53 +32,54 @@ import java.util.List;
 
 public abstract class ItemWand extends Item
 {
-	public ItemWand(String name, Item.Properties properties) {
-		super(properties.group(ItemGroup.TOOLS));
-		setRegistryName(ConstructionWand.loc(name));
+	public ItemWand(String name, Item.Settings settings) {
+		super(settings.group(ItemGroup.TOOLS));
 	}
 
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context)
+	public ActionResult useOnBlock(ItemUsageContext context)
 	{
 		PlayerEntity player = context.getPlayer();
 		Hand hand = context.getHand();
 		World world = context.getWorld();
 
-		if(world.isRemote || player == null) return ActionResultType.FAIL;
+		if(world.isClient || player == null) return ActionResult.FAIL;
 
-		ItemStack stack = player.getHeldItem(hand);
+		ItemStack stack = player.getStackInHand(hand);
 
 		if(player.isSneaking() && ConstructionWand.instance.undoHistory.isUndoActive(player)) {
-			return ConstructionWand.instance.undoHistory.undo(player, world, context.getPos()) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+			return ConstructionWand.instance.undoHistory.undo(player, world, context.getBlockPos()) ? ActionResult.SUCCESS : ActionResult.FAIL;
 		}
 		else {
-			WandJob job = WandJob.getJob(player, world, new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false), stack);
-			return job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+			WandJob job = WandJob.getJob(player, world, new BlockHitResult(context.getHitPos(), context.getSide(), context.getBlockPos(), false), stack);
+			return job.doIt() ? ActionResult.SUCCESS : ActionResult.FAIL;
 		}
 	}
 
+
+
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-		ItemStack stack = player.getHeldItem(hand);
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+		ItemStack stack = player.getStackInHand(hand);
 
 		if(!player.isSneaking()) {
-			if(world.isRemote) return ActionResult.resultFail(stack);
+			if(world.isClient) return TypedActionResult.fail(stack);
 
 			// Right click: Place angel block
 			//ConstructionWand.LOGGER.debug("Place angel block");
 			WandJob job = new AngelJob(player, world, stack);
-			return job.doIt() ? ActionResult.resultSuccess(stack) : ActionResult.resultFail(stack);
+			return job.doIt() ? TypedActionResult.success(stack) : TypedActionResult.fail(stack);
 		}
-		return ActionResult.resultFail(stack);
+		return TypedActionResult.fail(stack);
 	}
 
 	@Override
-	public boolean canHarvestBlock(BlockState blockIn) {
+	public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
 		return false;
 	}
 
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean canRepair(ItemStack toRepair, ItemStack repair) {
 		return false;
 	}
 
@@ -93,36 +96,36 @@ public abstract class ItemWand extends Item
 		return options.mode.get().ordinal();
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack itemstack, World worldIn, List<ITextComponent> lines, ITooltipFlag extraInfo) {
-		ItemWand wand = (ItemWand) itemstack.getItem();
-		WandOptions options = new WandOptions(itemstack);
+	@Environment(EnvType.CLIENT)
+	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> lines, TooltipContext context) {
+		ItemWand wand = (ItemWand) stack.getItem();
+		WandOptions options = new WandOptions(stack);
 
 		String langTooltip = ConstructionWand.MODID + ".tooltip.";
 
 		if(Screen.hasShiftDown()) {
 			for(int i=1; i<options.allOptions.length; i++) {
 				IOption<?> opt = options.allOptions[i];
-				lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-						.append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.GRAY))
+				lines.add(new TranslatableText(opt.getKeyTranslation()).formatted(Formatting.AQUA)
+						.append(new TranslatableText(opt.getValueTranslation()).formatted(Formatting.GRAY))
 				);
 			}
 		}
 		else {
 			IOption<?> opt = options.allOptions[0];
-			lines.add(new TranslationTextComponent(langTooltip + "blocks", getLimit()).mergeStyle(TextFormatting.GRAY));
-			lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-					.append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.WHITE)));
-			lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));
+			lines.add(new TranslatableText(langTooltip + "blocks", getLimit()).formatted(Formatting.GRAY));
+			lines.add(new TranslatableText(opt.getKeyTranslation()).formatted(Formatting.AQUA)
+					.append(new TranslatableText(opt.getValueTranslation()).formatted(Formatting.WHITE)));
+			lines.add(new TranslatableText(langTooltip + "shift").formatted(Formatting.AQUA));
 		}
 	}
 
 	public static void optionMessage(PlayerEntity player, IOption<?> option) {
-		player.sendStatusMessage(
-				new TranslationTextComponent(option.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-						.append(new TranslationTextComponent(option.getValueTranslation()).mergeStyle(TextFormatting.WHITE))
-						.append(new StringTextComponent(" - ").mergeStyle(TextFormatting.GRAY))
-						.append(new TranslationTextComponent(option.getDescTranslation()).mergeStyle(TextFormatting.WHITE))
+		player.sendMessage(
+				new TranslatableText(option.getKeyTranslation()).formatted(Formatting.AQUA)
+						.append(new TranslatableText(option.getValueTranslation()).formatted(Formatting.WHITE))
+						.append(new LiteralText(" - ").formatted(Formatting.GRAY))
+						.append(new TranslatableText(option.getDescTranslation()).formatted(Formatting.WHITE))
 				, true);
 	}
 }

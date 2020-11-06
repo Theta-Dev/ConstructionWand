@@ -1,13 +1,13 @@
 package thetadev.constructionwand.containers.handlers;
 
+import net.fabricmc.fabric.mixin.item.ItemStackMixin;
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.collection.DefaultedList;
 import thetadev.constructionwand.api.IContainerHandler;
 import thetadev.constructionwand.basics.WandUtil;
 
@@ -36,13 +36,13 @@ public class HandlerShulkerbox implements IContainerHandler
 	@Override
 	public int useItems(PlayerEntity player, ItemStack itemStack, ItemStack inventoryStack, int count)
 	{
-		NonNullList<ItemStack> itemList = getItemList(inventoryStack);
+		DefaultedList<ItemStack> itemList = getItemList(inventoryStack);
 		boolean changed = false;
 
 		for(ItemStack stack : itemList) {
 			if(WandUtil.stackEquals(stack, itemStack)) {
 				int toTake = Math.min(count, stack.getCount());
-				stack.shrink(toTake);
+				stack.decrement(toTake);
 				count -= toTake;
 				changed = true;
 				if(count == 0) break;
@@ -56,11 +56,11 @@ public class HandlerShulkerbox implements IContainerHandler
 		return count;
 	}
 
-	private NonNullList<ItemStack> getItemList(ItemStack itemStack) {
-		NonNullList<ItemStack> itemStacks = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
-		CompoundNBT rootTag = itemStack.getTag();
+	private DefaultedList<ItemStack> getItemList(ItemStack itemStack) {
+		DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(SLOTS, ItemStack.EMPTY);
+		CompoundTag rootTag = itemStack.getTag();
 		if (rootTag != null && rootTag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND)) {
-			CompoundNBT entityTag = rootTag.getCompound("BlockEntityTag");
+			CompoundTag entityTag = rootTag.getCompound("BlockEntityTag");
 			if (entityTag.contains("Items", Constants.NBT.TAG_LIST)) {
 				ItemStackHelper.loadAllItems(entityTag, itemStacks);
 			}
@@ -68,10 +68,10 @@ public class HandlerShulkerbox implements IContainerHandler
 		return itemStacks;
 	}
 
-	private void setItemList(ItemStack itemStack, NonNullList<ItemStack> itemStacks) {
-		CompoundNBT rootTag = itemStack.getOrCreateTag();
+	private void setItemList(ItemStack itemStack, DefaultedList<ItemStack> itemStacks) {
+		CompoundTag rootTag = itemStack.getOrCreateTag();
 		if (!rootTag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND)) {
-			rootTag.put("BlockEntityTag", new CompoundNBT());
+			rootTag.put("BlockEntityTag", new CompoundTag());
 		}
 		ItemStackHelper.saveAllItems(rootTag.getCompound("BlockEntityTag"), itemStacks);
 	}

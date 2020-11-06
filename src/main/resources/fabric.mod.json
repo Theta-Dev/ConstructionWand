@@ -1,37 +1,33 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "constructionwand",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Construction Wand",
+  "description": "Construction Wands make building easier!\n\nWith a Construction Wand you can place multiple blocks (up to 1024) at once, extending you build on the side you're facing.\nSneak+Right click to activate angel mode which allows you to place a block at the opposite side of the block facing you.\nIf you concentrate enough, you can even conjure a block in mid air!\n\nThis is my first minecraft mod. May the odds be ever in your favor.",
   "authors": [
-    "Me!"
+    "ThetaDev"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/Theta-Dev/ConstructionWand"
   },
 
-  "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "license": "MIT License",
+  "icon": "logo.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "thetadev.constructionwand.ConstructionWand"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "constructionwand.mixins.json"
   ],
 
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric": "*",
     "minecraft": "1.16.x"
-  },
-  "suggests": {
-    "flamingo": "*"
   }
 }

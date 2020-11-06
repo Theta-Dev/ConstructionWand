@@ -4,6 +4,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
@@ -30,7 +33,7 @@ public class UndoHistory
 	}
 
 	private PlayerEntry getEntryFromPlayer(PlayerEntity player) {
-		return history.computeIfAbsent(player.getUniqueID(), k -> new PlayerEntry());
+		return history.computeIfAbsent(player.getUuid(), k -> new PlayerEntry());
 	}
 
 	public void add(PlayerEntity player, World world, LinkedList<PlaceSnapshot> placeSnapshots) {
@@ -40,12 +43,12 @@ public class UndoHistory
 	}
 
 	public void removePlayer(PlayerEntity player) {
-		history.remove(player.getUniqueID());
+		history.remove(player.getUuid());
 	}
 
 	public void updateClient(PlayerEntity player, boolean ctrlDown) {
 		World world = player.getEntityWorld();
-		if(world.isRemote) return;
+		if(world.isClient) return;
 
 		// Set state of CTRL key
 		PlayerEntry playerEntry = getEntryFromPlayer(player);
@@ -118,19 +121,15 @@ public class UndoHistory
 				BlockState currentBlock = world.getBlockState(snapshot.pos);
 
 				// If placed block is still present and can be broken, break it and return item
-				if(world.isBlockModifiable(player, snapshot.pos) &&
+				if(world.canPlayerModifyAt(player, snapshot.pos) &&
 						(player.isCreative() ||
-								(currentBlock.getBlockHardness(world, snapshot.pos) > -1 && world.getTileEntity(snapshot.pos) == null && ReplacementRegistry.matchBlocks(currentBlock.getBlock(), snapshot.block.getBlock()))))
+								(currentBlock.getHardness(world, snapshot.pos) > -1 && world.getBlockEntity(snapshot.pos) == null && ReplacementRegistry.matchBlocks(currentBlock.getBlock(), snapshot.block.getBlock()))))
 				{
-					BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, snapshot.pos, currentBlock, player);
-					MinecraftForge.EVENT_BUS.post(breakEvent);
-					if(breakEvent.isCanceled()) continue;
-
 					world.removeBlock(snapshot.pos, false);
 
 					if(!player.isCreative()) {
 						ItemStack stack = new ItemStack(snapshot.item);
-						if(!player.inventory.addItemStackToInventory(stack)) {
+						if(!player.inventory.insertStack(stack)) {
 							player.dropItem(stack, false);
 						}
 					}

@@ -1,22 +1,22 @@
 package thetadev.constructionwand.job;
 
 import net.minecraft.block.*;
+import net.minecraft.block.enums.SlabType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
-import net.minecraft.state.Property;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.SlabType;
-import net.minecraft.stats.Stats;
+import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.stat.Stats;
+import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.*;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.world.BlockEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -24,7 +24,6 @@ import thetadev.constructionwand.basics.pool.*;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.ItemWand;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,7 +31,7 @@ public abstract class WandJob
 {
 	protected final PlayerEntity player;
 	protected final World world;
-	protected final BlockRayTraceResult rayTraceResult;
+	protected final BlockHitResult hitResult;
 	protected ItemStack wand;
 	protected ItemWand wandItem;
 
@@ -46,11 +45,11 @@ public abstract class WandJob
 	protected LinkedList<PlaceSnapshot> placeSnapshots;
 
 
-	protected WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand)
+	protected WandJob(PlayerEntity player, World world, BlockHitResult hitResult, ItemStack wand)
 	{
 		this.player = player;
 		this.world = world;
-		this.rayTraceResult = rayTraceResult;
+		this.hitResult = hitResult;
 		placeSnapshots = new LinkedList<>();
 
 		// Get wand
@@ -83,18 +82,18 @@ public abstract class WandJob
 		getBlockPositionList();
 	}
 
-	public static WandJob getJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack itemStack) {
+	public static WandJob getJob(PlayerEntity player, World world, BlockHitResult hitResult, ItemStack itemStack) {
 		WandOptions options = new WandOptions(itemStack);
 
-		if(options.mode.get() == WandOptions.MODE.ANGEL) return new TransductionJob(player, world, rayTraceResult, itemStack);
-		return new ConstructionJob(player, world, rayTraceResult, itemStack);
+		if(options.mode.get() == WandOptions.MODE.ANGEL) return new TransductionJob(player, world, hitResult, itemStack);
+		return new ConstructionJob(player, world, hitResult, itemStack);
 	}
 
 	public Set<BlockPos> getBlockPositions() {
 		return placeSnapshots.stream().map(snapshot -> snapshot.pos).collect(Collectors.toSet());
 	}
 
-	public BlockRayTraceResult getRayTraceResult() { return rayTraceResult; }
+	public BlockHitResult getHitResult() { return hitResult; }
 
 	public ItemStack getWand() { return wand; }
 
@@ -109,14 +108,14 @@ public abstract class WandJob
 	private void addBlockItems() {
 		itemCounts = new LinkedHashMap<>();
 
-		BlockPos targetPos = rayTraceResult.getPos();
+		BlockPos targetPos = hitResult.getBlockPos();
 		BlockState targetState = world.getBlockState(targetPos);
 		Block targetBlock = targetState.getBlock();
-		ItemStack offhandStack = player.getHeldItem(Hand.OFF_HAND);
+		ItemStack offhandStack = player.getStackInHand(Hand.OFF_HAND);
 
 		// Random mode -> add all items from hotbar
 		if(options.random.get()) {
-			itemPool = new RandomPool<>(player.getRNG());
+			itemPool = new RandomPool<>(player.getRandom());
 
 			for(ItemStack stack : WandUtil.getHotbarWithOffhand(player)) {
 				if(stack.getItem() instanceof BlockItem) addBlockItem((BlockItem) stack.getItem());
@@ -147,7 +146,7 @@ public abstract class WandJob
 	}
 
 	private int countItem(Item item) {
-		if(player.inventory == null || player.inventory.mainInventory == null) return 0;
+		if(player.inventory == null || player.inventory.main == null) return 0;
 		if(player.isCreative()) return Integer.MAX_VALUE;
 
 		int total = 0;
@@ -172,7 +171,7 @@ public abstract class WandJob
 	// Attempts to take specified number of items, returns number of missing items
 	private int takeItems(Item item, int count)
 	{
-		if(player.inventory == null || player.inventory.mainInventory == null) return count;
+		if(player.inventory == null || player.inventory.main == null) return count;
 		if(player.isCreative()) return 0;
 
 		List<ItemStack> hotbar = WandUtil.getHotbarWithOffhand(player);
@@ -202,7 +201,7 @@ public abstract class WandJob
 
 			if(!container && WandUtil.stackEquals(stack, item)) {
 				int toTake = Math.min(count, stack.getCount());
-				stack.shrink(toTake);
+				stack.decrement(toTake);
 				count -= toTake;
 				player.inventory.markDirty();
 			}
@@ -213,19 +212,18 @@ public abstract class WandJob
 	protected abstract void getBlockPositionList();
 
 	// Get PlaceSnapshot, or null if no block can be placed
-	@Nullable
 	protected PlaceSnapshot getPlaceSnapshot(BlockPos pos, BlockState supportingBlock) {
 		// Is position out of world?
-		if(!world.isBlockPresent(pos)) return null;
+		if(!World.method_24794(pos)) return null;
 
 		// Is block modifiable?
-		if(!world.isBlockModifiable(player, pos)) return null;
+		if(!world.canPlayerModifyAt(player, pos)) return null;
 
 		// If replace mode is off, target has to be air
-		if(!options.replace.get() && !world.isAirBlock(pos)) return null;
+		if(!options.replace.get() && !world.isAir(pos)) return null;
 
 		// Limit placement range
-		if(ConfigServer.MAX_RANGE.get() > 0 && WandUtil.maxRange(rayTraceResult.getPos(), pos) > ConfigServer.MAX_RANGE.get()) return null;
+		if(ConfigServer.MAX_RANGE.get() > 0 && WandUtil.maxRange(hitResult.getBlockPos(), pos) > ConfigServer.MAX_RANGE.get()) return null;
 
 		itemPool.reset();
 
@@ -238,20 +236,20 @@ public abstract class WandJob
 			if(count == 0) continue;
 
 			// Is block at pos replaceable?
-			BlockItemUseContext ctx = new WandItemUseContext(this, pos, item);
+			ItemPlacementContext ctx = new WandItemUseContext(this, pos, item);
 			if(!ctx.canPlace()) continue;
 
 			// Can block be placed?
-			BlockState blockState = item.getBlock().getStateForPlacement(ctx);
+			BlockState blockState = item.getBlock().getPlacementState(ctx);
 			if(blockState == null) continue;
-			blockState = Block.getValidBlockForPosition(blockState, world, pos);
-			if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) continue;
+			blockState = Block.postProcessState(blockState, world, pos);
+			if(blockState.getBlock() == Blocks.AIR || !blockState.canPlaceAt(world, pos)) continue;
 
 			// No entities colliding?
 			VoxelShape shape = blockState.getCollisionShape(world, pos);
 			if(!shape.isEmpty()) {
-				AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
-				if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty()) continue;
+				Box blockBB = shape.getBoundingBox().offset(pos);
+				if(!world.getEntitiesByClass(LivingEntity.class, blockBB, EntityPredicates.EXCEPT_SPECTATOR).isEmpty()) continue;
 			}
 
 			// Reduce item count
@@ -263,10 +261,10 @@ public abstract class WandJob
 	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
 		BlockPos blockPos = placeSnapshot.pos;
 
-		BlockItemUseContext ctx = new WandItemUseContext(this, blockPos, placeSnapshot.item);
+		ItemPlacementContext ctx = new WandItemUseContext(this, blockPos, placeSnapshot.item);
 		if(!ctx.canPlace()) return false;
 
-		BlockState placeBlock = Block.getBlockFromItem(placeSnapshot.item).getStateForPlacement(ctx);
+		BlockState placeBlock = Block.getBlockFromItem(placeSnapshot.item).getPlacementState(ctx);
 		if(placeBlock == null) return false;
 
 		BlockState supportingBlock = placeSnapshot.supportingBlock;
@@ -274,18 +272,18 @@ public abstract class WandJob
 		if(options.direction.get() == WandOptions.DIRECTION.TARGET) {
 			// Block properties to be copied (alignment/rotation properties)
 			for(Property property : new Property[] {
-					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
-					BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
+					Properties.HORIZONTAL_FACING, Properties.FACING, Properties.HOPPER_FACING,
+					Properties.ROTATION, Properties.AXIS, Properties.BLOCK_HALF, Properties.STAIR_SHAPE})
 			{
-				if(supportingBlock.hasProperty(property) && placeBlock.hasProperty(property)) {
+				if(supportingBlock.contains(property) && placeBlock.contains(property)) {
 					placeBlock = placeBlock.with(property, supportingBlock.get(property));
 				}
 			}
 
 			// Dont dupe double slabs
-			if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE) && placeBlock.hasProperty(BlockStateProperties.SLAB_TYPE)) {
-				SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
-				if(slabType != SlabType.DOUBLE) placeBlock = placeBlock.with(BlockStateProperties.SLAB_TYPE, slabType);
+			if(supportingBlock.contains(Properties.SLAB_TYPE) && placeBlock.contains(Properties.SLAB_TYPE)) {
+				SlabType slabType = supportingBlock.get(Properties.SLAB_TYPE);
+				if(slabType != SlabType.DOUBLE) placeBlock = placeBlock.with(Properties.SLAB_TYPE, slabType);
 			}
 		}
 		// Place the block
@@ -294,18 +292,9 @@ public abstract class WandJob
 			return false;
 		}
 
-		// Remove block if placeEvent is canceled
-		BlockSnapshot snapshot = BlockSnapshot.create(world.func_234923_W_(), world, blockPos);
-		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
-		MinecraftForge.EVENT_BUS.post(placeEvent);
-		if(placeEvent.isCanceled()) {
-			world.removeBlock(blockPos, false);
-			return false;
-		}
-
 		// Update stats
-		player.addStat(Stats.ITEM_USED.get(placeSnapshot.item));
-		player.addStat(ModStats.USE_WAND);
+		player.incrementStat(Stats.USED.getOrCreateStat(placeSnapshot.item));
+		player.incrementStat(ModStats.USE_WAND);
 
 		placeSnapshot.block = placeBlock;
 		return true;
@@ -330,7 +319,7 @@ public abstract class WandJob
 			BlockItem placeItem = snapshot.item;
 
 			if(placeBlock(snapshot)) {
-				wand.damageItem(1, player, (e) -> e.sendBreakAnimation(player.swingingHand));
+				wand.damage(1, player, (e) -> e.sendToolBreakStatus(player.getActiveHand()));
 
 				// If the item cant be taken, undo the placement
 				if(takeItems(placeItem, 1) == 0) placed.add(snapshot);
@@ -344,7 +333,7 @@ public abstract class WandJob
 
 		// Play place sound
 		if(!placeSnapshots.isEmpty()) {
-			SoundType sound = placeSnapshots.getFirst().block.getSoundType();
+			BlockSoundGroup sound = placeSnapshots.getFirst().block.getSoundGroup();
 			world.playSound(null, WandUtil.playerPos(player), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
 		}
 

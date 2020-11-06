@@ -9,7 +9,7 @@ public class ItemWandInfinity extends ItemWand
 {
 	public ItemWandInfinity(String name)
 	{
-		super(name, new Properties().maxStackSize(1).isBurnable());
+		super(name, new Settings().maxCount(1).fireproof());
 	}
 
 	@Override

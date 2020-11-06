@@ -1,6 +1,6 @@
 package thetadev.constructionwand;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -83,7 +83,7 @@ public class ConstructionWand
         ModItems.registerModelProperties();
     }
 
-    public static ResourceLocation loc(String name) {
-        return new ResourceLocation(MODID, name);
+    public static Identifier loc(String name) {
+        return new Identifier(MODID, name);
     }
 }

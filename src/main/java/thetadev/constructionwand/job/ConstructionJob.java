@@ -3,9 +3,9 @@ package thetadev.constructionwand.job;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.option.WandOptions;
 
@@ -14,8 +14,8 @@ import java.util.LinkedList;
 
 public class ConstructionJob extends WandJob
 {
-	public ConstructionJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack itemStack) {
-		super(player, world, rayTraceResult, itemStack);
+	public ConstructionJob(PlayerEntity player, World world, BlockHitResult hitResult, ItemStack itemStack) {
+		super(player, world, hitResult, itemStack);
 	}
 
 	@Override
@@ -23,9 +23,9 @@ public class ConstructionJob extends WandJob
 		LinkedList<BlockPos> candidates = new LinkedList<>();
 		HashSet<BlockPos> allCandidates = new HashSet<>();
 
-		Direction placeDirection = rayTraceResult.getFace();
-		BlockState targetBlock = world.getBlockState(rayTraceResult.getPos());
-		BlockPos startingPoint = rayTraceResult.getPos().offset(placeDirection);
+		Direction placeDirection = hitResult.getSide();
+		BlockState targetBlock = world.getBlockState(hitResult.getBlockPos());
+		BlockPos startingPoint = hitResult.getBlockPos().offset(placeDirection);
 
 		// Is place direction allowed by lock?
 		if(placeDirection == Direction.UP || placeDirection == Direction.DOWN) {

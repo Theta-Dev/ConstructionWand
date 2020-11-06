@@ -1,25 +1,20 @@
 package thetadev.constructionwand.items;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.Item;
-import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.ToolMaterial;
 import thetadev.constructionwand.basics.ConfigServer;
 
 public class ItemWandBasic extends ItemWand
 {
-	private final IItemTier tier;
+	private final ToolMaterial tier;
 
-	public ItemWandBasic(String name, IItemTier tier) {
-		super(name, new Properties().maxDamage(tier.getMaxUses()));
+	public ItemWandBasic(String name, ToolMaterial tier) {
+		super(name, new Settings().maxDamage(tier.getDurability()));
 		this.tier = tier;
 	}
 
-	@Override
+	// TODO: Mixin for durability
 	public int getMaxDamage(ItemStack stack) {
 		return ConfigServer.getWandProperties(this).getDurability();
 	}
@@ -30,7 +25,7 @@ public class ItemWandBasic extends ItemWand
 	}
 
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-		return this.tier.getRepairMaterial().test(repair);
+	public boolean canRepair(ItemStack toRepair, ItemStack repair) {
+		return this.tier.getRepairIngredient().test(repair);
 	}
 }

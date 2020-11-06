@@ -41,7 +41,7 @@ public class RenderBlockPreview
 		if(wand == null) return;
 
 		if(!(player.isSneaking() && Screen.hasControlDown())) {
-			if(wandJob == null || !(wandJob.getRayTraceResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
+			if(wandJob == null || !(wandJob.getHitResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
 				wandJob = WandJob.getJob(player, player.getEntityWorld(), rtr, wand);
 			}
 
