@@ -15,13 +15,13 @@
 
   "constructionwand.option.lock": "Beschränkung: ",
   "constructionwand.option.lock.horizontal": "§aHorizontal",
-  "constructionwand.option.lock.horizontal.desc": "Erweitert nach §arechts/links§f. Baut nicht auf der Ober/Unterseite",
+  "constructionwand.option.lock.horizontal.desc": "Baut eine horizontale Säule vor dem Originalblock",
   "constructionwand.option.lock.vertical": "§aVertikal",
-  "constructionwand.option.lock.vertical.desc": "Erweitert nach §aoben/unten§f. Baut nicht auf der Ober/Unterseite",
-  "constructionwand.option.lock.northsouth": "§6North/South",
-  "constructionwand.option.lock.northsouth.desc": "Erweitert nach §aNorden/Süden§f. Baut nicht an den Seitenflächen",
-  "constructionwand.option.lock.eastwest": "§6East/West",
-  "constructionwand.option.lock.eastwest.desc": "Erweitert nach §aOsten/Westen§f. Baut nicht an den Seitenflächen",
+  "constructionwand.option.lock.vertical.desc": "Baut eine vertikale Säule vor dem Originalblock",
+  "constructionwand.option.lock.northsouth": "§6Nord/Süd",
+  "constructionwand.option.lock.northsouth.desc": "Baut eine Reihe in NS-Richtung auf dem Originalblock",
+  "constructionwand.option.lock.eastwest": "§6Ost/West",
+  "constructionwand.option.lock.eastwest.desc": "Baut eine Reihe in OW-Richtung auf dem Originalblock",
   "constructionwand.option.lock.nolock": "§cKeine",
   "constructionwand.option.lock.nolock.desc": "Erweitert in jede Richtung",
 
@@ -29,7 +29,7 @@
   "constructionwand.option.direction.target": "§6Zielblock",
   "constructionwand.option.direction.target.desc": "Platziert Blöcke mit der selben Ausrichtung wie der Zielblock",
   "constructionwand.option.direction.player": "§aSpieler",
-  "constructionwand.option.direction.player.desc": "Place blocks facing the player",
+  "constructionwand.option.direction.player.desc": "Platziert Blöcke in der Richtung, auf die der Spieler zeigt",
 
   "constructionwand.option.replace": "Ersetzen: ",
   "constructionwand.option.replace.yes": "§aJa",
@@ -45,11 +45,11 @@
   "constructionwand.option.match.any": "§cAlle",
   "constructionwand.option.match.any.desc": "Erweitert alle Blöcke",
 
-  "constructionwand.option.random": "Zufall: ",
-  "constructionwand.option.random.yes": "§aJa",
+  "constructionwand.option.random": "Zufallsmodus: ",
+  "constructionwand.option.random.yes": "§aEin",
   "constructionwand.option.random.yes.desc": "Platziere zufällige Blöcke aus der Hotbar",
-  "constructionwand.option.random.no": "§cNein",
-  "constructionwand.option.random.no.desc": "Platziere Blöcke nicht zufällig",
+  "constructionwand.option.random.no": "§cAus",
+  "constructionwand.option.random.no.desc": "Platziere Blöcke normal",
 
   "stat.constructionwand.use_wand": "Blöcke mithilfe des Stabs platziert"
 }
