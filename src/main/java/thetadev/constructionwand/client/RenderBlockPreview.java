@@ -1,20 +1,15 @@
 package thetadev.constructionwand.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.client.event.DrawHighlightEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.job.WandJob;
 
@@ -22,56 +17,44 @@ import java.util.Set;
 
 public class RenderBlockPreview
 {
-	public WandJob wandJob;
-	public Set<BlockPos> undoBlocks;
+    public WandJob wandJob;
+    public Set<BlockPos> undoBlocks;
 
-	@SubscribeEvent
-	public void renderBlockHighlight(DrawHighlightEvent event)
-	{
-		if(event.getTarget().getType() != RayTraceResult.Type.BLOCK) return;
+    public void renderBlockHighlight(PlayerEntity player, World world, BlockHitResult rtr, MatrixStack ms, VertexConsumer vertexConsumer,
+                                     double renderPosX, double renderPosY, double renderPosZ) {
+        if(player == null) return;
+        Set<BlockPos> blocks;
+        float colorR = 0, colorG = 0, colorB = 0;
 
-		BlockRayTraceResult rtr = (BlockRayTraceResult) event.getTarget();
-		Entity entity = event.getInfo().getRenderViewEntity();
-		if(!(entity instanceof PlayerEntity)) return;
-		PlayerEntity player = (PlayerEntity) entity;
-		Set<BlockPos> blocks;
-		float colorR=0, colorG=0, colorB=0;
+        ItemStack wand = WandUtil.holdingWand(player);
+        if(wand == null) return;
 
-		ItemStack wand = WandUtil.holdingWand(player);
-		if(wand == null) return;
+        if(!(player.isSneaking() && Screen.hasControlDown())) {
+            if(wandJob == null || !(wandJob.getHitResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
+                wandJob = WandJob.getJob(player, world, rtr, wand);
+            }
 
-		if(!(player.isSneaking() && Screen.hasControlDown())) {
-			if(wandJob == null || !(wandJob.getHitResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
-				wandJob = WandJob.getJob(player, player.getEntityWorld(), rtr, wand);
-			}
+            blocks = wandJob.getBlockPositions();
+        }
+        else {
+            blocks = undoBlocks;
+            colorG = 1;
+        }
 
-			blocks = wandJob.getBlockPositions();
-		}
-		else {
-			blocks = undoBlocks;
-			colorG = 1;
-		}
+        if(blocks == null || blocks.isEmpty()) return;
 
-		if(blocks == null || blocks.isEmpty()) return;
+        renderBlockList(blocks, ms, vertexConsumer, colorR, colorG, colorB, renderPosX, renderPosY, renderPosZ);
+    }
 
-		renderBlockList(blocks, event.getMatrix(), event.getBuffers(), colorR, colorG, colorB);
+    private void renderBlockList(Set<BlockPos> blocks, MatrixStack ms, VertexConsumer vertexConsumer, float red, float green, float blue,
+                                 double renderPosX, double renderPosY, double renderPosZ) {
+        ms.push();
+        ms.translate(-renderPosX, -renderPosY, -renderPosZ);
 
-		event.setCanceled(true);
-	}
-
-	private void renderBlockList(Set<BlockPos> blocks, MatrixStack ms, IRenderTypeBuffer buffer, float red, float green, float blue) {
-		double renderPosX = Minecraft.getInstance().getRenderManager().info.getProjectedView().getX();
-		double renderPosY = Minecraft.getInstance().getRenderManager().info.getProjectedView().getY();
-		double renderPosZ = Minecraft.getInstance().getRenderManager().info.getProjectedView().getZ();
-
-		ms.push();
-		ms.translate(-renderPosX, -renderPosY, -renderPosZ);
-
-		for(BlockPos block : blocks) {
-			AxisAlignedBB aabb = new AxisAlignedBB(block);
-			IVertexBuilder lineBuilder = buffer.getBuffer(RenderTypes.TRANSLUCENT_LINES);
-			WorldRenderer.drawBoundingBox(ms, lineBuilder, aabb, red, green, blue, 0.4F);
-		}
-		ms.pop();
-	}
+        for(BlockPos block : blocks) {
+            Box aabb = new Box(block);
+            WorldRenderer.drawBox(ms, vertexConsumer, aabb, red, green, blue, 0.4F);
+        }
+        ms.pop();
+    }
 }

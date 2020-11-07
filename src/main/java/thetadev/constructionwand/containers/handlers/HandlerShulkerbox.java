@@ -1,15 +1,14 @@
 package thetadev.constructionwand.containers.handlers;
 
-import net.fabricmc.fabric.mixin.item.ItemStackMixin;
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.collection.DefaultedList;
 import thetadev.constructionwand.api.IContainerHandler;
 import thetadev.constructionwand.basics.WandUtil;
+import thetadev.constructionwand.containers.ContainerHelper;
 
 public class HandlerShulkerbox implements IContainerHandler
 {
@@ -59,10 +58,10 @@ public class HandlerShulkerbox implements IContainerHandler
 	private DefaultedList<ItemStack> getItemList(ItemStack itemStack) {
 		DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(SLOTS, ItemStack.EMPTY);
 		CompoundTag rootTag = itemStack.getTag();
-		if (rootTag != null && rootTag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND)) {
+		if (rootTag != null && rootTag.contains("BlockEntityTag", ContainerHelper.TAG_COMPOUND)) {
 			CompoundTag entityTag = rootTag.getCompound("BlockEntityTag");
-			if (entityTag.contains("Items", Constants.NBT.TAG_LIST)) {
-				ItemStackHelper.loadAllItems(entityTag, itemStacks);
+			if (entityTag.contains("Items", ContainerHelper.TAG_COMPOUND)) {
+				ContainerHelper.loadAllItems(entityTag, itemStacks);
 			}
 		}
 		return itemStacks;
@@ -70,9 +69,9 @@ public class HandlerShulkerbox implements IContainerHandler
 
 	private void setItemList(ItemStack itemStack, DefaultedList<ItemStack> itemStacks) {
 		CompoundTag rootTag = itemStack.getOrCreateTag();
-		if (!rootTag.contains("BlockEntityTag", Constants.NBT.TAG_COMPOUND)) {
+		if (!rootTag.contains("BlockEntityTag", ContainerHelper.TAG_COMPOUND)) {
 			rootTag.put("BlockEntityTag", new CompoundTag());
 		}
-		ItemStackHelper.saveAllItems(rootTag.getCompound("BlockEntityTag"), itemStacks);
+		ContainerHelper.saveAllItems(rootTag.getCompound("BlockEntityTag"), itemStacks, true);
 	}
 }

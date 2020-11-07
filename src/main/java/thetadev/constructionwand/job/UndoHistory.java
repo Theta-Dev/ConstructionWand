@@ -1,22 +1,16 @@
 package thetadev.constructionwand.job;
 
+import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.Packet;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
 import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ReplacementRegistry;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.network.PacketUndoBlocks;
@@ -39,7 +33,7 @@ public class UndoHistory
 	public void add(PlayerEntity player, World world, LinkedList<PlaceSnapshot> placeSnapshots) {
 		LinkedList<HistoryEntry> list = getEntryFromPlayer(player).entries;
 		list.add(new HistoryEntry(placeSnapshots, world));
-		while(list.size() > ConfigServer.UNDO_HISTORY.get()) list.removeFirst();
+		while(list.size() > ConstructionWand.instance.config.UNDO_HISTORY) list.removeFirst();
 	}
 
 	public void removePlayer(PlayerEntity player) {
@@ -67,7 +61,7 @@ public class UndoHistory
 		}
 
 		PacketUndoBlocks packet = new PacketUndoBlocks(positions);
-		ConstructionWand.instance.HANDLER.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), packet);
+		ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PacketUndoBlocks.ID, packet.encode());
 	}
 
 	public boolean isUndoActive(PlayerEntity player) {

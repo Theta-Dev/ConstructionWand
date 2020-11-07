@@ -1,9 +1,12 @@
 package thetadev.constructionwand.network;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
+import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -13,6 +16,8 @@ import java.util.function.Supplier;
 
 public class PacketWandOption
 {
+	public static final Identifier ID = ConstructionWand.loc("wand_option");
+
 	public final String key;
 	public final String value;
 	public final boolean notify;
@@ -27,34 +32,35 @@ public class PacketWandOption
 		this.notify = notify;
 	}
 
-	public static void encode(PacketWandOption msg, PacketBuffer buffer) {
-		buffer.writeString(msg.key);
-		buffer.writeString(msg.value);
-		buffer.writeBoolean(msg.notify);
+	public PacketByteBuf encode() {
+		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+		buffer.writeString(key);
+		buffer.writeString(value);
+		buffer.writeBoolean(notify);
+		return buffer;
 	}
 
-	public static PacketWandOption decode(PacketBuffer buffer) {
+	public static PacketWandOption decode(PacketByteBuf buffer) {
 		return new PacketWandOption(buffer.readString(100), buffer.readString(100), buffer.readBoolean());
 	}
 
-	public static class Handler
-	{
-		public static void handle(final PacketWandOption msg, final Supplier<NetworkEvent.Context> ctx) {
-			if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
+	public static void handle(PacketContext ctx, PacketByteBuf buffer) {
+		//if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
 
-			ServerPlayerEntity player = ctx.get().getSender();
-			if(player == null) return;
+		PlayerEntity player = ctx.getPlayer();
+		if(player == null) return;
 
-			ItemStack wand = WandUtil.holdingWand(player);
-			if(wand == null) return;
-			WandOptions options = new WandOptions(wand);
+		PacketWandOption msg = decode(buffer);
 
-			IOption<?> option = options.get(msg.key);
-			if(option == null) return;
-			option.setValueString(msg.value);
+		ItemStack wand = WandUtil.holdingWand(player);
+		if(wand == null) return;
+		WandOptions options = new WandOptions(wand);
 
-			if(msg.notify) ItemWand.optionMessage(player, option);
-			player.inventory.markDirty();
-		}
+		IOption<?> option = options.get(msg.key);
+		if(option == null) return;
+		option.setValueString(msg.value);
+
+		if(msg.notify) ItemWand.optionMessage(player, option);
+		player.inventory.markDirty();
 	}
 }

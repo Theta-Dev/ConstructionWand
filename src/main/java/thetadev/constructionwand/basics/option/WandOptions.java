@@ -1,15 +1,13 @@
 package thetadev.constructionwand.basics.option;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import thetadev.constructionwand.basics.ConfigServer;
+import net.minecraft.nbt.CompoundTag;
+import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.items.ItemWand;
-
-import javax.annotation.Nullable;
 
 public class WandOptions
 {
-	public final CompoundNBT tag;
+	public final CompoundTag tag;
 
 	private static final String TAG_ROOT = "wand_options";
 
@@ -49,9 +47,9 @@ public class WandOptions
 
 	public WandOptions(ItemStack wandStack) {
 		ItemWand wand = (ItemWand) wandStack.getItem();
-		tag = wandStack.getOrCreateChildTag(TAG_ROOT);
+		tag = wandStack.getOrCreateSubTag(TAG_ROOT);
 
-		mode = new OptionEnum<>(tag, "mode", MODE.class, MODE.DEFAULT, ConfigServer.getWandProperties(wand).getAngel() > 0);
+		mode = new OptionEnum<>(tag, "mode", MODE.class, MODE.DEFAULT, ConstructionWand.instance.config.getWandAngel(wand.name) > 0);
 		lock = new OptionEnum<>(tag, "lock", LOCK.class, LOCK.NOLOCK);
 		direction = new OptionEnum<>(tag, "direction", DIRECTION.class, DIRECTION.TARGET);
 		replace = new OptionBoolean(tag, "replace", true);
@@ -61,7 +59,6 @@ public class WandOptions
 		allOptions = new IOption[]{mode, lock, direction, replace, match, random};
 	}
 
-	@Nullable
 	public IOption<?> get(String key){
 		for(IOption<?> option : allOptions) {
 			if(option.getKey().equals(key)) return option;

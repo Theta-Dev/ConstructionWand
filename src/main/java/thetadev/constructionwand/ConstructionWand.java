@@ -1,70 +1,64 @@
 package thetadev.constructionwand;
 
+import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
+import me.sargunvohra.mcmods.autoconfig1u.ConfigHolder;
+import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import thetadev.constructionwand.basics.ConfigClient;
-import thetadev.constructionwand.basics.ConfigServer;
+import thetadev.constructionwand.basics.ModConfig;
 import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.basics.ReplacementRegistry;
-import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
 import thetadev.constructionwand.items.ModItems;
 import thetadev.constructionwand.job.UndoHistory;
 import thetadev.constructionwand.network.PacketQueryUndo;
-import thetadev.constructionwand.network.PacketUndoBlocks;
 import thetadev.constructionwand.network.PacketWandOption;
 
 
-@Mod(ConstructionWand.MODID)
-public class ConstructionWand
+public class ConstructionWand implements ModInitializer
 {
     public static final String MODID = "constructionwand";
     public static ConstructionWand instance;
     public static final Logger LOGGER = LogManager.getLogger();
     private static final String PROTOCOL_VERSION = "1";
-    public SimpleChannel HANDLER;
+    public ModConfig config;
 
     public ContainerManager containerManager;
     public UndoHistory undoHistory;
-    public RenderBlockPreview renderBlockPreview;
 
     public ConstructionWand() {
         instance = this;
 
         containerManager = new ContainerManager();
         undoHistory = new UndoHistory();
-
-        // Register setup methods for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
-        MinecraftForge.EVENT_BUS.register(this);
-
-        // Config setup
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ConfigServer.SPEC);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ConfigClient.SPEC);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
+    @Override
+    public void onInitialize() {
         LOGGER.info("ConstructionWand says hello - may the odds be ever in your favor.");
 
+        ConfigHolder<ModConfig> holder = AutoConfig.register(ModConfig.class, JanksonConfigSerializer::new);
+        config = holder.getConfig();
+
+        AutoConfig.getConfigHolder(ModConfig.class).registerSaveListener((manager, data) -> {
+            ConstructionWand.instance.config = data;
+            return ActionResult.SUCCESS;
+        });
+        AutoConfig.getConfigHolder(ModConfig.class).registerLoadListener((manager, newData) -> {
+            ConstructionWand.instance.config = newData;
+            return ActionResult.SUCCESS;
+        });
+
+        ModItems.register();
+
         // Register packets
-        HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, "main"), ()->PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
-        int packetIndex = 0;
-        HANDLER.registerMessage(packetIndex++, PacketUndoBlocks.class, PacketUndoBlocks::encode, PacketUndoBlocks::decode, PacketUndoBlocks.Handler::handle);
-        HANDLER.registerMessage(packetIndex++, PacketQueryUndo.class, PacketQueryUndo::encode, PacketQueryUndo::decode, PacketQueryUndo.Handler::handle);
-        HANDLER.registerMessage(packetIndex++, PacketWandOption.class, PacketWandOption::encode, PacketWandOption::decode, PacketWandOption.Handler::handle);
+        ServerSidePacketRegistry.INSTANCE.register(PacketQueryUndo.ID, PacketQueryUndo::handle);
+        ServerSidePacketRegistry.INSTANCE.register(PacketWandOption.ID, PacketWandOption::handle);
 
         // Container registry
         ContainerRegistrar.register();
@@ -74,13 +68,6 @@ public class ConstructionWand
 
         // Stats
         ModStats.register();
-    }
-
-    private void clientSetup(final FMLClientSetupEvent event)
-    {
-        renderBlockPreview = new RenderBlockPreview();
-        MinecraftForge.EVENT_BUS.register(renderBlockPreview);
-        ModItems.registerModelProperties();
     }
 
     public static Identifier loc(String name) {

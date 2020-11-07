@@ -1,34 +1,38 @@
 package thetadev.constructionwand.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.RenderState;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderPhase;
+import net.minecraft.client.render.VertexFormats;
 import org.lwjgl.opengl.GL11;
 import thetadev.constructionwand.ConstructionWand;
 
 import java.util.OptionalDouble;
 
+@Environment(EnvType.CLIENT)
 public class RenderTypes
 {
-	public static final RenderType TRANSLUCENT_LINES;
+	public static final RenderLayer TRANSLUCENT_LINES;
 
-	protected static final RenderState.TransparencyState TRANSLUCENT_TRANSPARENCY = new RenderState.TransparencyState("translucent_transparency", () -> {
+	protected static final RenderPhase.Transparency TRANSLUCENT_TRANSPARENCY = new RenderPhase.Transparency("translucent_transparency", () -> {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 	}, RenderSystem::disableBlend);
-	protected static final RenderState.DepthTestState DEPTH_ALWAYS = new RenderState.DepthTestState("always", GL11.GL_ALWAYS);
+	protected static final RenderPhase.DepthTest DEPTH_ALWAYS = new RenderPhase.DepthTest("always", GL11.GL_ALWAYS);
 
 	static {
-		RenderType.State translucentNoDepthState = RenderType.State.getBuilder().transparency(TRANSLUCENT_TRANSPARENCY)
-				.line(new RenderState.LineState(OptionalDouble.of(2)))
-				.texture(new RenderState.TextureState())
+		RenderLayer.MultiPhaseParameters translucentNoDepthState = RenderLayer.MultiPhaseParameters.builder()
+				.transparency(TRANSLUCENT_TRANSPARENCY)
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
+				.texture(new RenderPhase.Texture())
 				.depthTest(DEPTH_ALWAYS)
 				.build(false);
 
-		TRANSLUCENT_LINES = RenderType.makeType(
+		TRANSLUCENT_LINES = RenderLayer.of(
 				ConstructionWand.MODID+":translucent_lines",
-				DefaultVertexFormats.POSITION_COLOR,
+				VertexFormats.POSITION_COLOR,
 				GL11.GL_LINES,
 				256,
 				translucentNoDepthState

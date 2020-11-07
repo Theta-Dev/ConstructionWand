@@ -19,6 +19,9 @@
   "entrypoints": {
     "main": [
       "thetadev.constructionwand.ConstructionWand"
+    ],
+    "client": [
+      "thetadev.constructionwand.ConstructionWandClient"
     ]
   },
   "mixins": [

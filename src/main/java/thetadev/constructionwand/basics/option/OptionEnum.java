@@ -1,18 +1,18 @@
 package thetadev.constructionwand.basics.option;
 
 import com.google.common.base.Enums;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class OptionEnum<E extends Enum<E>> implements IOption<E>
 {
-	private final CompoundNBT tag;
+	private final CompoundTag tag;
 	private final String key;
 	private final Class<E> enumClass;
 	private final boolean enabled;
 	private final E dval;
 	private E value;
 
-	public OptionEnum(CompoundNBT tag, String key, Class<E> enumClass, E dval, boolean enabled) {
+	public OptionEnum(CompoundTag tag, String key, Class<E> enumClass, E dval, boolean enabled) {
 		this.tag = tag;
 		this.key = key;
 		this.enumClass = enumClass;
@@ -22,7 +22,7 @@ public class OptionEnum<E extends Enum<E>> implements IOption<E>
 		value = Enums.getIfPresent(enumClass, tag.getString(key).toUpperCase()).or(dval);
 	}
 
-	public OptionEnum(CompoundNBT tag, String key, Class<E> enumClass, E dval) {
+	public OptionEnum(CompoundTag tag, String key, Class<E> enumClass, E dval) {
 		this(tag, key, enumClass, dval, true);
 	}
 

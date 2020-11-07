@@ -22,7 +22,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.job.AngelJob;
@@ -32,8 +31,11 @@ import java.util.List;
 
 public abstract class ItemWand extends Item
 {
+	public final String name;
+
 	public ItemWand(String name, Item.Settings settings) {
 		super(settings.group(ItemGroup.TOOLS));
+		this.name = name;
 	}
 
 	@Override
@@ -88,7 +90,7 @@ public abstract class ItemWand extends Item
 	}
 
 	protected int getLimit() {
-		return ConfigServer.getWandProperties(this).getLimit();
+		return ConstructionWand.instance.config.getWandLimit(name);
 	}
 
 	public static int getWandMode(ItemStack stack) {

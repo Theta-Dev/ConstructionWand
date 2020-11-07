@@ -1,39 +1,42 @@
 package thetadev.constructionwand.network;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
 import thetadev.constructionwand.ConstructionWand;
-
-import java.util.function.Supplier;
 
 public class PacketQueryUndo
 {
-	public boolean undoPressed;
+    public static final Identifier ID = ConstructionWand.loc("query_undo");
 
-	public PacketQueryUndo(boolean undoPressed) {
-		this.undoPressed = undoPressed;
-	}
+    public boolean undoPressed;
 
-	public static void encode(PacketQueryUndo msg, PacketBuffer buffer) {
-		buffer.writeBoolean(msg.undoPressed);
-	}
+    public PacketQueryUndo(boolean undoPressed) {
+        this.undoPressed = undoPressed;
+    }
 
-	public static PacketQueryUndo decode(PacketBuffer buffer) {
-		return new PacketQueryUndo(buffer.readBoolean());
-	}
+    public PacketByteBuf encode() {
+        PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+        buffer.writeBoolean(undoPressed);
+        return buffer;
+    }
 
-	public static class Handler
-	{
-		public static void handle(final PacketQueryUndo msg, final Supplier<NetworkEvent.Context> ctx) {
-			if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
+    public static PacketQueryUndo decode(PacketByteBuf buffer) {
+        return new PacketQueryUndo(buffer.readBoolean());
+    }
 
-			ServerPlayerEntity player = ctx.get().getSender();
-			if(player == null) return;
+    public static void handle(PacketContext ctx, PacketByteBuf buffer) {
+        //if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
+        ConstructionWand.LOGGER.debug("PacketQueryUndo" + ctx.getPacketEnvironment());
 
-			ConstructionWand.instance.undoHistory.updateClient(player, msg.undoPressed);
+        PlayerEntity player = ctx.getPlayer();
+        if(player == null) return;
 
-			//ConstructionWand.LOGGER.debug("Undo queried");
-		}
-	}
+        PacketQueryUndo msg = decode(buffer);
+        ConstructionWand.instance.undoHistory.updateClient(player, msg.undoPressed);
+
+        //ConstructionWand.LOGGER.debug("Undo queried");
+    }
 }

@@ -223,7 +223,7 @@ public abstract class WandJob
 		if(!options.replace.get() && !world.isAir(pos)) return null;
 
 		// Limit placement range
-		if(ConfigServer.MAX_RANGE.get() > 0 && WandUtil.maxRange(hitResult.getBlockPos(), pos) > ConfigServer.MAX_RANGE.get()) return null;
+		if(ConstructionWand.instance.config.MAX_RANGE > 0 && WandUtil.maxRange(hitResult.getBlockPos(), pos) > ConstructionWand.instance.config.MAX_RANGE) return null;
 
 		itemPool.reset();
 

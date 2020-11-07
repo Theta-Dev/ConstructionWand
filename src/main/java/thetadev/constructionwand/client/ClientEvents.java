@@ -1,15 +1,13 @@
 package thetadev.constructionwand.client;
 
-import net.minecraft.client.Minecraft;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -17,26 +15,41 @@ import thetadev.constructionwand.items.ItemWand;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketWandOption;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ClientEvents
 {
 	private static boolean ctrlPressed = false;
 
-	@SubscribeEvent
-	public static void KeyEvent(InputEvent.KeyInputEvent event) {
-		PlayerEntity player = Minecraft.getInstance().player;
-		if(player == null) return;
-		if(WandUtil.holdingWand(player) == null) return;
+	public static void registerEvents() {
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			PlayerEntity player = MinecraftClient.getInstance().player;
+			if(player == null) return;
 
-		boolean ctrlState = Screen.hasControlDown();
-		if(ctrlPressed != ctrlState) {
-			ctrlPressed = ctrlState;
-			PacketQueryUndo packet = new PacketQueryUndo(ctrlPressed);
-			ConstructionWand.instance.HANDLER.sendToServer(packet);
-			//ConstructionWand.LOGGER.debug("CTRL key update: "+ctrlPressed);
-		}
+			ItemStack wand = WandUtil.holdingWand(player);
+			if(wand == null) return;
+
+			boolean ctrlState = Screen.hasControlDown();
+			if(ctrlPressed != ctrlState) {
+				ctrlPressed = ctrlState;
+				PacketQueryUndo packet = new PacketQueryUndo(ctrlPressed);
+				ClientSidePacketRegistry.INSTANCE.sendToServer(PacketQueryUndo.ID, packet.encode());
+				//ConstructionWand.LOGGER.debug("CTRL key update: "+ctrlPressed);
+			}
+
+			/*
+			if(player.isSneaking() && (ctrlPressed || !ConstructionWand.instance.config.SHIFTCTRL_GUI)) {
+				MinecraftClient.getInstance().openScreen(new ScreenWand(wand));
+			}
+
+			if(player.isSneaking() && (ctrlPressed || !ConstructionWand.instance.config.SHIFTCTRL_MODE)) {
+				WandOptions wandOptions = new WandOptions(wand);
+				wandOptions.mode.next();
+				ClientSidePacketRegistry.INSTANCE.sendToServer(PacketWandOption.ID, new PacketWandOption(wandOptions.mode, true).encode());
+			}*/
+		});
 	}
 
+	/*
 	// SHIFT+(CTRL)+Scroll to change direction lock
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void MouseScrollEvent(InputEvent.MouseScrollEvent event) {
@@ -52,33 +65,5 @@ public class ClientEvents
 		wandOptions.lock.next(scroll<0);
 		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.lock, true));
 		event.setCanceled(true);
-	}
-
-	// SHIFT+(CTRL)+Left click wand to change mode
-	@SubscribeEvent
-	public static void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
-		PlayerEntity player = event.getPlayer();
-
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL_MODE.get())) return;
-
-		ItemStack wand = event.getItemStack();
-		if(!(wand.getItem() instanceof ItemWand)) return;
-
-		WandOptions wandOptions = new WandOptions(wand);
-		wandOptions.mode.next();
-		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.mode, true));
-	}
-
-	// SHIFT+Right click wand to open GUI
-	@SubscribeEvent
-	public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-		PlayerEntity player = event.getPlayer();
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL_GUI.get())) return;
-
-		ItemStack wand = event.getItemStack();
-		if(!(wand.getItem() instanceof ItemWand)) return;
-
-		Minecraft.getInstance().displayGuiScreen(new ScreenWand(wand));
-		event.setCanceled(true);
-	}
+	}*/
 }

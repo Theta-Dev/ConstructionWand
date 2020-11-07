@@ -2,11 +2,12 @@ package thetadev.constructionwand.basics;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import thetadev.constructionwand.ConstructionWand;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class ReplacementRegistry
@@ -14,17 +15,13 @@ public class ReplacementRegistry
 	private static final HashSet<HashSet<Item>> replacements = new HashSet<>();
 
 	public static void init() {
-		for(Object key : ConfigServer.SIMILAR_BLOCKS.get()) {
-			if(!(key instanceof String)) continue;
+		for(String key : ConstructionWand.instance.config.SIMILAR_BLOCKS) {
 			HashSet<Item> set = new HashSet<>();
 
 			for(String id : ((String)key).split(";")) {
-				Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
-				if(item == null) {
-					ConstructionWand.LOGGER.warn("Replacement Registry: Could not find item "+id);
-					continue;
-				}
-				set.add(item);
+				Optional<Item> itemOptional = Registry.ITEM.getOrEmpty(new Identifier(id));
+				if(itemOptional.isPresent()) set.add(itemOptional.get());
+				else ConstructionWand.LOGGER.warn("Replacement Registry: Could not find item "+id);
 			}
 			if(!set.isEmpty()) replacements.add(set);
 		}

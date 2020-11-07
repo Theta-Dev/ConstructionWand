@@ -1,6 +1,5 @@
 package thetadev.constructionwand.basics.pool;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -28,7 +27,6 @@ public class RandomPool<T> implements IPool<T>
 		pool.add(element);
 	}
 
-	@Nullable
 	@Override
 	public T draw() {
 		int allWeights = pool.stream().reduce(0, (partialRes, e) -> partialRes + elements.get(e), Integer::sum);

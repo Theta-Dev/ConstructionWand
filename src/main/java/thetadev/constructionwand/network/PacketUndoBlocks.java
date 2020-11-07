@@ -1,17 +1,20 @@
 package thetadev.constructionwand.network;
 
-import net.minecraft.network.PacketBuffer;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.network.NetworkEvent;
 import thetadev.constructionwand.ConstructionWand;
+import thetadev.constructionwand.ConstructionWandClient;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class PacketUndoBlocks
 {
+	public static final Identifier ID = ConstructionWand.loc("undo_blocks");
+
 	public HashSet<BlockPos> undoBlocks;
 
 	public PacketUndoBlocks(Set<BlockPos> undoBlocks) {
@@ -21,13 +24,15 @@ public class PacketUndoBlocks
 		this.undoBlocks = undoBlocks;
 	}
 
-	public static void encode(PacketUndoBlocks msg, PacketBuffer buffer) {
-		for(BlockPos pos : msg.undoBlocks) {
+	public PacketByteBuf encode() {
+		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+		for(BlockPos pos : undoBlocks) {
 			buffer.writeBlockPos(pos);
 		}
+		return buffer;
 	}
 
-	public static PacketUndoBlocks decode(PacketBuffer buffer) {
+	public static PacketUndoBlocks decode(PacketByteBuf buffer) {
 		HashSet<BlockPos> undoBlocks = new HashSet<>();
 
 		while(buffer.isReadable()) {
@@ -36,14 +41,12 @@ public class PacketUndoBlocks
 		return new PacketUndoBlocks(undoBlocks);
 	}
 
-	public static class Handler {
-		public static void handle(final PacketUndoBlocks msg, final Supplier<NetworkEvent.Context> ctx) {
-			if(!ctx.get().getDirection().getReceptionSide().isClient()) return;
+	public static void handle(PacketContext ctx, PacketByteBuf buffer) {
+		//if(!ctx.get().getDirection().getReceptionSide().isClient()) return;
 
-			//ConstructionWand.LOGGER.debug("PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
-			ConstructionWand.instance.renderBlockPreview.undoBlocks = msg.undoBlocks;
+		//ConstructionWand.LOGGER.debug("PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
 
-			ctx.get().setPacketHandled(true);
-		}
+		PacketUndoBlocks msg = decode(buffer);
+		ConstructionWandClient.instance.renderBlockPreview.undoBlocks = msg.undoBlocks;
 	}
 }

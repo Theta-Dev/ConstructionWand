@@ -7,7 +7,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import thetadev.constructionwand.basics.ConfigServer;
+import thetadev.constructionwand.ConstructionWand;
 
 public class TransductionJob extends WandJob
 {
@@ -21,7 +21,7 @@ public class TransductionJob extends WandJob
 		BlockPos currentPos = hitResult.getBlockPos();
 		BlockState supportingBlock = world.getBlockState(currentPos);
 
-		for(int i = 0; i< ConfigServer.getWandProperties(wandItem).getAngel(); i++) {
+		for(int i = 0; i< ConstructionWand.instance.config.getWandAngel(wandItem.name); i++) {
 			currentPos = currentPos.offset(placeDirection.getOpposite());
 
 			PlaceSnapshot snapshot = getPlaceSnapshot(currentPos, supportingBlock);

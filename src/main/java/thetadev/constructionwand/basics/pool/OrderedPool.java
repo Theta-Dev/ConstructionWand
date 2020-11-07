@@ -1,6 +1,5 @@
 package thetadev.constructionwand.basics.pool;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 
 public class OrderedPool<T> implements IPool<T>
@@ -18,7 +17,6 @@ public class OrderedPool<T> implements IPool<T>
 		elements.add(element);
 	}
 
-	@Nullable
 	@Override
 	public T draw() {
 		if(index >= elements.size()) return null;
