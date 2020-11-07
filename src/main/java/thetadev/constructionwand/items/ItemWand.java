@@ -49,7 +49,7 @@ public abstract class ItemWand extends Item
 
 		ItemStack stack = player.getStackInHand(hand);
 
-		if(player.isSneaking() && ConstructionWand.instance.undoHistory.isUndoActive(player)) {
+		if(ConstructionWand.instance.undoHistory.isUndoActive(player)) {
 			return ConstructionWand.instance.undoHistory.undo(player, world, context.getBlockPos()) ? ActionResult.SUCCESS : ActionResult.FAIL;
 		}
 		else {

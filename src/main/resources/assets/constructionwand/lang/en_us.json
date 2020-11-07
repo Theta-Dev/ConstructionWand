@@ -4,6 +4,9 @@
   "item.constructionwand.diamond_wand": "Diamond Wand",
   "item.constructionwand.infinity_wand": "Infinity Wand",
 
+  "category.constructionwand.keys": "Construction Wand",
+  "key.constructionwand.option": "Option Key",
+
   "constructionwand.tooltip.blocks": "Max. %d blocks",
   "constructionwand.tooltip.shift": "Press [SHIFT]",
 

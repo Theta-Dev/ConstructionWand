@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import thetadev.constructionwand.ConstructionWand;
+import thetadev.constructionwand.ConstructionWandClient;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.ItemWand;
@@ -24,7 +25,7 @@ public class ClientEvents
 		if(player == null) return;
 		if(WandUtil.holdingWand(player) == null) return;
 
-		boolean ctrlState = Screen.hasControlDown();
+		boolean ctrlState = ConstructionWandClient.instance.optionPressed();
 		if(ctrlPressed != ctrlState) {
 			ctrlPressed = ctrlState;
 			PacketQueryUndo packet = new PacketQueryUndo(ctrlPressed);
@@ -37,7 +38,7 @@ public class ClientEvents
 	public static boolean MouseScrollEvent(double scroll) {
 		PlayerEntity player = MinecraftClient.getInstance().player;
 
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConstructionWand.instance.config.SHIFTCTRL_MODE) || scroll == 0) return false;
+		if(player == null || !ConstructionWandClient.instance.optionPressed() || scroll == 0) return false;
 
 		ItemStack wand = WandUtil.holdingWand(player);
 		if(wand == null) return false;
@@ -50,7 +51,7 @@ public class ClientEvents
 
 	// SHIFT+(CTRL)+Left click wand to change mode
 	public static void onLeftClickEmpty(PlayerEntity player) {
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConstructionWand.instance.config.SHIFTCTRL_MODE)) return;
+		if(player == null || !ConstructionWandClient.instance.optionPressed()) return;
 
 		ItemStack wand = player.getMainHandStack();
 		if(wand == null || !(wand.getItem() instanceof ItemWand)) return;
@@ -62,7 +63,7 @@ public class ClientEvents
 
 	// SHIFT+Right click wand to open GUI
 	public static boolean onRightClickItem(PlayerEntity player, ItemStack wand) {
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConstructionWand.instance.config.SHIFTCTRL_GUI)) return false;
+		if(player == null || !ConstructionWandClient.instance.optionPressed()) return false;
 
 		if(wand == null || !(wand.getItem() instanceof ItemWand)) return false;
 

@@ -12,10 +12,6 @@ import java.util.List;
 @Config(name = ConstructionWand.MODID)
 public class ModConfig implements ConfigData
 {
-    // Client
-    public boolean SHIFTCTRL_MODE = false;
-    public boolean SHIFTCTRL_GUI = false;
-
     // Misc
     public int LIMIT_CREATIVE = 2048;
     public int MAX_RANGE = 256;

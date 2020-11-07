@@ -10,6 +10,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
+import thetadev.constructionwand.ConstructionWandClient;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.job.WandJob;
 
@@ -29,7 +30,7 @@ public class RenderBlockPreview
         ItemStack wand = WandUtil.holdingWand(player);
         if(wand == null) return;
 
-        if(!(player.isSneaking() && Screen.hasControlDown())) {
+        if(!ConstructionWandClient.instance.optionPressed()) {
             if(wandJob == null || !(wandJob.getHitResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
                 wandJob = WandJob.getJob(player, world, rtr, wand);
             }

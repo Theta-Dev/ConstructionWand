@@ -9,11 +9,11 @@
     "ThetaDev"
   ],
   "contact": {
-    "sources": "https://github.com/Theta-Dev/ConstructionWand"
+    "homepage": "https://github.com/Theta-Dev/ConstructionWand"
   },
 
   "license": "MIT License",
-  "icon": "logo.png",
+  "icon": "icon.png",
 
   "environment": "*",
   "entrypoints": {
