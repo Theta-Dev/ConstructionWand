@@ -1,6 +1,7 @@
 package thetadev.constructionwand.network;
 
 import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -42,11 +43,10 @@ public class PacketUndoBlocks
 	}
 
 	public static void handle(PacketContext ctx, PacketByteBuf buffer) {
-		//if(!ctx.get().getDirection().getReceptionSide().isClient()) return;
-
-		//ConstructionWand.LOGGER.debug("PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
+		if(ctx.getPacketEnvironment() != EnvType.CLIENT) return;
 
 		PacketUndoBlocks msg = decode(buffer);
+		ConstructionWand.LOGGER.info("PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
 		ConstructionWandClient.instance.renderBlockPreview.undoBlocks = msg.undoBlocks;
 	}
 }

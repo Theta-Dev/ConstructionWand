@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.network.PacketWandOption;

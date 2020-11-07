@@ -1,7 +1,7 @@
 package thetadev.constructionwand.containers;
 
 import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.containers.handlers.*;
+import thetadev.constructionwand.containers.handlers.HandlerShulkerbox;
 
 public class ContainerRegistrar
 {

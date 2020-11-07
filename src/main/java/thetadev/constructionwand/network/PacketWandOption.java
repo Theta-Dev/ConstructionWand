@@ -1,6 +1,7 @@
 package thetadev.constructionwand.network;
 
 import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -11,8 +12,6 @@ import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.ItemWand;
-
-import java.util.function.Supplier;
 
 public class PacketWandOption
 {
@@ -45,7 +44,7 @@ public class PacketWandOption
 	}
 
 	public static void handle(PacketContext ctx, PacketByteBuf buffer) {
-		//if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
+		if(ctx.getPacketEnvironment() != EnvType.SERVER) return;
 
 		PlayerEntity player = ctx.getPlayer();
 		if(player == null) return;

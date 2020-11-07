@@ -4,9 +4,14 @@
   "package": "thetadev.constructionwand.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "PlayerManagerMixin"
   ],
   "client": [
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "KeyboardMixin",
+    "MouseMixin",
+    "ClientPlayerInteractionManagerMixin",
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

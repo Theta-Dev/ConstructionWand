@@ -1,6 +1,7 @@
 package thetadev.constructionwand.network;
 
 import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
@@ -28,8 +29,7 @@ public class PacketQueryUndo
     }
 
     public static void handle(PacketContext ctx, PacketByteBuf buffer) {
-        //if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
-        ConstructionWand.LOGGER.debug("PacketQueryUndo" + ctx.getPacketEnvironment());
+        if(ctx.getPacketEnvironment() != EnvType.SERVER) return;
 
         PlayerEntity player = ctx.getPlayer();
         if(player == null) return;
