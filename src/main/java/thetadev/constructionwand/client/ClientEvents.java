@@ -29,7 +29,7 @@ public class ClientEvents
 			ctrlPressed = ctrlState;
 			PacketQueryUndo packet = new PacketQueryUndo(ctrlPressed);
 			ClientSidePacketRegistry.INSTANCE.sendToServer(PacketQueryUndo.ID, packet.encode());
-			ConstructionWand.LOGGER.info("CTRL key update: "+ctrlPressed);
+			//ConstructionWand.LOGGER.info("CTRL key update: "+ctrlPressed);
 		}
 	}
 

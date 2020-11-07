@@ -46,7 +46,7 @@ public class PacketUndoBlocks
 		if(ctx.getPacketEnvironment() != EnvType.CLIENT) return;
 
 		PacketUndoBlocks msg = decode(buffer);
-		ConstructionWand.LOGGER.info("PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
+		//ConstructionWand.LOGGER.info("PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
 		ConstructionWandClient.instance.renderBlockPreview.undoBlocks = msg.undoBlocks;
 	}
 }

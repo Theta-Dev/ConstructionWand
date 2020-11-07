@@ -76,11 +76,6 @@ public abstract class ItemWand extends Item
 	}
 
 	@Override
-	public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
-		return false;
-	}
-
-	@Override
 	public boolean canRepair(ItemStack toRepair, ItemStack repair) {
 		return false;
 	}

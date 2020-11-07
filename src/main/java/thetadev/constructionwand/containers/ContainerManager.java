@@ -4,13 +4,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import thetadev.constructionwand.api.IContainerHandler;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 public class ContainerManager {
-	private ArrayList<IContainerHandler> handlers;
+	private HashSet<IContainerHandler> handlers;
 
 	public ContainerManager() {
-		handlers = new ArrayList<IContainerHandler>();
+		handlers = new HashSet<IContainerHandler>();
 	}
 
 	public boolean register(IContainerHandler handler) {

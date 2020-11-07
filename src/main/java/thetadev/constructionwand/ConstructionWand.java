@@ -25,7 +25,6 @@ public class ConstructionWand implements ModInitializer
     public static final String MODID = "constructionwand";
     public static ConstructionWand instance;
     public static final Logger LOGGER = LogManager.getLogger();
-    private static final String PROTOCOL_VERSION = "1";
     public ModConfig config;
 
     public ContainerManager containerManager;
