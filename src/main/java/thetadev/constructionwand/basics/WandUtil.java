@@ -1,5 +1,6 @@
 package thetadev.constructionwand.basics;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -63,5 +64,20 @@ public class WandUtil
 
 	public static int maxRange(BlockPos p1, BlockPos p2) {
 		return Math.max(Math.abs(p1.getX() - p2.getX()), Math.abs(p1.getZ() - p2.getZ()));
+	}
+
+	public static boolean isTEAllowed(BlockState state) {
+		if(!state.hasTileEntity()) return true;
+
+		ResourceLocation name = state.getBlock().getRegistryName();
+		if(name == null) return false;
+
+		String fullId = name.toString();
+		String modId = name.getNamespace();
+
+		boolean inList = ConfigServer.TE_LIST.get().contains(fullId) || ConfigServer.TE_LIST.get().contains(modId);
+		boolean isWhitelist = ConfigServer.TE_WHITELIST.get();
+
+		return isWhitelist == inList;
 	}
 }
