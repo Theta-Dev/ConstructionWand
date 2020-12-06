@@ -2,12 +2,7 @@ package thetadev.constructionwand.items;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemTier;
-import net.minecraft.item.Item;
-import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
 import thetadev.constructionwand.basics.ConfigServer;
 
 public class ItemWandBasic extends ItemWand
