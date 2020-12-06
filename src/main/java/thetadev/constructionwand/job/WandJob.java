@@ -247,6 +247,9 @@ public abstract class WandJob
 			blockState = Block.getValidBlockForPosition(blockState, world, pos);
 			if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) continue;
 
+			// Forbidden Tile Entity?
+			if(!WandUtil.isTEAllowed(blockState)) continue;
+
 			// No entities colliding?
 			VoxelShape shape = blockState.getCollisionShape(world, pos);
 			if(!shape.isEmpty()) {
@@ -302,6 +305,9 @@ public abstract class WandJob
 			world.removeBlock(blockPos, false);
 			return false;
 		}
+
+		// Call OnBlockPlaced method
+		placeBlock.getBlock().onBlockPlacedBy(world, blockPos, placeBlock, player, new ItemStack(placeSnapshot.item));
 
 		// Update stats
 		player.addStat(Stats.ITEM_USED.get(placeSnapshot.item));

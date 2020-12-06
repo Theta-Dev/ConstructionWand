@@ -65,3 +65,14 @@ SHIFT+Right clicking empty space opens the option screen of your wand.
 As #Hacktoberfest now requires repo owners to opt in, I added the tag to this repository.
 
 I'd really appreciate translations. Currently ConstructionWand only has English and German, so if you speak any other language you can help translate the mod and add a new language file under `src/main/resources/assets/constructionwand/lang/`.
+
+## TileEntity Blacklist
+Some modded TileEntitys can cause issues when placed using a wand. They may turn into invisible and unremovable ghost blocks,
+become unbreakable or cause other unwanted effects.
+
+That's why I've included a Black/Whitelist system
+for TileEntities in CW Version 1.7. Chisels&Bits blocks are blacklisted by default. There are probably a few other tile entities
+from other mods out there which may cause issues as well. If you find some of them you can tell me by creating
+an issue, commenting on Curse or editing the default blacklist yourself
+(it is located at https://github.com/Theta-Dev/ConstructionWand/blob/1.16.2/src/main/java/thetadev/constructionwand/basics/ConfigServer.java#L28)
+and making a PR.
