@@ -5,8 +5,8 @@
     },
     "overrides": [{
         "predicate": {
-            "constructionwand:wand_mode": 1
+            "constructionwand:using_core": 1
         },
-        "model": "constructionwand:item/iron_wand_angel"
+        "model": "constructionwand:item/iron_wand_core"
     }]
 }

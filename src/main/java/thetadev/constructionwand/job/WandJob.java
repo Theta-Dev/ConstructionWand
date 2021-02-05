@@ -7,16 +7,12 @@ import net.minecraft.item.*;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.state.properties.SlabType;
-import net.minecraft.stats.Stats;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.world.BlockEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.*;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -43,7 +39,7 @@ public abstract class WandJob
 	protected HashMap<BlockItem, Integer> itemCounts;
 	protected IPool<BlockItem> itemPool;
 
-	protected LinkedList<PlaceSnapshot> placeSnapshots;
+	protected LinkedList<ISnapshot> placeSnapshots;
 
 
 	protected WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand)
@@ -91,7 +87,7 @@ public abstract class WandJob
 	}
 
 	public Set<BlockPos> getBlockPositions() {
-		return placeSnapshots.stream().map(snapshot -> snapshot.pos).collect(Collectors.toSet());
+		return placeSnapshots.stream().map(ISnapshot::getPos).collect(Collectors.toSet());
 	}
 
 	public BlockRayTraceResult getRayTraceResult() { return rayTraceResult; }
@@ -170,8 +166,11 @@ public abstract class WandJob
 	}
 
 	// Attempts to take specified number of items, returns number of missing items
-	private int takeItems(Item item, int count)
+	private int takeItemStack(ItemStack stack)
 	{
+		int count = stack.getCount();
+		Item item = stack.getItem();
+
 		if(player.inventory == null || player.inventory.mainInventory == null) return count;
 		if(player.isCreative()) return 0;
 
@@ -244,8 +243,6 @@ public abstract class WandJob
 			// Can block be placed?
 			BlockState blockState = item.getBlock().getStateForPlacement(ctx);
 			if(blockState == null) continue;
-			blockState = Block.getValidBlockForPosition(blockState, world, pos);
-			if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) continue;
 
 			// Forbidden Tile Entity?
 			if(!WandUtil.isTEAllowed(blockState)) continue;
@@ -257,64 +254,33 @@ public abstract class WandJob
 				if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty()) continue;
 			}
 
-			// Reduce item count
-			if(count < Integer.MAX_VALUE) itemCounts.merge(item, -1, Integer::sum);
-			return new PlaceSnapshot(pos, supportingBlock, item);
-		}
-	}
+			// Adjust blockstate to neighbors
+			blockState = Block.getValidBlockForPosition(blockState, world, pos);
+			if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) continue;
 
-	private boolean placeBlock(PlaceSnapshot placeSnapshot) {
-		BlockPos blockPos = placeSnapshot.pos;
+			// Copy block properties from supporting block
+			if(options.direction.get() == WandOptions.DIRECTION.TARGET) {
+				// Block properties to be copied (alignment/rotation properties)
+				for(Property property : new Property[] {
+						BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
+						BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
+				{
+					if(supportingBlock.hasProperty(property) && blockState.hasProperty(property)) {
+						blockState = blockState.with(property, supportingBlock.get(property));
+					}
+				}
 
-		BlockItemUseContext ctx = new WandItemUseContext(this, blockPos, placeSnapshot.item);
-		if(!ctx.canPlace()) return false;
-
-		BlockState placeBlock = Block.getBlockFromItem(placeSnapshot.item).getStateForPlacement(ctx);
-		if(placeBlock == null) return false;
-
-		BlockState supportingBlock = placeSnapshot.supportingBlock;
-
-		if(options.direction.get() == WandOptions.DIRECTION.TARGET) {
-			// Block properties to be copied (alignment/rotation properties)
-			for(Property property : new Property[] {
-					BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
-					BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE})
-			{
-				if(supportingBlock.hasProperty(property) && placeBlock.hasProperty(property)) {
-					placeBlock = placeBlock.with(property, supportingBlock.get(property));
+				// Dont dupe double slabs
+				if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE) && blockState.hasProperty(BlockStateProperties.SLAB_TYPE)) {
+					SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
+					if(slabType != SlabType.DOUBLE) blockState = blockState.with(BlockStateProperties.SLAB_TYPE, slabType);
 				}
 			}
 
-			// Dont dupe double slabs
-			if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE) && placeBlock.hasProperty(BlockStateProperties.SLAB_TYPE)) {
-				SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
-				if(slabType != SlabType.DOUBLE) placeBlock = placeBlock.with(BlockStateProperties.SLAB_TYPE, slabType);
-			}
+			// Reduce item count
+			if(count < Integer.MAX_VALUE) itemCounts.merge(item, -1, Integer::sum);
+			return new PlaceSnapshot(blockState, pos, item);
 		}
-		// Place the block
-		if(!world.setBlockState(blockPos, placeBlock)) {
-			ConstructionWand.LOGGER.info("Block could not be placed");
-			return false;
-		}
-
-		// Remove block if placeEvent is canceled
-		BlockSnapshot snapshot = BlockSnapshot.create(world.func_234923_W_(), world, blockPos);
-		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
-		MinecraftForge.EVENT_BUS.post(placeEvent);
-		if(placeEvent.isCanceled()) {
-			world.removeBlock(blockPos, false);
-			return false;
-		}
-
-		// Call OnBlockPlaced method
-		placeBlock.getBlock().onBlockPlacedBy(world, blockPos, placeBlock, player, new ItemStack(placeSnapshot.item));
-
-		// Update stats
-		player.addStat(Stats.ITEM_USED.get(placeSnapshot.item));
-		player.addStat(ModStats.USE_WAND);
-
-		placeSnapshot.block = placeBlock;
-		return true;
 	}
 
 	protected boolean matchBlocks(Block b1, Block b2) {
@@ -327,30 +293,29 @@ public abstract class WandJob
 	}
 
 	public boolean doIt() {
-		LinkedList<PlaceSnapshot> placed = new LinkedList<>();
+		LinkedList<ISnapshot> executed = new LinkedList<>();
 
-		for(PlaceSnapshot snapshot : placeSnapshots) {
+		for(ISnapshot snapshot : placeSnapshots) {
 			if(wand.isEmpty() || wandItem.getLimit(player, wand) == 0) continue;
 
-			BlockPos pos = snapshot.pos;
-			BlockItem placeItem = snapshot.item;
-
-			if(placeBlock(snapshot)) {
-				wand.damageItem(1, player, (e) -> e.sendBreakAnimation(player.swingingHand));
-
+			if(snapshot.execute(world, player)) {
 				// If the item cant be taken, undo the placement
-				if(takeItems(placeItem, 1) == 0) placed.add(snapshot);
+				if(takeItemStack(snapshot.getRequiredItems()) == 0) executed.add(snapshot);
 				else {
-					ConstructionWand.LOGGER.info("Item could not be taken. Remove block: "+placeItem.toString());
-					world.removeBlock(pos, false);
+					ConstructionWand.LOGGER.info("Item could not be taken. Remove block: "+
+							snapshot.getBlockState().getBlock().toString());
+					snapshot.forceRestore(world);
 				}
+
+				wand.damageItem(1, player, (e) -> e.sendBreakAnimation(player.swingingHand));
+				player.addStat(ModStats.USE_WAND);
 			}
 		}
-		placeSnapshots = placed;
+		placeSnapshots = executed;
 
 		// Play place sound
 		if(!placeSnapshots.isEmpty()) {
-			SoundType sound = placeSnapshots.getFirst().block.getSoundType();
+			SoundType sound = placeSnapshots.getFirst().getBlockState().getSoundType();
 			world.playSound(null, WandUtil.playerPos(player), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
 		}
 

@@ -33,7 +33,7 @@ public class UndoHistory
 		return history.computeIfAbsent(player.getUniqueID(), k -> new PlayerEntry());
 	}
 
-	public void add(PlayerEntity player, World world, LinkedList<PlaceSnapshot> placeSnapshots) {
+	public void add(PlayerEntity player, World world, LinkedList<ISnapshot> placeSnapshots) {
 		LinkedList<HistoryEntry> list = getEntryFromPlayer(player).entries;
 		list.add(new HistoryEntry(placeSnapshots, world));
 		while(list.size() > ConfigServer.UNDO_HISTORY.get()) list.removeFirst();
@@ -101,38 +101,25 @@ public class UndoHistory
 	}
 
 	private static class HistoryEntry {
-		public final LinkedList<PlaceSnapshot> placeSnapshots;
+		public final LinkedList<ISnapshot> placeSnapshots;
 		public final World world;
 
-		public HistoryEntry(LinkedList<PlaceSnapshot> placeSnapshots, World world) {
+		public HistoryEntry(LinkedList<ISnapshot> placeSnapshots, World world) {
 			this.placeSnapshots = placeSnapshots;
 			this.world = world;
 		}
 
 		public Set<BlockPos> getBlockPositions() {
-			return placeSnapshots.stream().map(snapshot -> snapshot.pos).collect(Collectors.toSet());
+			return placeSnapshots.stream().map(ISnapshot::getPos).collect(Collectors.toSet());
 		}
 
 		public boolean undo(PlayerEntity player) {
-			for(PlaceSnapshot snapshot : placeSnapshots) {
-				BlockState currentBlock = world.getBlockState(snapshot.pos);
+			for(ISnapshot snapshot : placeSnapshots) {
+				if(snapshot.restore(world, player) && !player.isCreative()) {
+					ItemStack stack = snapshot.getRequiredItems();
 
-				// If placed block is still present and can be broken, break it and return item
-				if(world.isBlockModifiable(player, snapshot.pos) &&
-						(player.isCreative() ||
-								(currentBlock.getBlockHardness(world, snapshot.pos) > -1 && world.getTileEntity(snapshot.pos) == null && ReplacementRegistry.matchBlocks(currentBlock.getBlock(), snapshot.block.getBlock()))))
-				{
-					BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, snapshot.pos, currentBlock, player);
-					MinecraftForge.EVENT_BUS.post(breakEvent);
-					if(breakEvent.isCanceled()) continue;
-
-					world.removeBlock(snapshot.pos, false);
-
-					if(!player.isCreative()) {
-						ItemStack stack = new ItemStack(snapshot.item);
-						if(!player.inventory.addItemStackToInventory(stack)) {
-							player.dropItem(stack, false);
-						}
+					if(!player.inventory.addItemStackToInventory(stack)) {
+						player.dropItem(stack, false);
 					}
 				}
 			}

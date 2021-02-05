@@ -1,9 +1,12 @@
 package thetadev.constructionwand.items;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemTier;
-import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -25,12 +28,22 @@ public class ModItems
 		event.getRegistry().registerAll(WANDS);
 	}
 
+	@OnlyIn(Dist.CLIENT)
 	public static void registerModelProperties() {
 		for(Item item : WANDS) {
 			ItemModelsProperties.func_239418_a_(
-					item, new ResourceLocation(ConstructionWand.MODID, "wand_mode"),
+					item, ConstructionWand.loc("using_core"),
 					(stack, world, entity) -> entity == null || !(stack.getItem() instanceof ItemWand) ? 0 : ItemWand.getWandMode(stack)
 			);
+		}
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public static void registerItemColors() {
+		ItemColors colors = Minecraft.getInstance().getItemColors();
+
+		for(Item item : WANDS) {
+			colors.register((stack, layer) -> layer == 1 ? 0xFF0000 : -1, item);
 		}
 	}
 }

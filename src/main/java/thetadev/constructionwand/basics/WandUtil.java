@@ -3,12 +3,18 @@ package thetadev.constructionwand.basics;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.world.BlockEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.items.ItemWand;
 
@@ -87,5 +93,51 @@ public class WandUtil
 		boolean isWhitelist = ConfigServer.TE_WHITELIST.get();
 
 		return isWhitelist == inList;
+	}
+
+	public static boolean placeBlock(World world, PlayerEntity player, BlockState block, BlockPos pos, BlockItem item) {
+		if(!world.setBlockState(pos, block)) {
+			ConstructionWand.LOGGER.info("Block could not be placed");
+			return false;
+		}
+
+		// Remove block if placeEvent is canceled
+		BlockSnapshot snapshot = BlockSnapshot.create(world.func_234923_W_(), world, pos);
+		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, block, player);
+		MinecraftForge.EVENT_BUS.post(placeEvent);
+		if(placeEvent.isCanceled()) {
+			world.removeBlock(pos, false);
+			return false;
+		}
+
+		ItemStack stack;
+		if(item == null) stack = new ItemStack(block.getBlock().asItem());
+		else {
+			stack = new ItemStack(item);
+			player.addStat(Stats.ITEM_USED.get(item));
+		}
+
+		// Call OnBlockPlaced method
+		block.getBlock().onBlockPlacedBy(world, pos, block, player, stack);
+
+		return true;
+	}
+
+	public static boolean removeBlock(World world, PlayerEntity player, BlockState block, BlockPos pos) {
+		BlockState currentBlock = world.getBlockState(pos);
+
+		if(world.isBlockModifiable(player, pos) &&
+				(player.isCreative() ||
+						(currentBlock.getBlockHardness(world, pos) > -1 && world.getTileEntity(pos) == null &&
+								ReplacementRegistry.matchBlocks(currentBlock.getBlock(), block.getBlock())))) {
+
+			BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
+			MinecraftForge.EVENT_BUS.post(breakEvent);
+			if(breakEvent.isCanceled()) return false;
+
+			world.removeBlock(pos, false);
+			return true;
+		}
+		return false;
 	}
 }
