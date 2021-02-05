@@ -23,11 +23,39 @@ Wand properties can be changed in the config.
 ![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.15/images/crafting4.png)
 
 ## Modes
-**Default mode:** Extends your build on the side facing you. Maximum number of blocks depends on wand tier. SHIFT+scroll to change the placement mode (Horizontal, Vertical, North/South, East/West, No lock).
+**Default mode:** Extends your build on the side facing you. Maximum number of blocks depends on wand tier.
+SHIFT+scroll to change the placement mode (Horizontal, Vertical, North/South, East/West, No lock).
 
-**Angel mode:** Places a block on the opposite side of the block (or row of blocks) you are facing. Maximum distance depends on wand tier. Right click empty space to place a block in midair (similar to angel blocks, hence the name). To do that, you'll need to have the block you want to place in your offhand. You can't place a block in midair if you've fallen more than 10 blocks deep (no easy rescue tool from falling into the void).
+**Angel mode:** Places a block on the opposite side of the block (or row of blocks) you are facing.
+Maximum distance depends on wand tier. Right click empty space to place a block in midair (similar to angel blocks,
+hence the name). To do that, you'll need to have the block you want to place in your offhand.
+You can't place a block in midair if you've fallen more than 10 blocks deep
+(no easy rescue tool from falling into the void).
 
 You can change the wand mode using the option screen or by SHIFT+Left clicking empty space.
+
+## Wand cores
+Make your wand even better by putting aditional wand cores into it.
+
+- New modes:
+    - **Angel core**
+    
+      Places a block on the opposite side of the block (or row of blocks) you are facing. Maximum distance depends
+      on wand tier. Right click empty space to place a block in midair (similar to angel blocks, hence the name).
+      To do that, you'll need to have the block you want to place in your offhand. You can't place a block in midair
+      if you've fallen more than 10 blocks deep (no easy rescue tool from falling into the void).  
+    
+    - **Destruction core**
+      
+      Point the wand at some blocks to destroy them.
+
+- Upgrades
+    - **Conjuration core**
+    
+      If the wand runs out of blocks, it conjures them from thin air. Conjured blocks are nearly transparent and 
+      are very easy to break. Right click them with any block to replace them.
+      You can force the placement of conjured blocks by holding a feather in your offhand.
+  
 
 ## Options
 SHIFT+Right clicking empty space opens the option screen of your wand.

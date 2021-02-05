@@ -16,6 +16,7 @@ import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.basics.ReplacementRegistry;
+import thetadev.constructionwand.client.ClientEvents;
 import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
@@ -80,6 +81,7 @@ public class ConstructionWand
     {
         renderBlockPreview = new RenderBlockPreview();
         MinecraftForge.EVENT_BUS.register(renderBlockPreview);
+        MinecraftForge.EVENT_BUS.register(new ClientEvents());
         ModItems.registerModelProperties();
     }
 
