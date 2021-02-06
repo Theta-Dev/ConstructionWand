@@ -8,15 +8,15 @@ import thetadev.constructionwand.ConstructionWand;
 
 public class ModStats
 {
-	public static final ResourceLocation USE_WAND = new ResourceLocation(ConstructionWand.MODID, "use_wand");
+    public static final ResourceLocation USE_WAND = new ResourceLocation(ConstructionWand.MODID, "use_wand");
 
-	public static void register() {
-		registerStat(USE_WAND);
-	}
+    public static void register() {
+        registerStat(USE_WAND);
+    }
 
-	private static void registerStat(ResourceLocation registryName) {
-		// Compare with net.minecraft.stats.Stats#registerCustom
-		Registry.register(Registry.CUSTOM_STAT, registryName.getPath(), registryName);
-		Stats.CUSTOM.get(registryName, IStatFormatter.DEFAULT);
-	}
+    private static void registerStat(ResourceLocation registryName) {
+        // Compare with net.minecraft.stats.Stats#registerCustom
+        Registry.register(Registry.CUSTOM_STAT, registryName.getPath(), registryName);
+        Stats.CUSTOM.get(registryName, IStatFormatter.DEFAULT);
+    }
 }

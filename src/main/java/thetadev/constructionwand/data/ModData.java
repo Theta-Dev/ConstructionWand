@@ -8,12 +8,12 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModData
 {
-	@SubscribeEvent
-	public static void gatherData(GatherDataEvent event) {
-		DataGenerator generator = event.getGenerator();
+    @SubscribeEvent
+    public static void gatherData(GatherDataEvent event) {
+        DataGenerator generator = event.getGenerator();
 
-		if(event.includeServer()) {
-			generator.addProvider(new RecipeGenerator(generator));
-		}
-	}
+        if(event.includeServer()) {
+            generator.addProvider(new RecipeGenerator(generator));
+        }
+    }
 }

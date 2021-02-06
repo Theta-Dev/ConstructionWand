@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 
 public interface IPool<T>
 {
-	void add(T element);
-	@Nullable
-	T draw();
-	void reset();
+    void add(T element);
+    @Nullable
+    T draw();
+    void reset();
 }
