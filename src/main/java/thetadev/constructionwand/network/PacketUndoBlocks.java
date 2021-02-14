@@ -16,6 +16,7 @@ public class PacketUndoBlocks
     public PacketUndoBlocks(Set<BlockPos> undoBlocks) {
         this.undoBlocks = new HashSet<>(undoBlocks);
     }
+
     private PacketUndoBlocks(HashSet<BlockPos> undoBlocks) {
         this.undoBlocks = undoBlocks;
     }
@@ -35,7 +36,8 @@ public class PacketUndoBlocks
         return new PacketUndoBlocks(undoBlocks);
     }
 
-    public static class Handler {
+    public static class Handler
+    {
         public static void handle(final PacketUndoBlocks msg, final Supplier<NetworkEvent.Context> ctx) {
             if(!ctx.get().getDirection().getReceptionSide().isClient()) return;
 

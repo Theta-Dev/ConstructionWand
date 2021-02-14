@@ -61,7 +61,7 @@ public class OptionEnum<E extends Enum<E>> implements IOption<E>
     @Override
     public E next(boolean dir) {
         E[] enumValues = enumClass.getEnumConstants();
-        int i = value.ordinal() + (dir ? 1:-1);
+        int i = value.ordinal() + (dir ? 1 : -1);
         if(i < 0) i += enumValues.length;
         set(enumValues[i % enumValues.length]);
         return value;

@@ -1,4 +1,4 @@
-package thetadev.constructionwand.items;
+package thetadev.constructionwand.items.wand;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -6,9 +6,8 @@ import thetadev.constructionwand.basics.ConfigServer;
 
 public class ItemWandInfinity extends ItemWand
 {
-    public ItemWandInfinity(String name)
-    {
-        super(name, new Properties().maxStackSize(1).isBurnable());
+    public ItemWandInfinity(Properties properties, String name) {
+        super(properties.maxStackSize(1).isBurnable(), name);
     }
 
     @Override

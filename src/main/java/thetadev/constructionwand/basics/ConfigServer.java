@@ -67,9 +67,11 @@ public class ConfigServer
         public int getDurability() {
             return durability == null ? -1 : durability.get();
         }
+
         public int getLimit() {
             return limit == null ? 0 : limit.get();
         }
+
         public int getAngel() {
             return angel == null ? 0 : angel.get();
         }

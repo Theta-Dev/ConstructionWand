@@ -1,4 +1,4 @@
-package thetadev.constructionwand.job;
+package thetadev.constructionwand.wand.undo;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -29,7 +29,7 @@ public class UndoHistory
         return history.computeIfAbsent(player.getUniqueID(), k -> new PlayerEntry());
     }
 
-    public void add(PlayerEntity player, World world, LinkedList<ISnapshot> placeSnapshots) {
+    public void add(PlayerEntity player, World world, List<ISnapshot> placeSnapshots) {
         LinkedList<HistoryEntry> list = getEntryFromPlayer(player).entries;
         list.add(new HistoryEntry(placeSnapshots, world));
         while(list.size() > ConfigServer.UNDO_HISTORY.get()) list.removeFirst();
@@ -86,7 +86,8 @@ public class UndoHistory
         return false;
     }
 
-    private static class PlayerEntry {
+    private static class PlayerEntry
+    {
         public final LinkedList<HistoryEntry> entries;
         public boolean undoActive;
 
@@ -96,11 +97,12 @@ public class UndoHistory
         }
     }
 
-    private static class HistoryEntry {
-        public final LinkedList<ISnapshot> placeSnapshots;
+    private static class HistoryEntry
+    {
+        public final List<ISnapshot> placeSnapshots;
         public final World world;
 
-        public HistoryEntry(LinkedList<ISnapshot> placeSnapshots, World world) {
+        public HistoryEntry(List<ISnapshot> placeSnapshots, World world) {
             this.placeSnapshots = placeSnapshots;
             this.world = world;
         }

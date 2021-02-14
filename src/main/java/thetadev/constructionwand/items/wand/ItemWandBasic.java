@@ -1,16 +1,18 @@
-package thetadev.constructionwand.items;
+package thetadev.constructionwand.items.wand;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemTier;
 import net.minecraft.item.ItemStack;
 import thetadev.constructionwand.basics.ConfigServer;
 
+import javax.annotation.Nonnull;
+
 public class ItemWandBasic extends ItemWand
 {
     private final IItemTier tier;
 
-    public ItemWandBasic(String name, IItemTier tier) {
-        super(name, new Properties().maxDamage(tier.getMaxUses()));
+    public ItemWandBasic(Properties properties, String name, IItemTier tier) {
+        super(properties.maxDamage(tier.getMaxUses()), name);
         this.tier = tier;
     }
 
@@ -25,7 +27,7 @@ public class ItemWandBasic extends ItemWand
     }
 
     @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+    public boolean getIsRepairable(@Nonnull ItemStack toRepair, @Nonnull ItemStack repair) {
         return this.tier.getRepairMaterial().test(repair);
     }
 }

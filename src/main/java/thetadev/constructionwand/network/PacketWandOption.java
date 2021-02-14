@@ -7,7 +7,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
-import thetadev.constructionwand.items.ItemWand;
+import thetadev.constructionwand.items.wand.ItemWand;
 
 import java.util.function.Supplier;
 

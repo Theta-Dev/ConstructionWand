@@ -18,10 +18,10 @@ public class ReplacementRegistry
             if(!(key instanceof String)) continue;
             HashSet<Item> set = new HashSet<>();
 
-            for(String id : ((String)key).split(";")) {
+            for(String id : ((String) key).split(";")) {
                 Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
                 if(item == null) {
-                    ConstructionWand.LOGGER.warn("Replacement Registry: Could not find item "+id);
+                    ConstructionWand.LOGGER.warn("Replacement Registry: Could not find item " + id);
                     continue;
                 }
                 set.add(item);

@@ -13,6 +13,8 @@ import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.network.PacketWandOption;
 
+import javax.annotation.Nonnull;
+
 public class ScreenWand extends Screen
 {
     private final ItemStack wand;
@@ -25,8 +27,8 @@ public class ScreenWand extends Screen
     private static final int N_COLS = 2;
     private static final int N_ROWS = 3;
 
-    private static final int FIELD_WIDTH = N_COLS * (BUTTON_WIDTH+SPACING_WIDTH) - SPACING_WIDTH;
-    private static final int FIELD_HEIGHT = N_ROWS * (BUTTON_HEIGHT+SPACING_HEIGHT) - SPACING_HEIGHT;
+    private static final int FIELD_WIDTH = N_COLS * (BUTTON_WIDTH + SPACING_WIDTH) - SPACING_WIDTH;
+    private static final int FIELD_HEIGHT = N_ROWS * (BUTTON_HEIGHT + SPACING_HEIGHT) - SPACING_HEIGHT;
 
     public ScreenWand(ItemStack wand) {
         super(new StringTextComponent("ScreenWand"));
@@ -35,22 +37,22 @@ public class ScreenWand extends Screen
     }
 
     @Override
-    public void init(Minecraft minecraft, int width, int height) {
+    public void init(@Nonnull Minecraft minecraft, int width, int height) {
         super.init(minecraft, width, height);
 
-        createButton(0, 0, wandOptions.mode);
+        createButton(0, 0, wandOptions.cores);
         createButton(0, 1, wandOptions.lock);
         createButton(0, 2, wandOptions.direction);
-        createButton(1, 0, wandOptions.replace);
-        createButton(1, 1, wandOptions.match);
-        createButton(1, 2, wandOptions.random);
+        createButton(1, 0, wandOptions.reservoirs);
+        createButton(1, 1, wandOptions.replace);
+        createButton(1, 2, wandOptions.match);
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        drawCenteredString(matrixStack, font, wand.getDisplayName(), width/2, height/2 - FIELD_HEIGHT/2 - SPACING_HEIGHT, 16777215);
+        drawCenteredString(matrixStack, font, wand.getDisplayName(), width / 2, height / 2 - FIELD_HEIGHT / 2 - SPACING_HEIGHT, 16777215);
     }
 
     @Override
@@ -78,11 +80,11 @@ public class ScreenWand extends Screen
     }
 
     private int getX(int n) {
-        return width/2 - FIELD_WIDTH/2 + n*(BUTTON_WIDTH+SPACING_WIDTH);
+        return width / 2 - FIELD_WIDTH / 2 + n * (BUTTON_WIDTH + SPACING_WIDTH);
     }
 
     private int getY(int n) {
-        return height/2 - FIELD_HEIGHT/2 + n*(BUTTON_HEIGHT+SPACING_HEIGHT);
+        return height / 2 - FIELD_HEIGHT / 2 + n * (BUTTON_HEIGHT + SPACING_HEIGHT);
     }
 
     private ITextComponent getButtonLabel(IOption<?> option) {

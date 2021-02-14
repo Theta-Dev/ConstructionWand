@@ -1,25 +1,40 @@
-package thetadev.constructionwand.job;
+package thetadev.constructionwand.wand.action;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
+import thetadev.constructionwand.api.IWandAction;
+import thetadev.constructionwand.api.IWandSupplier;
+import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
+import thetadev.constructionwand.wand.WandJob;
+import thetadev.constructionwand.wand.undo.ISnapshot;
+import thetadev.constructionwand.wand.undo.PlaceSnapshot;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
-public class ConstructionJob extends WandJob
+/**
+ * Default WandAction. Extends your building on the side you're facing.
+ */
+public class ActionConstruction implements IWandAction
 {
-    public ConstructionJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack itemStack) {
-        super(player, world, rayTraceResult, itemStack);
+    private final World world;
+    private final BlockRayTraceResult rayTraceResult;
+    private final WandOptions options;
+
+    public ActionConstruction(WandJob wandJob) {
+        world = wandJob.world;
+        rayTraceResult = wandJob.rayTraceResult;
+        options = wandJob.options;
     }
 
     @Override
-    protected void getBlockPositionList() {
+    public List<ISnapshot> getSnapshots(IWandSupplier supplier) {
+        LinkedList<ISnapshot> placeSnapshots = new LinkedList<>();
         LinkedList<BlockPos> candidates = new LinkedList<>();
         HashSet<BlockPos> allCandidates = new HashSet<>();
 
@@ -29,19 +44,22 @@ public class ConstructionJob extends WandJob
 
         // Is place direction allowed by lock?
         if(placeDirection == Direction.UP || placeDirection == Direction.DOWN) {
-            if(options.testLock(WandOptions.LOCK.NORTHSOUTH) || options.testLock(WandOptions.LOCK.EASTWEST)) candidates.add(startingPoint);
+            if(options.testLock(WandOptions.LOCK.NORTHSOUTH) || options.testLock(WandOptions.LOCK.EASTWEST))
+                candidates.add(startingPoint);
         }
-        else if(options.testLock(WandOptions.LOCK.HORIZONTAL) || options.testLock(WandOptions.LOCK.VERTICAL)) candidates.add(startingPoint);
+        else
+            if(options.testLock(WandOptions.LOCK.HORIZONTAL) || options.testLock(WandOptions.LOCK.VERTICAL))
+                candidates.add(startingPoint);
 
-        while(!candidates.isEmpty() && placeSnapshots.size() < maxBlocks)
-        {
+        while(!candidates.isEmpty() && placeSnapshots.size() < supplier.getMaxBlocks()) {
             BlockPos currentCandidate = candidates.removeFirst();
             try {
                 BlockPos supportingPoint = currentCandidate.offset(placeDirection.getOpposite());
                 BlockState candidateSupportingBlock = world.getBlockState(supportingPoint);
 
-                if(matchBlocks(targetBlock.getBlock(), candidateSupportingBlock.getBlock()) && allCandidates.add(currentCandidate)) {
-                    PlaceSnapshot snapshot = getPlaceSnapshot(currentCandidate, candidateSupportingBlock);
+                if(WandUtil.matchBlocks(options, targetBlock.getBlock(), candidateSupportingBlock.getBlock()) &&
+                        allCandidates.add(currentCandidate)) {
+                    PlaceSnapshot snapshot = supplier.getPlaceSnapshot(currentCandidate, candidateSupportingBlock);
                     if(snapshot == null) continue;
                     placeSnapshots.add(snapshot);
 
@@ -99,11 +117,11 @@ public class ConstructionJob extends WandJob
                             break;
                     }
                 }
-            }
-            catch(Exception e) {
+            } catch(Exception e) {
                 // Can't do anything, could be anything.
                 // Skip if anything goes wrong.
             }
         }
+        return placeSnapshots;
     }
 }

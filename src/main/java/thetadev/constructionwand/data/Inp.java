@@ -21,6 +21,7 @@ public class Inp
     public static Inp fromItem(IItemProvider in) {
         return new Inp(in.asItem().getRegistryName().getPath(), Ingredient.fromItems(in), ItemPredicate.Builder.create().item(in).build());
     }
+
     public static Inp fromTag(ITag.INamedTag<Item> in) {
         return new Inp(in.getName().getPath(), Ingredient.fromTag(in), ItemPredicate.Builder.create().tag(in).build());
     }

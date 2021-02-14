@@ -6,7 +6,8 @@ import thetadev.constructionwand.api.IContainerHandler;
 
 import java.util.ArrayList;
 
-public class ContainerManager {
+public class ContainerManager
+{
     private final ArrayList<IContainerHandler> handlers;
 
     public ContainerManager() {
@@ -20,7 +21,7 @@ public class ContainerManager {
     public int countItems(PlayerEntity player, ItemStack itemStack, ItemStack inventoryStack) {
         for(IContainerHandler handler : handlers) {
             if(handler.matches(player, itemStack, inventoryStack)) {
-                return handler.countItems(player,itemStack, inventoryStack);
+                return handler.countItems(player, itemStack, inventoryStack);
             }
         }
         return 0;

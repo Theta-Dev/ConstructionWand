@@ -4,14 +4,23 @@
   "item.constructionwand.diamond_wand": "Diamond Wand",
   "item.constructionwand.infinity_wand": "Infinity Wand",
 
+  "item.constructionwand.core_angel": "Angel Wand Core",
+  "item.constructionwand.reservoir_random": "Random Wand Reservoir",
+
   "constructionwand.tooltip.blocks": "Max. %d blocks",
   "constructionwand.tooltip.shift": "Press [SHIFT]",
 
-  "constructionwand.option.mode": "",
-  "constructionwand.option.mode.default": "Default mode",
-  "constructionwand.option.mode.default.desc": "Extend your building on the side facing you",
-  "constructionwand.option.mode.angel": "§6Angel mode",
-  "constructionwand.option.mode.angel.desc": "Place behind blocks and in mid air",
+  "constructionwand.option.cores": "",
+  "constructionwand.option.cores.constructionwand:default": "Construction Core",
+  "constructionwand.option.cores.constructionwand:default.desc": "Extend your building on the side facing you",
+  "constructionwand.option.cores.constructionwand:core_angel": "§6Angel Core",
+  "constructionwand.option.cores.constructionwand:core_angel.desc": "Place behind blocks and in mid air",
+
+  "constructionwand.option.reservoirs": "",
+  "constructionwand.option.reservoirs.constructionwand:default": "Inventory Reservoir",
+  "constructionwand.option.reservoirs.constructionwand:default.desc": "Delivers the matching building material from your inventory. Take a block into your offhand to specify a different material.",
+  "constructionwand.option.reservoirs.constructionwand:reservoir_random": "Random Reservoir",
+  "constructionwand.option.reservoirs.constructionwand:reservoir_random.desc": "Takes random blocks from your hotbar",
 
   "constructionwand.option.lock": "Restriction: ",
   "constructionwand.option.lock.horizontal": "§aLeft/Right",
@@ -44,12 +53,6 @@
   "constructionwand.option.match.similar.desc": "Treat similar blocks (dirt/grass types) equally",
   "constructionwand.option.match.any": "§cAny",
   "constructionwand.option.match.any.desc": "Extend any block",
-
-  "constructionwand.option.random": "Random: ",
-  "constructionwand.option.random.yes": "§aYes",
-  "constructionwand.option.random.yes.desc": "Place random blocks present in your hotbar",
-  "constructionwand.option.random.no": "§cNo",
-  "constructionwand.option.random.no.desc": "Don't randomize placed blocks",
 
   "stat.constructionwand.use_wand": "Blocks placed using Wand"
 }

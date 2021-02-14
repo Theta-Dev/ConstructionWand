@@ -1,20 +1,23 @@
-package thetadev.constructionwand.job;
+package thetadev.constructionwand.wand.undo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.WandUtil;
 
-public class DestroySnapshot implements ISnapshot
+public class PlaceSnapshot implements ISnapshot
 {
     public final BlockState block;
     public final BlockPos pos;
+    public final BlockItem item;
 
-    public DestroySnapshot(BlockState block, BlockPos pos) {
-        this.pos = pos;
+    public PlaceSnapshot(BlockState block, BlockPos pos, BlockItem item) {
         this.block = block;
+        this.pos = pos;
+        this.item = item;
     }
 
     @Override
@@ -29,21 +32,21 @@ public class DestroySnapshot implements ISnapshot
 
     @Override
     public ItemStack getRequiredItems() {
-        return ItemStack.EMPTY;
+        return new ItemStack(item);
     }
 
     @Override
     public boolean execute(World world, PlayerEntity player) {
-        return WandUtil.removeBlock(world, player, block, pos);
+        return WandUtil.placeBlock(world, player, block, pos, item);
     }
 
     @Override
     public boolean restore(World world, PlayerEntity player) {
-        return WandUtil.placeBlock(world, player, block, pos, null);
+        return WandUtil.removeBlock(world, player, block, pos);
     }
 
     @Override
     public void forceRestore(World world) {
-        world.setBlockState(pos, block);
+        world.removeBlock(pos, false);
     }
 }

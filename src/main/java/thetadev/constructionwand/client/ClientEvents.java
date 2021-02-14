@@ -12,7 +12,7 @@ import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
-import thetadev.constructionwand.items.ItemWand;
+import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketWandOption;
 
@@ -36,7 +36,7 @@ public class ClientEvents
             optPressed = optState;
             PacketQueryUndo packet = new PacketQueryUndo(optPressed);
             ConstructionWand.instance.HANDLER.sendToServer(packet);
-            ConstructionWand.LOGGER.debug("OPT key update: " + optPressed);
+            //ConstructionWand.LOGGER.debug("OPT key update: " + optPressed);
         }
     }
 
@@ -57,7 +57,7 @@ public class ClientEvents
         event.setCanceled(true);
     }
 
-    // Sneak+(OPT)+Left click wand to change mode
+    // Sneak+(OPT)+Left click wand to change core
     @SubscribeEvent
     public void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
         PlayerEntity player = event.getPlayer();
@@ -68,8 +68,8 @@ public class ClientEvents
         if(!(wand.getItem() instanceof ItemWand)) return;
 
         WandOptions wandOptions = new WandOptions(wand);
-        wandOptions.mode.next();
-        ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.mode, true));
+        wandOptions.cores.next();
+        ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.cores, true));
     }
 
     // Sneak+(OPT)+Right click wand to open GUI

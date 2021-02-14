@@ -27,7 +27,7 @@ public class RenderTypes
                 .build(false);
 
         TRANSLUCENT_LINES = RenderType.makeType(
-                ConstructionWand.MODID+":translucent_lines",
+                ConstructionWand.MODID + ":translucent_lines",
                 DefaultVertexFormats.POSITION_COLOR,
                 GL11.GL_LINES,
                 256,
