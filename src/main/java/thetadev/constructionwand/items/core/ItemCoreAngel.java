@@ -8,8 +8,8 @@ import thetadev.constructionwand.wand.action.ActionAngel;
 
 public class ItemCoreAngel extends ItemBase implements IWandCore
 {
-    public ItemCoreAngel(Properties properties, String name) {
-        super(properties, name);
+    public ItemCoreAngel(String name, Properties properties) {
+        super(name, properties);
     }
 
     @Override

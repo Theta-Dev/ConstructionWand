@@ -8,8 +8,8 @@ import thetadev.constructionwand.wand.supplier.SupplierRandom;
 
 public class ItemReservoirRandom extends ItemBase implements IWandReservoir
 {
-    public ItemReservoirRandom(Properties properties, String name) {
-        super(properties, name);
+    public ItemReservoirRandom(String name, Properties properties) {
+        super(name, properties);
     }
 
     @Override

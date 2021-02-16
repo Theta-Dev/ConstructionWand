@@ -17,21 +17,24 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.generators.ModelFile;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
+import thetadev.constructionwand.data.ICustomItemModel;
+import thetadev.constructionwand.data.ItemModelGenerator;
 import thetadev.constructionwand.items.ItemBase;
 import thetadev.constructionwand.wand.WandJob;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public abstract class ItemWand extends ItemBase
+public abstract class ItemWand extends ItemBase implements ICustomItemModel
 {
-    public ItemWand(Properties properties, String name) {
-        super(properties, name);
+    public ItemWand(String name, Properties properties) {
+        super(name, properties);
     }
 
     @Nonnull
@@ -127,5 +130,19 @@ public abstract class ItemWand extends ItemBase
                         .append(new StringTextComponent(" - ").mergeStyle(TextFormatting.GRAY))
                         .append(new TranslationTextComponent(option.getDescTranslation()).mergeStyle(TextFormatting.WHITE))
                 , true);
+    }
+
+    @Override
+    public void generateCustomItemModel(ItemModelGenerator generator, String name) {
+        ModelFile wandWithCore = generator.withExistingParent(name + "_core", "item/handheld")
+                .texture("layer0", generator.modLoc("item/" + name))
+                .texture("layer1", generator.modLoc("item/overlay_core"));
+
+        generator.withExistingParent(name, "item/handheld")
+                .texture("layer0", generator.modLoc("item/" + name))
+                .override()
+                .predicate(generator.modLoc("using_core"), 1)
+                .model(wandWithCore).end();
+
     }
 }

@@ -11,8 +11,8 @@ public class ItemWandBasic extends ItemWand
 {
     private final IItemTier tier;
 
-    public ItemWandBasic(Properties properties, String name, IItemTier tier) {
-        super(properties.maxDamage(tier.getMaxUses()), name);
+    public ItemWandBasic(String name, Properties properties, IItemTier tier) {
+        super(name, properties.maxDamage(tier.getMaxUses()));
         this.tier = tier;
     }
 

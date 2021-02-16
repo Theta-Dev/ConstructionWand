@@ -17,6 +17,7 @@ import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.basics.pool.IPool;
 import thetadev.constructionwand.basics.pool.OrderedPool;
 import thetadev.constructionwand.containers.ContainerManager;
+import thetadev.constructionwand.items.ModItems;
 import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.wand.WandJob;
 import thetadev.constructionwand.wand.undo.PlaceSnapshot;
@@ -27,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * Default WandSupplier. Takes Items from player inventory.
+ * Default WandSupplier. Takes items from player inventory.
  */
 public class SupplierInventory implements IWandSupplier
 {
@@ -35,8 +36,7 @@ public class SupplierInventory implements IWandSupplier
     protected final World world;
     protected final BlockRayTraceResult rayTraceResult;
     protected final WandOptions options;
-    protected final ItemStack wand;
-    protected final ItemWand wandItem;
+    protected final int wandLimit;
 
     protected HashMap<BlockItem, Integer> itemCounts;
     protected IPool<BlockItem> itemPool;
@@ -47,8 +47,15 @@ public class SupplierInventory implements IWandSupplier
         world = job.world;
         rayTraceResult = job.rayTraceResult;
         options = job.options;
-        wand = job.wand;
-        wandItem = job.wandItem;
+        wandLimit = job.wandItem.getLimit(player, job.wand);
+    }
+
+    public SupplierInventory(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, int wandLimit) {
+        this.player = player;
+        this.world = world;
+        this.rayTraceResult = rayTraceResult;
+        this.options = new WandOptions(new ItemStack(ModItems.WAND_INFINITY));
+        this.wandLimit = wandLimit;
     }
 
     @Override
@@ -89,7 +96,7 @@ public class SupplierInventory implements IWandSupplier
             }
         }
 
-        maxBlocks = Math.min(maxBlocks, wandItem.getLimit(player, wand));
+        maxBlocks = Math.min(maxBlocks, wandLimit);
     }
 
     @Override
@@ -107,7 +114,7 @@ public class SupplierInventory implements IWandSupplier
 
     @Override
     @Nullable
-    public PlaceSnapshot getPlaceSnapshot(BlockPos pos, BlockState supportingBlock) {
+    public PlaceSnapshot getPlaceSnapshot(BlockPos pos, @Nullable BlockState supportingBlock) {
         if(!WandUtil.isPositionPlaceable(world, player, pos, rayTraceResult, options)) return null;
         itemPool.reset();
 

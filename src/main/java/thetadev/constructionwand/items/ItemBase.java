@@ -1,11 +1,12 @@
 package thetadev.constructionwand.items;
 
 import net.minecraft.item.Item;
+import thetadev.constructionwand.ConstructionWand;
 
 public class ItemBase extends Item
 {
-    public ItemBase(Properties properties, String name) {
+    public ItemBase(String name, Properties properties) {
         super(properties);
-        setRegistryName(name);
+        setRegistryName(ConstructionWand.MODID, name);
     }
 }

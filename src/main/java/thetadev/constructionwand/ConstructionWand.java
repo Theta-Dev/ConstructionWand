@@ -16,6 +16,7 @@ import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.basics.ReplacementRegistry;
+import thetadev.constructionwand.block.ModBlocks;
 import thetadev.constructionwand.client.ClientEvents;
 import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
@@ -31,6 +32,8 @@ import thetadev.constructionwand.wand.undo.UndoHistory;
 public class ConstructionWand
 {
     public static final String MODID = "constructionwand";
+    public static final String MODNAME = "ConstructionWand";
+
     public static ConstructionWand instance;
     public static final Logger LOGGER = LogManager.getLogger();
     private static final String PROTOCOL_VERSION = "1";
@@ -82,6 +85,7 @@ public class ConstructionWand
         MinecraftForge.EVENT_BUS.register(new ClientEvents());
         ModItems.registerModelProperties();
         ModItems.registerItemColors();
+        ModBlocks.registerRenderLayers();
     }
 
     public static ResourceLocation loc(String name) {

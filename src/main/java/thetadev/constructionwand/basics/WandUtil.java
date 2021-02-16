@@ -29,6 +29,7 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.world.BlockEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.WandOptions;
+import thetadev.constructionwand.block.ModBlocks;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.wand.WandItemUseContext;
@@ -139,22 +140,24 @@ public class WandUtil
         return true;
     }
 
-    public static boolean removeBlock(World world, PlayerEntity player, BlockState block, BlockPos pos) {
+    public static boolean removeBlock(World world, PlayerEntity player, @Nullable BlockState block, BlockPos pos) {
         BlockState currentBlock = world.getBlockState(pos);
 
-        if(world.isBlockModifiable(player, pos) &&
-                (player.isCreative() ||
-                        (currentBlock.getBlockHardness(world, pos) > -1 && world.getTileEntity(pos) == null &&
-                                ReplacementRegistry.matchBlocks(currentBlock.getBlock(), block.getBlock())))) {
+        if(!world.isBlockModifiable(player, pos)) return false;
 
-            BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
-            MinecraftForge.EVENT_BUS.post(breakEvent);
-            if(breakEvent.isCanceled()) return false;
+        if(!player.isCreative()) {
+            if(currentBlock.getBlockHardness(world, pos) <= -1 || world.getTileEntity(pos) != null) return false;
 
-            world.removeBlock(pos, false);
-            return true;
+            if(block != null)
+                if(!ReplacementRegistry.matchBlocks(currentBlock.getBlock(), block.getBlock())) return false;
         }
-        return false;
+
+        BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
+        MinecraftForge.EVENT_BUS.post(breakEvent);
+        if(breakEvent.isCanceled()) return false;
+
+        world.removeBlock(pos, false);
+        return true;
     }
 
     public static int countItem(PlayerEntity player, Item item) {
@@ -201,7 +204,8 @@ public class WandUtil
         if(!world.isBlockModifiable(player, pos)) return false;
 
         // If replace mode is off, target has to be air
-        if(!options.replace.get() && !world.isAirBlock(pos)) return false;
+        if(!options.replace.get() && !world.isAirBlock(pos))
+            if(world.getBlockState(pos).getBlock() != ModBlocks.CONJURED_BLOCK) return false;
 
         // Limit placement range
         if(ConfigServer.MAX_RANGE.get() > 0 && WandUtil.maxRange(rayTraceResult.getPos(), pos) > ConfigServer.MAX_RANGE.get())
@@ -214,7 +218,7 @@ public class WandUtil
     @Nullable
     public static PlaceSnapshot getPlaceSnapshot(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
                                                  BlockPos pos, BlockItem item,
-                                                 BlockState supportingBlock, WandOptions options) {
+                                                 @Nullable BlockState supportingBlock, @Nullable WandOptions options) {
         // Is block at pos replaceable?
         BlockItemUseContext ctx = new WandItemUseContext(world, player, rayTraceResult, pos, item);
         if(!ctx.canPlace()) return null;
@@ -239,7 +243,7 @@ public class WandUtil
         if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) return null;
 
         // Copy block properties from supporting block
-        if(options.direction.get() == WandOptions.DIRECTION.TARGET) {
+        if(options != null && supportingBlock != null && options.direction.get() == WandOptions.DIRECTION.TARGET) {
             // Block properties to be copied (alignment/rotation properties)
 
             for(Property property : new Property[]{

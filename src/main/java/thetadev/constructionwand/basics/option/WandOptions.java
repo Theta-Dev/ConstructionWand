@@ -53,7 +53,6 @@ public class WandOptions
     public final IOption<?>[] allOptions;
 
     public WandOptions(ItemStack wandStack) {
-        ItemWand wand = (ItemWand) wandStack.getItem();
         tag = wandStack.getOrCreateChildTag(TAG_ROOT);
 
         cores = new WandUpgradesSelectable<>(tag, "cores", new CoreDefault());

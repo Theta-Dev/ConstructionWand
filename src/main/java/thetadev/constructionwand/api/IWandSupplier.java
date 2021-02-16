@@ -15,7 +15,7 @@ public interface IWandSupplier
     int getMaxBlocks();
 
     @Nullable
-    PlaceSnapshot getPlaceSnapshot(BlockPos pos, BlockState supportingBlock);
+    PlaceSnapshot getPlaceSnapshot(BlockPos pos, @Nullable BlockState supportingBlock);
 
     int takeItemStack(ItemStack stack);
 }

@@ -6,8 +6,8 @@ import thetadev.constructionwand.basics.ConfigServer;
 
 public class ItemWandInfinity extends ItemWand
 {
-    public ItemWandInfinity(Properties properties, String name) {
-        super(properties.maxStackSize(1).isBurnable(), name);
+    public ItemWandInfinity(String name, Properties properties) {
+        super(name, properties.maxStackSize(1).isBurnable());
     }
 
     @Override

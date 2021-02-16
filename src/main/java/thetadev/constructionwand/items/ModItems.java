@@ -1,11 +1,9 @@
 package thetadev.constructionwand.items;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.ItemColors;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.item.ItemTier;
+import net.minecraft.item.*;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -16,6 +14,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.WandOptions;
+import thetadev.constructionwand.block.ModBlocks;
 import thetadev.constructionwand.crafting.RecipeWandUpgrade;
 import thetadev.constructionwand.items.core.ItemCoreAngel;
 import thetadev.constructionwand.items.reservoir.ItemReservoirRandom;
@@ -23,27 +22,43 @@ import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.items.wand.ItemWandBasic;
 import thetadev.constructionwand.items.wand.ItemWandInfinity;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 @Mod.EventBusSubscriber(modid = ConstructionWand.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModItems
 {
-    public static final Item WAND_STONE = new ItemWandBasic(itemprops(), "stone_wand", ItemTier.STONE);
-    public static final Item WAND_IRON = new ItemWandBasic(itemprops(), "iron_wand", ItemTier.IRON);
-    public static final Item WAND_DIAMOND = new ItemWandBasic(itemprops(), "diamond_wand", ItemTier.DIAMOND);
-    public static final Item WAND_INFINITY = new ItemWandInfinity(itemprops(), "infinity_wand");
+    // Wands
+    public static final Item WAND_STONE = new ItemWandBasic("stone_wand", itemprops(), ItemTier.STONE);
+    public static final Item WAND_IRON = new ItemWandBasic("iron_wand", itemprops(), ItemTier.IRON);
+    public static final Item WAND_DIAMOND = new ItemWandBasic("diamond_wand", itemprops(), ItemTier.DIAMOND);
+    public static final Item WAND_INFINITY = new ItemWandInfinity("infinity_wand", itemprops());
 
-    public static final Item CORE_ANGEL = new ItemCoreAngel(unstackable(), "core_angel");
+    // Upgrades
+    public static final Item CORE_ANGEL = new ItemCoreAngel("core_angel", unstackable());
+    public static final Item RESERVOIR_RANDOM = new ItemReservoirRandom("reservoir_random", unstackable());
 
-    public static final Item RESERVOIR_RANDOM = new ItemReservoirRandom(unstackable(), "reservoir_random");
-
+    // Collections
     public static final Item[] WANDS = {WAND_STONE, WAND_IRON, WAND_DIAMOND, WAND_INFINITY};
-    public static final Item[] UPGRADES = {CORE_ANGEL, RESERVOIR_RANDOM};
+    public static final HashSet<Item> ALL_ITEMS = new HashSet<>();
+
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         IForgeRegistry<Item> r = event.getRegistry();
 
         r.registerAll(WANDS);
-        r.registerAll(UPGRADES);
+        ALL_ITEMS.addAll(Arrays.asList(WANDS));
+
+        registerItem(r, CORE_ANGEL);
+        registerItem(r, RESERVOIR_RANDOM);
+
+        // BlockItems
+        for(Block block : ModBlocks.ALL_BLOCKS) {
+            BlockItem item = new BlockItem(block, itemprops());
+            item.setRegistryName(block.getRegistryName());
+            registerItem(r, item);
+        }
     }
 
     public static Item.Properties itemprops() {
@@ -54,8 +69,9 @@ public class ModItems
         return itemprops().maxStackSize(1);
     }
 
-    private static <V extends IForgeRegistryEntry<V>> void register(IForgeRegistry<V> reg, String name, IForgeRegistryEntry<V> thing) {
-        reg.register(thing.setRegistryName(ConstructionWand.loc(name)));
+    private static void registerItem(IForgeRegistry<Item> reg, Item item) {
+        reg.register(item);
+        ALL_ITEMS.add(item);
     }
 
     @SubscribeEvent
@@ -83,5 +99,9 @@ public class ModItems
             colors.register((stack, layer) -> (layer == 1 && stack.getItem() instanceof ItemWand) ?
                     new WandOptions(stack).cores.get().getColor() : -1, item);
         }
+    }
+
+    private static <V extends IForgeRegistryEntry<V>> void register(IForgeRegistry<V> reg, String name, IForgeRegistryEntry<V> thing) {
+        reg.register(thing.setRegistryName(ConstructionWand.loc(name)));
     }
 }
