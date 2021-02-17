@@ -11,19 +11,28 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import thetadev.constructionwand.ConstructionWand;
+import thetadev.constructionwand.api.IWandAction;
+import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.WandUtil;
+import thetadev.constructionwand.items.ModItems;
+import thetadev.constructionwand.wand.WandJob;
 import thetadev.constructionwand.wand.supplier.SupplierInventory;
-import thetadev.constructionwand.wand.undo.PlaceSnapshot;
+import thetadev.constructionwand.wand.undo.ISnapshot;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class BlockConjured extends AbstractGlassBlock
 {
@@ -31,7 +40,7 @@ public class BlockConjured extends AbstractGlassBlock
     private static final AbstractBlock.IPositionPredicate NOT_SOLID = (state, world, pos) -> false;
 
     public BlockConjured(String name) {
-        super(AbstractBlock.Properties.create(Material.SNOW).zeroHardnessAndResistance()
+        super(AbstractBlock.Properties.create(Material.SNOW).hardnessAndResistance(0.2F)
                 .sound(SoundType.CLOTH).notSolid().setAllowsSpawn(NO_SPAWN)
                 .setOpaque(NOT_SOLID).setSuffocates(NOT_SOLID).setBlocksVision(NOT_SOLID));
         setRegistryName(ConstructionWand.MODID, name);
@@ -65,35 +74,12 @@ public class BlockConjured extends AbstractGlassBlock
         if(blockItem.getBlock() == ModBlocks.CONJURED_BLOCK)
             return super.onBlockActivated(state, world, pos, player, handIn, hit);
 
-        SupplierInventory supplier = new SupplierInventory(player, world, hit, 64);
-        supplier.getSupply(blockItem);
-
-        HashSet<BlockPos> placePositions = getAdjacentBlocks(world, pos, supplier.getMaxBlocks());
-        boolean success = false;
-
-        for(BlockPos placePos : placePositions) {
-            PlaceSnapshot snapshot = supplier.getPlaceSnapshot(placePos, null);
-
-            if(snapshot != null && snapshot.execute(world, player)) {
-                if(supplier.takeItemStack(snapshot.getRequiredItems()) > 0) {
-                    ConstructionWand.LOGGER.info("Item could not be taken. Remove block: " +
-                            snapshot.getBlockState().getBlock().toString());
-                    snapshot.forceRestore(world);
-                }
-                else success = true;
-            }
-        }
-
-        if(success) {
-            // Play teleport sound
-            SoundEvent sound = SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT;
-            world.playSound(null, WandUtil.playerPos(player), sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
-        }
-
-        return success ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+        WandJob job = new WandJob(player, world, hit, new ItemStack(ModItems.WAND_INFINITY));
+        job.getPlaceSnapshots(new ActionConjuredBlocks(job), new SupplierInventory(job), blockItem);
+        return job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL;
     }
 
-    private HashSet<BlockPos> getAdjacentBlocks(World world, BlockPos pos, int maxBlocks) {
+    public static HashSet<BlockPos> getAdjacentBlocks(World world, BlockPos pos, int maxBlocks) {
         HashSet<BlockPos> blockPositions = new HashSet<>();
         LinkedList<BlockPos> candidates = new LinkedList<>();
         HashSet<BlockPos> allCandidates = new HashSet<>();
@@ -103,7 +89,7 @@ public class BlockConjured extends AbstractGlassBlock
             BlockPos currentPos = candidates.removeFirst();
             allCandidates.add(currentPos);
 
-            if(world.getBlockState(currentPos).getBlock() == this || currentPos.equals(pos)) {
+            if(world.getBlockState(currentPos).getBlock() == ModBlocks.CONJURED_BLOCK || currentPos.equals(pos)) {
                 blockPositions.add(currentPos);
 
                 for(Direction dir : Direction.values()) {
@@ -114,5 +100,24 @@ public class BlockConjured extends AbstractGlassBlock
         }
 
         return blockPositions;
+    }
+
+    private static class ActionConjuredBlocks implements IWandAction
+    {
+        private final World world;
+        private final BlockRayTraceResult rayTraceResult;
+
+        public ActionConjuredBlocks(WandJob wandJob) {
+            world = wandJob.world;
+            rayTraceResult = wandJob.rayTraceResult;
+        }
+
+        @Override
+        public List<ISnapshot> getSnapshots(IWandSupplier supplier) {
+            HashSet<BlockPos> adjacentBlocks = BlockConjured.getAdjacentBlocks(world, rayTraceResult.getPos(), supplier.getMaxBlocks());
+
+            return adjacentBlocks.stream().map(blockPos -> supplier.getPlaceSnapshot(blockPos, null))
+                    .filter(Objects::nonNull).collect(Collectors.toList());
+        }
     }
 }

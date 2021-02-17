@@ -1,7 +1,6 @@
 package thetadev.constructionwand.wand.action;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -51,7 +50,7 @@ public class ActionAngel implements IWandAction
 
         BlockPos currentPos = new BlockPos(placeVec);
 
-        PlaceSnapshot snapshot = supplier.getPlaceSnapshot(currentPos, Blocks.AIR.getDefaultState());
+        PlaceSnapshot snapshot = supplier.getPlaceSnapshot(currentPos, null);
         if(snapshot != null) placeSnapshots.add(snapshot);
 
         return placeSnapshots;

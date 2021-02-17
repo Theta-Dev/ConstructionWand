@@ -6,5 +6,5 @@ public interface IWandCore extends IWandUpgrade
 {
     int getColor();
 
-    IWandAction getWandAction(WandJob wandJob);
+    IWandAction getWandAction(WandJob job);
 }

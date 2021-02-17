@@ -12,6 +12,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.WandUtil;
+import thetadev.constructionwand.block.ModBlocks;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 
 import java.util.*;
@@ -113,7 +114,7 @@ public class UndoHistory
 
         public boolean undo(PlayerEntity player) {
             for(ISnapshot snapshot : placeSnapshots) {
-                if(snapshot.restore(world, player) && !player.isCreative()) {
+                if(snapshot.restore(world, player) && !player.isCreative() && snapshot.getBlockState().getBlock() != ModBlocks.CONJURED_BLOCK) {
                     ItemStack stack = snapshot.getRequiredItems();
 
                     if(!player.inventory.addItemStackToInventory(stack)) {

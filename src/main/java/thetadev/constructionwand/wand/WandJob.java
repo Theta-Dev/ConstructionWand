@@ -18,6 +18,7 @@ import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.wand.undo.ISnapshot;
 
+import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +30,6 @@ public class WandJob
     public final World world;
     public final BlockRayTraceResult rayTraceResult;
     public final WandOptions options;
-    public final BlockItem targetItem;
 
     public final ItemStack wand;
     public final ItemWand wandItem;
@@ -49,16 +49,20 @@ public class WandJob
         this.wand = wand;
         this.wandItem = (ItemWand) wand.getItem();
         options = new WandOptions(wand);
-
-        // Get target item
-        Item tgitem = world.getBlockState(rayTraceResult.getPos()).getBlock().asItem();
-        if(!(tgitem instanceof BlockItem)) tgitem = null;
-        targetItem = (BlockItem) tgitem;
     }
 
     public void getPlaceSnapshots(IWandAction wandAction, IWandSupplier wandSupplier) {
+        // Get target item
+        Item tgitem = world.getBlockState(rayTraceResult.getPos()).getBlock().asItem();
+        if(!(tgitem instanceof BlockItem)) tgitem = null;
+        BlockItem targetItem = (BlockItem) tgitem;
+
+        getPlaceSnapshots(wandAction, wandSupplier, targetItem);
+    }
+
+    public void getPlaceSnapshots(IWandAction wandAction, IWandSupplier wandSupplier, @Nullable BlockItem targetItem) {
         this.wandSupplier = wandSupplier;
-        wandSupplier.getSupply((BlockItem) targetItem);
+        wandSupplier.getSupply(targetItem);
         this.wandAction = wandAction;
         placeSnapshots = wandAction.getSnapshots(wandSupplier);
     }
@@ -71,7 +75,7 @@ public class WandJob
         LinkedList<ISnapshot> executed = new LinkedList<>();
 
         for(ISnapshot snapshot : placeSnapshots) {
-            if(wand.isEmpty() || wandItem.getLimit(player, wand) == 0) continue;
+            if(wand.isEmpty() || wandItem.getLimit(player, wand) == 0) break;
 
             if(snapshot.execute(world, player)) {
                 // If the item cant be taken, undo the placement

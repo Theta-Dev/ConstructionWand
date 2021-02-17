@@ -221,7 +221,9 @@ public class WandUtil
                                                  @Nullable BlockState supportingBlock, @Nullable WandOptions options) {
         // Is block at pos replaceable?
         BlockItemUseContext ctx = new WandItemUseContext(world, player, rayTraceResult, pos, item);
-        if(!ctx.canPlace()) return null;
+
+        if(!(world.getBlockState(pos).getBlock() == ModBlocks.CONJURED_BLOCK && item.getBlock() != ModBlocks.CONJURED_BLOCK))
+            if(!ctx.canPlace()) return null;
 
         // Can block be placed?
         BlockState blockState = item.getBlock().getStateForPlacement(ctx);

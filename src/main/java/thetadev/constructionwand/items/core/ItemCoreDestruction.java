@@ -4,21 +4,21 @@ import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.api.IWandCore;
 import thetadev.constructionwand.items.ItemBase;
 import thetadev.constructionwand.wand.WandJob;
-import thetadev.constructionwand.wand.action.ActionAngel;
+import thetadev.constructionwand.wand.action.ActionDestruction;
 
-public class ItemCoreAngel extends ItemBase implements IWandCore
+public class ItemCoreDestruction extends ItemBase implements IWandCore
 {
-    public ItemCoreAngel(String name, Properties properties) {
+    public ItemCoreDestruction(String name, Properties properties) {
         super(name, properties);
     }
 
     @Override
     public int getColor() {
-        return 0xE9B115;
+        return 0xFF0000;
     }
 
     @Override
     public IWandAction getWandAction(WandJob job) {
-        return new ActionAngel(job);
+        return new ActionDestruction(job);
     }
 }
