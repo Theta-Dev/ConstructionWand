@@ -126,7 +126,7 @@ public class SupplierInventory implements IWandSupplier
             int count = itemCounts.get(item);
             if(count == 0) continue;
 
-            PlaceSnapshot placeSnapshot = WandUtil.getPlaceSnapshot(world, player, rayTraceResult, pos, item, supportingBlock, options);
+            PlaceSnapshot placeSnapshot = PlaceSnapshot.get(world, player, rayTraceResult, pos, item, supportingBlock, options);
             if(placeSnapshot != null) return placeSnapshot;
         }
     }

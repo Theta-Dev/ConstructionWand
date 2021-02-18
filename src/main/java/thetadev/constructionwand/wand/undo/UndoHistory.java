@@ -114,7 +114,7 @@ public class UndoHistory
 
         public boolean undo(PlayerEntity player) {
             for(ISnapshot snapshot : placeSnapshots) {
-                if(snapshot.restore(world, player) && !player.isCreative() && snapshot.getBlockState().getBlock() != ModBlocks.CONJURED_BLOCK) {
+                if(snapshot.restore(world, player) && !player.isCreative()) {
                     ItemStack stack = snapshot.getRequiredItems();
 
                     if(!player.inventory.addItemStackToInventory(stack)) {

@@ -19,7 +19,6 @@ import thetadev.constructionwand.crafting.RecipeWandUpgrade;
 import thetadev.constructionwand.items.core.ItemCoreAngel;
 import thetadev.constructionwand.items.core.ItemCoreDestruction;
 import thetadev.constructionwand.items.reservoir.ItemReservoirConjuration;
-import thetadev.constructionwand.items.reservoir.ItemReservoirPetrogenesis;
 import thetadev.constructionwand.items.reservoir.ItemReservoirRandom;
 import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.items.wand.ItemWandBasic;
@@ -43,7 +42,6 @@ public class ModItems
 
     public static final Item RESERVOIR_RANDOM = new ItemReservoirRandom("reservoir_random", unstackable());
     public static final Item RESERVOIR_CONJURATION = new ItemReservoirConjuration("reservoir_conjuration", unstackable());
-    public static final Item RESERVOIR_PETROGENESIS = new ItemReservoirPetrogenesis("reservoir_petrogenesis", unstackable());
 
     // Collections
     public static final Item[] WANDS = {WAND_STONE, WAND_IRON, WAND_DIAMOND, WAND_INFINITY};
@@ -60,7 +58,6 @@ public class ModItems
         registerItem(r, CORE_ANGEL);
         registerItem(r, RESERVOIR_RANDOM);
         registerItem(r, RESERVOIR_CONJURATION);
-        registerItem(r, RESERVOIR_PETROGENESIS);
 
         // BlockItems
         for(Block block : ModBlocks.ALL_BLOCKS) {

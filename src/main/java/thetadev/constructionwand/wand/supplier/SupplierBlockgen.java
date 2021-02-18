@@ -11,6 +11,7 @@ import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.wand.WandJob;
+import thetadev.constructionwand.wand.undo.BlockgenSnapshot;
 import thetadev.constructionwand.wand.undo.PlaceSnapshot;
 
 import javax.annotation.Nullable;
@@ -45,7 +46,7 @@ public abstract class SupplierBlockgen implements IWandSupplier
     public PlaceSnapshot getPlaceSnapshot(BlockPos pos, @Nullable BlockState supportingBlock) {
         if(!WandUtil.isPositionPlaceable(world, player, pos, rayTraceResult, options)) return null;
 
-        return WandUtil.getPlaceSnapshot(world, player, rayTraceResult, pos, getBlockItem(), supportingBlock, options);
+        return BlockgenSnapshot.get(world, player, rayTraceResult, pos, getBlockItem(), supportingBlock, options);
     }
 
     @Override

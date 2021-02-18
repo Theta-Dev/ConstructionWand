@@ -33,6 +33,7 @@ import thetadev.constructionwand.block.ModBlocks;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.wand.WandItemUseContext;
+import thetadev.constructionwand.wand.undo.BlockgenSnapshot;
 import thetadev.constructionwand.wand.undo.PlaceSnapshot;
 
 import javax.annotation.Nullable;
@@ -112,7 +113,7 @@ public class WandUtil
         return isWhitelist == inList;
     }
 
-    public static boolean placeBlock(World world, PlayerEntity player, BlockState block, BlockPos pos, BlockItem item) {
+    public static boolean placeBlock(World world, PlayerEntity player, BlockState block, BlockPos pos, @Nullable BlockItem item) {
         if(!world.setBlockState(pos, block)) {
             ConstructionWand.LOGGER.info("Block could not be placed");
             return false;
@@ -216,9 +217,9 @@ public class WandUtil
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
-    public static PlaceSnapshot getPlaceSnapshot(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
-                                                 BlockPos pos, BlockItem item,
-                                                 @Nullable BlockState supportingBlock, @Nullable WandOptions options) {
+    public static BlockState getPlaceBlockstate(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+                                                BlockPos pos, BlockItem item,
+                                                @Nullable BlockState supportingBlock, @Nullable WandOptions options) {
         // Is block at pos replaceable?
         BlockItemUseContext ctx = new WandItemUseContext(world, player, rayTraceResult, pos, item);
 
@@ -262,8 +263,7 @@ public class WandUtil
                 if(slabType != SlabType.DOUBLE) blockState = blockState.with(BlockStateProperties.SLAB_TYPE, slabType);
             }
         }
-
-        return new PlaceSnapshot(blockState, pos, item);
+        return blockState;
     }
 
     public static Direction fromVector(Vector3d vector) {

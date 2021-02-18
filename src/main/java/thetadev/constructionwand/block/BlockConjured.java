@@ -9,6 +9,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -67,15 +68,13 @@ public class BlockConjured extends AbstractGlassBlock
     public ActionResultType onBlockActivated(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos,
                                              @Nonnull PlayerEntity player, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit) {
         ItemStack handStack = player.getHeldItem(handIn);
+        Item handItem = handStack.getItem();
 
-        if(!(handStack.getItem() instanceof BlockItem))
-            return super.onBlockActivated(state, world, pos, player, handIn, hit);
-        BlockItem blockItem = (BlockItem) handStack.getItem();
-        if(blockItem.getBlock() == ModBlocks.CONJURED_BLOCK)
+        if(!(handItem instanceof BlockItem) || ((BlockItem) handItem).getBlock() == ModBlocks.CONJURED_BLOCK)
             return super.onBlockActivated(state, world, pos, player, handIn, hit);
 
         WandJob job = new WandJob(player, world, hit, new ItemStack(ModItems.WAND_INFINITY));
-        job.getPlaceSnapshots(new ActionConjuredBlocks(job), new SupplierInventory(job), blockItem);
+        job.getPlaceSnapshots(new ActionConjuredBlocks(job), new SupplierInventory(job), (BlockItem) handItem);
         return job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL;
     }
 
