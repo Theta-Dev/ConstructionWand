@@ -73,8 +73,8 @@ public class BlockConjured extends AbstractGlassBlock
         if(!(handItem instanceof BlockItem) || ((BlockItem) handItem).getBlock() == ModBlocks.CONJURED_BLOCK)
             return super.onBlockActivated(state, world, pos, player, handIn, hit);
 
-        WandJob job = new WandJob(player, world, hit, new ItemStack(ModItems.WAND_INFINITY));
-        job.getPlaceSnapshots(new ActionConjuredBlocks(job), new SupplierInventory(job), (BlockItem) handItem);
+        WandJob job = WandJob.withDummyWand(player, world, hit, (BlockItem) handItem);
+        job.getPlaceSnapshots(new ActionConjuredBlocks(job), new SupplierInventory(job));
         return job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL;
     }
 

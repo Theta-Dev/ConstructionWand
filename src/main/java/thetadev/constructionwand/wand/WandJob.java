@@ -15,6 +15,7 @@ import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
+import thetadev.constructionwand.items.ModItems;
 import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.wand.undo.ISnapshot;
 
@@ -30,9 +31,11 @@ public class WandJob
     public final World world;
     public final BlockRayTraceResult rayTraceResult;
     public final WandOptions options;
-
     public final ItemStack wand;
     public final ItemWand wandItem;
+
+    @Nullable
+    public final BlockItem targetItem;
 
     private IWandAction wandAction;
     private IWandSupplier wandSupplier;
@@ -40,10 +43,23 @@ public class WandJob
     private List<ISnapshot> placeSnapshots;
 
     public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand) {
+        this(player, world, rayTraceResult, wand, getTargetItem(world, rayTraceResult));
+    }
+
+    @Nullable
+    private static BlockItem getTargetItem(World world, BlockRayTraceResult rayTraceResult) {
+        // Get target item
+        Item tgitem = world.getBlockState(rayTraceResult.getPos()).getBlock().asItem();
+        if(!(tgitem instanceof BlockItem)) return null;
+        return (BlockItem) tgitem;
+    }
+
+    public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand, @Nullable BlockItem targetItem) {
         this.player = player;
         this.world = world;
         this.rayTraceResult = rayTraceResult;
         this.placeSnapshots = new LinkedList<>();
+        this.targetItem = targetItem;
 
         // Get wand
         this.wand = wand;
@@ -51,16 +67,15 @@ public class WandJob
         options = new WandOptions(wand);
     }
 
-    public void getPlaceSnapshots(IWandAction wandAction, IWandSupplier wandSupplier) {
-        // Get target item
-        Item tgitem = world.getBlockState(rayTraceResult.getPos()).getBlock().asItem();
-        if(!(tgitem instanceof BlockItem)) tgitem = null;
-        BlockItem targetItem = (BlockItem) tgitem;
-
-        getPlaceSnapshots(wandAction, wandSupplier, targetItem);
+    /**
+     * Creates a WandJob with a dummy wand (Infinity with standard settings) for use of the wand behavior
+     * in other contexts
+     */
+    public static WandJob withDummyWand(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, @Nullable BlockItem targetItem) {
+        return new WandJob(player, world, rayTraceResult, new ItemStack(ModItems.WAND_INFINITY), targetItem);
     }
 
-    public void getPlaceSnapshots(IWandAction wandAction, IWandSupplier wandSupplier, @Nullable BlockItem targetItem) {
+    public void getPlaceSnapshots(IWandAction wandAction, IWandSupplier wandSupplier) {
         this.wandSupplier = wandSupplier;
         wandSupplier.getSupply(targetItem);
         this.wandAction = wandAction;

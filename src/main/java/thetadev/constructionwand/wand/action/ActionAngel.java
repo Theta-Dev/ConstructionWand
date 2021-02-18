@@ -2,6 +2,7 @@ package thetadev.constructionwand.wand.action;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -25,17 +26,19 @@ public class ActionAngel implements IWandAction
     private final PlayerEntity player;
     private final BlockRayTraceResult rayTraceResult;
     private final ItemWand wandItem;
+    private final BlockItem targetItem;
 
     public ActionAngel(WandJob wandJob) {
         world = wandJob.world;
         player = wandJob.player;
         rayTraceResult = wandJob.rayTraceResult;
         wandItem = wandJob.wandItem;
+        targetItem = wandJob.targetItem;
     }
 
     @Override
     public List<ISnapshot> getSnapshots(IWandSupplier supplier) {
-        if(rayTraceResult == null) return getAngelSnapshots(supplier);
+        if(targetItem == null) return getAngelSnapshots(supplier);
         else return getTransductionSnapshots(supplier);
     }
 

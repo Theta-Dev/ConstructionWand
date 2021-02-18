@@ -29,6 +29,7 @@ import thetadev.constructionwand.items.ItemBase;
 import thetadev.constructionwand.wand.WandJob;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class ItemWand extends ItemBase implements ICustomItemModel
@@ -73,7 +74,7 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         return ActionResult.resultFail(stack);
     }
 
-    public static WandJob getWandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand) {
+    public static WandJob getWandJob(PlayerEntity player, World world, @Nullable BlockRayTraceResult rayTraceResult, ItemStack wand) {
         WandOptions options = new WandOptions(wand);
 
         WandJob wandJob = new WandJob(player, world, rayTraceResult, wand);
