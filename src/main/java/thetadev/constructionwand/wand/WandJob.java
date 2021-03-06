@@ -11,12 +11,13 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IWandAction;
-import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
-import thetadev.constructionwand.items.ModItems;
 import thetadev.constructionwand.items.wand.ItemWand;
+import thetadev.constructionwand.api.IWandSupplier;
+import thetadev.constructionwand.wand.supplier.SupplierInventory;
+import thetadev.constructionwand.wand.supplier.SupplierRandom;
 import thetadev.constructionwand.wand.undo.ISnapshot;
 
 import javax.annotation.Nullable;
@@ -37,10 +38,27 @@ public class WandJob
     @Nullable
     public final BlockItem targetItem;
 
-    private IWandAction wandAction;
-    private IWandSupplier wandSupplier;
+    private final IWandAction wandAction;
+    private final IWandSupplier wandSupplier;
 
     private List<ISnapshot> placeSnapshots;
+
+    public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand, @Nullable BlockItem targetItem) {
+        this.player = player;
+        this.world = world;
+        this.rayTraceResult = rayTraceResult;
+        this.placeSnapshots = new LinkedList<>();
+        this.targetItem = targetItem;
+
+        // Get wand
+        this.wand = wand;
+        this.wandItem = (ItemWand) wand.getItem();
+        options = new WandOptions(wand);
+
+        // Select wand action and supplier based on options
+        wandSupplier = options.random.get() ? new SupplierRandom(this) : new SupplierInventory(this);
+        wandAction = options.cores.get().getWandAction(this);
+    }
 
     public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand) {
         this(player, world, rayTraceResult, wand, getTargetItem(world, rayTraceResult));
@@ -54,31 +72,7 @@ public class WandJob
         return (BlockItem) tgitem;
     }
 
-    public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand, @Nullable BlockItem targetItem) {
-        this.player = player;
-        this.world = world;
-        this.rayTraceResult = rayTraceResult;
-        this.placeSnapshots = new LinkedList<>();
-        this.targetItem = targetItem;
-
-        // Get wand
-        this.wand = wand;
-        this.wandItem = (ItemWand) wand.getItem();
-        options = new WandOptions(wand);
-    }
-
-    /**
-     * Creates a WandJob with a dummy wand (Infinity with standard settings) for use of the wand behavior
-     * in other contexts
-     */
-    public static WandJob withDummyWand(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, @Nullable BlockItem targetItem) {
-        return new WandJob(player, world, rayTraceResult, new ItemStack(ModItems.WAND_INFINITY), targetItem);
-    }
-
-    public void getPlaceSnapshots(IWandAction wandAction, IWandSupplier wandSupplier) {
-        this.wandSupplier = wandSupplier;
-        wandSupplier.getSupply(targetItem);
-        this.wandAction = wandAction;
+    public void getPlaceSnapshots() {
         placeSnapshots = wandAction.getSnapshots(wandSupplier);
     }
 

@@ -19,7 +19,6 @@ public class ModData
         }
 
         if(event.includeClient()) {
-            generator.addProvider(new BlockStateGenerator(generator, fileHelper));
             generator.addProvider(new ItemModelGenerator(generator, fileHelper));
         }
     }

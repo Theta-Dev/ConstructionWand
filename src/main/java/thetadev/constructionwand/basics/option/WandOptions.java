@@ -5,12 +5,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import thetadev.constructionwand.api.IWandCore;
-import thetadev.constructionwand.api.IWandReservoir;
 import thetadev.constructionwand.api.IWandUpgrade;
 import thetadev.constructionwand.basics.ReplacementRegistry;
 import thetadev.constructionwand.items.core.CoreDefault;
-import thetadev.constructionwand.items.reservoir.ReservoirDefault;
-import thetadev.constructionwand.items.wand.ItemWand;
 
 import javax.annotation.Nullable;
 
@@ -43,12 +40,12 @@ public class WandOptions
     }
 
     public final WandUpgradesSelectable<IWandCore> cores;
-    public final WandUpgradesSelectable<IWandReservoir> reservoirs;
 
     public final OptionEnum<LOCK> lock;
     public final OptionEnum<DIRECTION> direction;
     public final OptionBoolean replace;
     public final OptionEnum<MATCH> match;
+    public final OptionBoolean random;
 
     public final IOption<?>[] allOptions;
 
@@ -56,14 +53,14 @@ public class WandOptions
         tag = wandStack.getOrCreateChildTag(TAG_ROOT);
 
         cores = new WandUpgradesSelectable<>(tag, "cores", new CoreDefault());
-        reservoirs = new WandUpgradesSelectable<>(tag, "reservoirs", new ReservoirDefault());
 
         lock = new OptionEnum<>(tag, "lock", LOCK.class, LOCK.NOLOCK);
         direction = new OptionEnum<>(tag, "direction", DIRECTION.class, DIRECTION.TARGET);
         replace = new OptionBoolean(tag, "replace", true);
         match = new OptionEnum<>(tag, "match", MATCH.class, MATCH.SIMILAR);
+        random = new OptionBoolean(tag, "random", false);
 
-        allOptions = new IOption[]{cores, reservoirs, lock, direction, replace, match};
+        allOptions = new IOption[]{cores, lock, direction, replace, match, random};
     }
 
     @Nullable
@@ -93,15 +90,11 @@ public class WandOptions
 
     public boolean hasUpgrade(IWandUpgrade upgrade) {
         if(upgrade instanceof IWandCore) return cores.hasUpgrade((IWandCore) upgrade);
-        else
-            if(upgrade instanceof IWandReservoir) return reservoirs.hasUpgrade((IWandReservoir) upgrade);
         return false;
     }
 
     public boolean addUpgrade(IWandUpgrade upgrade) {
         if(upgrade instanceof IWandCore) return cores.addUpgrade((IWandCore) upgrade);
-        else
-            if(upgrade instanceof IWandReservoir) return reservoirs.addUpgrade((IWandReservoir) upgrade);
         return false;
     }
 }

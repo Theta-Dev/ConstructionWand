@@ -43,9 +43,9 @@ public class ScreenWand extends Screen
         createButton(0, 0, wandOptions.cores);
         createButton(0, 1, wandOptions.lock);
         createButton(0, 2, wandOptions.direction);
-        createButton(1, 0, wandOptions.reservoirs);
-        createButton(1, 1, wandOptions.replace);
-        createButton(1, 2, wandOptions.match);
+        createButton(1, 0, wandOptions.replace);
+        createButton(1, 1, wandOptions.match);
+        createButton(1, 2, wandOptions.random);
     }
 
     @Override

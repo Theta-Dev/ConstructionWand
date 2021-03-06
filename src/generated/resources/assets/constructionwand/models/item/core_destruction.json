@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "constructionwand:item/reservoir_random"
+    "layer0": "constructionwand:item/core_destruction"
   }
 }

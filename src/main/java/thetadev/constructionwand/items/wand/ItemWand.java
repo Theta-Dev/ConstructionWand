@@ -75,10 +75,8 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
     }
 
     public static WandJob getWandJob(PlayerEntity player, World world, @Nullable BlockRayTraceResult rayTraceResult, ItemStack wand) {
-        WandOptions options = new WandOptions(wand);
-
         WandJob wandJob = new WandJob(player, world, rayTraceResult, wand);
-        wandJob.getPlaceSnapshots(options.cores.get().getWandAction(wandJob), options.reservoirs.get().getWandSupplier(wandJob));
+        wandJob.getPlaceSnapshots();
 
         return wandJob;
     }

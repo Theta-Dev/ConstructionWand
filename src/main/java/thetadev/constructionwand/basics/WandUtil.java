@@ -29,12 +29,9 @@ import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.world.BlockEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.WandOptions;
-import thetadev.constructionwand.block.ModBlocks;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.wand.WandItemUseContext;
-import thetadev.constructionwand.wand.undo.BlockgenSnapshot;
-import thetadev.constructionwand.wand.undo.PlaceSnapshot;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -196,6 +193,10 @@ public class WandUtil
         return false;
     }
 
+    /**
+     * Tests if a wand can place a block at a certain position.
+     * This check is independent from the used block.
+     */
     public static boolean isPositionPlaceable(World world, PlayerEntity player, BlockPos pos,
                                               BlockRayTraceResult rayTraceResult, WandOptions options) {
         // Is position out of world?
@@ -205,16 +206,17 @@ public class WandUtil
         if(!world.isBlockModifiable(player, pos)) return false;
 
         // If replace mode is off, target has to be air
-        if(!options.replace.get() && !world.isAirBlock(pos))
-            if(world.getBlockState(pos).getBlock() != ModBlocks.CONJURED_BLOCK) return false;
+        if(!options.replace.get() && !world.isAirBlock(pos)) return false;
 
         // Limit placement range
-        if(ConfigServer.MAX_RANGE.get() > 0 && WandUtil.maxRange(rayTraceResult.getPos(), pos) > ConfigServer.MAX_RANGE.get())
-            return false;
-
-        return true;
+        return ConfigServer.MAX_RANGE.get() <= 0 ||
+                WandUtil.maxRange(rayTraceResult.getPos(), pos) <= ConfigServer.MAX_RANGE.get();
     }
 
+    /**
+     * Tests if a certain block can be placed by the wand.
+     * If it can, returns the blockstate to be placed.
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     public static BlockState getPlaceBlockstate(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
@@ -222,9 +224,7 @@ public class WandUtil
                                                 @Nullable BlockState supportingBlock, @Nullable WandOptions options) {
         // Is block at pos replaceable?
         BlockItemUseContext ctx = new WandItemUseContext(world, player, rayTraceResult, pos, item);
-
-        if(!(world.getBlockState(pos).getBlock() == ModBlocks.CONJURED_BLOCK && item.getBlock() != ModBlocks.CONJURED_BLOCK))
-            if(!ctx.canPlace()) return null;
+        if(!ctx.canPlace()) return null;
 
         // Can block be placed?
         BlockState blockState = item.getBlock().getStateForPlacement(ctx);

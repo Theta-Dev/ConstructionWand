@@ -12,7 +12,6 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.WandUtil;
-import thetadev.constructionwand.block.ModBlocks;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 
 import java.util.*;

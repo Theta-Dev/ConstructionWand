@@ -16,7 +16,7 @@ public class SupplierRandom extends SupplierInventory
     }
 
     @Override
-    public void getSupply(@Nullable BlockItem target) {
+    protected void getSupply(@Nullable BlockItem target) {
         itemCounts = new LinkedHashMap<>();
 
         // Random mode -> add all items from hotbar

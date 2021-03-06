@@ -18,7 +18,6 @@ import thetadev.constructionwand.basics.pool.IPool;
 import thetadev.constructionwand.basics.pool.OrderedPool;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.ModItems;
-import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.wand.WandJob;
 import thetadev.constructionwand.wand.undo.PlaceSnapshot;
 
@@ -48,18 +47,10 @@ public class SupplierInventory implements IWandSupplier
         rayTraceResult = job.rayTraceResult;
         options = job.options;
         wandLimit = job.wandItem.getLimit(player, job.wand);
+        getSupply(job.targetItem);
     }
 
-    public SupplierInventory(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, int wandLimit) {
-        this.player = player;
-        this.world = world;
-        this.rayTraceResult = rayTraceResult;
-        this.options = new WandOptions(new ItemStack(ModItems.WAND_INFINITY));
-        this.wandLimit = wandLimit;
-    }
-
-    @Override
-    public void getSupply(@Nullable BlockItem target) {
+    protected void getSupply(@Nullable BlockItem target) {
         itemCounts = new LinkedHashMap<>();
         ItemStack offhandStack = player.getHeldItem(Hand.OFF_HAND);
 

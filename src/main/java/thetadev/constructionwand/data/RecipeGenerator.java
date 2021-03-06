@@ -11,6 +11,7 @@ import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.crafting.RecipeWandUpgrade;
 import thetadev.constructionwand.items.ModItems;
 
+import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
 public class RecipeGenerator extends RecipeProvider
@@ -20,7 +21,7 @@ public class RecipeGenerator extends RecipeProvider
     }
 
     @Override
-    protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+    protected void registerRecipes(@Nonnull Consumer<IFinishedRecipe> consumer) {
         wandRecipe(consumer, ModItems.WAND_STONE, Inp.fromTag(ItemTags.field_232909_aa_)); //stone_tool_materials
         wandRecipe(consumer, ModItems.WAND_IRON, Inp.fromTag(Tags.Items.INGOTS_IRON));
         wandRecipe(consumer, ModItems.WAND_DIAMOND, Inp.fromTag(Tags.Items.GEMS_DIAMOND));
@@ -45,6 +46,7 @@ public class RecipeGenerator extends RecipeProvider
         CustomRecipeBuilder.customRecipe(serializer).build(consumer, ConstructionWand.loc("dynamic/" + name.getPath()).toString());
     }
 
+    @Nonnull
     @Override
     public String getName() {
         return ConstructionWand.MODID + " crafting recipes";
