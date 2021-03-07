@@ -4,7 +4,6 @@ import net.minecraft.util.ResourceLocation;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.api.IWandCore;
-import thetadev.constructionwand.wand.WandJob;
 import thetadev.constructionwand.wand.action.ActionConstruction;
 
 public class CoreDefault implements IWandCore

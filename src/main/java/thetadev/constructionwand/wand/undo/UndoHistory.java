@@ -115,7 +115,7 @@ public class UndoHistory
 
             if(positions.contains(pos)) return true;
 
-            for(BlockPos p: positions) {
+            for(BlockPos p : positions) {
                 if(pos.withinDistance(p, 2)) return true;
             }
             return false;

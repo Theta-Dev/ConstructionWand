@@ -7,7 +7,6 @@ import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.option.WandOptions;
-import thetadev.constructionwand.wand.WandJob;
 import thetadev.constructionwand.wand.undo.ISnapshot;
 
 import javax.annotation.Nonnull;
@@ -27,7 +26,9 @@ public class ActionDestruction implements IWandAction
 
     @Nonnull
     @Override
-    public List<ISnapshot> getSnapshotsFromAir(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult, WandOptions options, ConfigServer.WandProperties properties, int limit, IWandSupplier supplier) {
+    public List<ISnapshot> getSnapshotsFromAir(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+                                               WandOptions options, ConfigServer.WandProperties properties,
+                                               int limit, IWandSupplier supplier) {
         return new ArrayList<>();
     }
 }

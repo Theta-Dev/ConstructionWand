@@ -52,10 +52,9 @@ public class WandUtil
         if(player.getHeldItem(Hand.MAIN_HAND) != ItemStack.EMPTY && player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof ItemWand) {
             return player.getHeldItem(Hand.MAIN_HAND);
         }
-        else
-            if(player.getHeldItem(Hand.OFF_HAND) != ItemStack.EMPTY && player.getHeldItem(Hand.OFF_HAND).getItem() instanceof ItemWand) {
-                return player.getHeldItem(Hand.OFF_HAND);
-            }
+        else if(player.getHeldItem(Hand.OFF_HAND) != ItemStack.EMPTY && player.getHeldItem(Hand.OFF_HAND).getItem() instanceof ItemWand) {
+            return player.getHeldItem(Hand.OFF_HAND);
+        }
         return null;
     }
 

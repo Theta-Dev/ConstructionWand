@@ -30,10 +30,9 @@ public class RecipeWandUpgrade extends SpecialRecipe
             ItemStack stack = inv.getStackInSlot(i);
             if(!stack.isEmpty()) {
                 if(wand == null && stack.getItem() instanceof ItemWand) wand = stack;
-                else
-                    if(upgrade == null && stack.getItem() instanceof IWandUpgrade)
-                        upgrade = (IWandUpgrade) stack.getItem();
-                    else return false;
+                else if(upgrade == null && stack.getItem() instanceof IWandUpgrade)
+                    upgrade = (IWandUpgrade) stack.getItem();
+                else return false;
             }
         }
 
@@ -51,8 +50,7 @@ public class RecipeWandUpgrade extends SpecialRecipe
             ItemStack stack = inv.getStackInSlot(i);
             if(!stack.isEmpty()) {
                 if(stack.getItem() instanceof ItemWand) wand = stack;
-                else
-                    if(stack.getItem() instanceof IWandUpgrade) upgrade = (IWandUpgrade) stack.getItem();
+                else if(stack.getItem() instanceof IWandUpgrade) upgrade = (IWandUpgrade) stack.getItem();
             }
         }
 

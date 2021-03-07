@@ -59,7 +59,7 @@ public class ActionAngel implements IWandAction
 
         BlockPos currentPos = new BlockPos(placeVec);
 
-        PlaceSnapshot snapshot = supplier.getPlaceSnapshot(world, currentPos, rayTraceResult,null);
+        PlaceSnapshot snapshot = supplier.getPlaceSnapshot(world, currentPos, rayTraceResult, null);
         if(snapshot != null) placeSnapshots.add(snapshot);
 
         return placeSnapshots;

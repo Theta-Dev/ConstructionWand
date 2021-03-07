@@ -7,10 +7,8 @@
   "item.constructionwand.core_destruction": "Destruction Wand Core",
   "item.constructionwand.reservoir_random": "Random Wand Reservoir",
   "item.constructionwand.reservoir_conjuration": "Conjuration Wand Reservoir",
-
   "constructionwand.tooltip.blocks": "Max. %d blocks",
   "constructionwand.tooltip.shift": "Press [SHIFT]",
-
   "constructionwand.option.cores": "",
   "constructionwand.option.cores.constructionwand:default": "Construction Core",
   "constructionwand.option.cores.constructionwand:default.desc": "Extend your building on the side facing you",
@@ -18,7 +16,6 @@
   "constructionwand.option.cores.constructionwand:core_angel.desc": "Place behind blocks and in mid air",
   "constructionwand.option.cores.constructionwand:core_destruction": "§cDestruction Core",
   "constructionwand.option.cores.constructionwand:core_destruction.desc": "Destroys blocks on the side facing you",
-
   "constructionwand.option.lock": "Restriction: ",
   "constructionwand.option.lock.horizontal": "§aLeft/Right",
   "constructionwand.option.lock.horizontal.desc": "Build a horizontal column in front of the original block",
@@ -30,19 +27,16 @@
   "constructionwand.option.lock.eastwest.desc": "Build a row in E/W direction on top of the original block",
   "constructionwand.option.lock.nolock": "§cNone",
   "constructionwand.option.lock.nolock.desc": "Extend from any side of the original block",
-
   "constructionwand.option.direction": "Direction: ",
   "constructionwand.option.direction.target": "§6Target",
   "constructionwand.option.direction.target.desc": "Place blocks with same direction as target block",
   "constructionwand.option.direction.player": "§aPlayer",
   "constructionwand.option.direction.player.desc": "Place blocks facing the player",
-
   "constructionwand.option.replace": "Replacement: ",
   "constructionwand.option.replace.yes": "§aYes",
   "constructionwand.option.replace.yes.desc": "Replace certain blocks like fluids, snow and tallgrass",
   "constructionwand.option.replace.no": "§cNo",
   "constructionwand.option.replace.no.desc": "Don't replace blocks",
-
   "constructionwand.option.match": "Matching: ",
   "constructionwand.option.match.exact": "§aExact",
   "constructionwand.option.match.exact.desc": "Only extend blocks that are exactly the same",
@@ -50,12 +44,10 @@
   "constructionwand.option.match.similar.desc": "Treat similar blocks (dirt/grass types) equally",
   "constructionwand.option.match.any": "§cAny",
   "constructionwand.option.match.any.desc": "Extend any block",
-
   "constructionwand.option.random": "Random: ",
   "constructionwand.option.random.yes": "§aYes",
   "constructionwand.option.random.yes.desc": "Place random blocks present in your hotbar",
   "constructionwand.option.random.no": "§cNo",
   "constructionwand.option.random.no.desc": "Don't randomize placed blocks",
-
   "stat.constructionwand.use_wand": "Blocks placed using Wand"
 }

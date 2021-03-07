@@ -24,7 +24,7 @@ public class ItemModelGenerator extends ItemModelProvider
             if(item instanceof ICustomItemModel)
                 ((ICustomItemModel) item).generateCustomItemModel(this, name);
             else if(item instanceof BlockItem)
-                withExistingParent(name, modLoc("block/"+name));
+                withExistingParent(name, modLoc("block/" + name));
             else withExistingParent(name, "item/generated").texture("layer0", "item/" + name);
         }
     }

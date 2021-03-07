@@ -11,7 +11,6 @@ import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
-import thetadev.constructionwand.wand.WandJob;
 import thetadev.constructionwand.wand.undo.ISnapshot;
 import thetadev.constructionwand.wand.undo.PlaceSnapshot;
 
@@ -44,9 +43,8 @@ public class ActionConstruction implements IWandAction
             if(options.testLock(WandOptions.LOCK.NORTHSOUTH) || options.testLock(WandOptions.LOCK.EASTWEST))
                 candidates.add(startingPoint);
         }
-        else
-            if(options.testLock(WandOptions.LOCK.HORIZONTAL) || options.testLock(WandOptions.LOCK.VERTICAL))
-                candidates.add(startingPoint);
+        else if(options.testLock(WandOptions.LOCK.HORIZONTAL) || options.testLock(WandOptions.LOCK.VERTICAL))
+            candidates.add(startingPoint);
 
         while(!candidates.isEmpty() && placeSnapshots.size() < limit) {
             BlockPos currentCandidate = candidates.removeFirst();
