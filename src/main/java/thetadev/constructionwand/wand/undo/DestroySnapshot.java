@@ -7,6 +7,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.WandUtil;
 
+import javax.annotation.Nullable;
+
 public class DestroySnapshot implements ISnapshot
 {
     public final BlockState block;
@@ -15,6 +17,13 @@ public class DestroySnapshot implements ISnapshot
     public DestroySnapshot(BlockState block, BlockPos pos) {
         this.pos = pos;
         this.block = block;
+    }
+
+    @Nullable
+    public static DestroySnapshot get(World world, PlayerEntity player, BlockPos pos) {
+        if(!WandUtil.isBlockRemovable(world, player, pos)) return null;
+
+        return new DestroySnapshot(world.getBlockState(pos), pos);
     }
 
     @Override

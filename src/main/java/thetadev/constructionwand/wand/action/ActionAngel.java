@@ -2,6 +2,7 @@ package thetadev.constructionwand.wand.action;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -21,18 +22,22 @@ import java.util.List;
 
 public class ActionAngel implements IWandAction
 {
+    @Override
+    public int getLimit(ItemStack wand) {
+        return ConfigServer.getWandProperties(wand.getItem()).getAngel();
+    }
+
     @Nonnull
     @Override
     public List<ISnapshot> getSnapshots(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
-                                        WandOptions options, ConfigServer.WandProperties properties, int limit,
-                                        IWandSupplier supplier) {
+                                        ItemStack wand, WandOptions options, IWandSupplier supplier, int limit) {
         LinkedList<ISnapshot> placeSnapshots = new LinkedList<>();
 
         Direction placeDirection = rayTraceResult.getFace();
         BlockPos currentPos = rayTraceResult.getPos();
         BlockState supportingBlock = world.getBlockState(currentPos);
 
-        for(int i = 0; i < properties.getAngel(); i++) {
+        for(int i = 0; i < limit; i++) {
             currentPos = currentPos.offset(placeDirection.getOpposite());
 
             PlaceSnapshot snapshot = supplier.getPlaceSnapshot(world, currentPos, rayTraceResult, supportingBlock);
@@ -47,8 +52,7 @@ public class ActionAngel implements IWandAction
     @Nonnull
     @Override
     public List<ISnapshot> getSnapshotsFromAir(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
-                                               WandOptions options, ConfigServer.WandProperties properties, int limit,
-                                               IWandSupplier supplier) {
+                                               ItemStack wand, WandOptions options, IWandSupplier supplier, int limit) {
         LinkedList<ISnapshot> placeSnapshots = new LinkedList<>();
 
         if(!player.isCreative() && !ConfigServer.ANGEL_FALLING.get() && player.fallDistance > 10) return placeSnapshots;

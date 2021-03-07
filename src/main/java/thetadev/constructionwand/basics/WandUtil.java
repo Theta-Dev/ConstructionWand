@@ -212,6 +212,17 @@ public class WandUtil
                 WandUtil.maxRange(rayTraceResult.getPos(), pos) <= ConfigServer.MAX_RANGE.get();
     }
 
+    public static boolean isBlockRemovable(World world, PlayerEntity player, BlockPos pos) {
+        BlockState currentBlock = world.getBlockState(pos);
+
+        if(!world.isBlockModifiable(player, pos)) return false;
+
+        if(!player.isCreative()) {
+            if(currentBlock.getBlockHardness(world, pos) <= -1 || world.getTileEntity(pos) != null) return false;
+        }
+        return true;
+    }
+
     /**
      * Tests if a certain block can be placed by the wand.
      * If it can, returns the blockstate to be placed.

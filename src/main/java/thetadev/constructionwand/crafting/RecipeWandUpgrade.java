@@ -8,6 +8,7 @@ import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import thetadev.constructionwand.api.IWandUpgrade;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.wand.ItemWand;
 
@@ -37,7 +38,7 @@ public class RecipeWandUpgrade extends SpecialRecipe
         }
 
         if(wand == null || upgrade == null) return false;
-        return !new WandOptions(wand).hasUpgrade(upgrade);
+        return !new WandOptions(wand).hasUpgrade(upgrade) && ConfigServer.getWandProperties(wand.getItem()).isUpgradeable();
     }
 
     @Nonnull

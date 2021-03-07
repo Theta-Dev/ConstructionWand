@@ -35,19 +35,26 @@ public class ConfigServer
 
     public static class WandProperties
     {
-        public static final WandProperties DEFAULT = new WandProperties(null, null, null);
+        public static final WandProperties DEFAULT = new WandProperties(null, null, null, null, null);
 
         private final ForgeConfigSpec.IntValue durability;
         private final ForgeConfigSpec.IntValue limit;
         private final ForgeConfigSpec.IntValue angel;
+        private final ForgeConfigSpec.IntValue destruction;
+        private final ForgeConfigSpec.BooleanValue upgradeable;
 
-        private WandProperties(ForgeConfigSpec.IntValue durability, ForgeConfigSpec.IntValue limit, ForgeConfigSpec.IntValue angel) {
+        private WandProperties(ForgeConfigSpec.IntValue durability, ForgeConfigSpec.IntValue limit,
+                               ForgeConfigSpec.IntValue angel, ForgeConfigSpec.IntValue destruction,
+                               ForgeConfigSpec.BooleanValue upgradeable) {
             this.durability = durability;
             this.limit = limit;
             this.angel = angel;
+            this.destruction = destruction;
+            this.upgradeable = upgradeable;
         }
 
-        public WandProperties(ForgeConfigSpec.Builder builder, Item wand, int defDurability, int defLimit, int defAngel) {
+        public WandProperties(ForgeConfigSpec.Builder builder, Item wand, int defDurability, int defLimit,
+                              int defAngel, int defDestruction, boolean defUpgradeable) {
             builder.push(wand.getRegistryName().getPath());
 
             if(defDurability > 0) {
@@ -57,8 +64,12 @@ public class ConfigServer
             else durability = null;
             builder.comment("Wand block limit");
             limit = builder.defineInRange("limit", defLimit, 1, Integer.MAX_VALUE);
-            builder.comment("Max placement distance with angel mode (0 to disable angel mode)");
+            builder.comment("Max placement distance with angel mode (0 to disable angel core)");
             angel = builder.defineInRange("angel", defAngel, 0, Integer.MAX_VALUE);
+            builder.comment("Wand destruction block limit (0 to disable destruction core)");
+            destruction = builder.defineInRange("destruction", defDestruction, 0, Integer.MAX_VALUE);
+            builder.comment("Allow wand upgrading by putting the wand together with a wand core in a crafting grid.");
+            upgradeable = builder.define("upgradeable", defUpgradeable);
             builder.pop();
 
             wandProperties.put(wand, this);
@@ -75,6 +86,14 @@ public class ConfigServer
         public int getAngel() {
             return angel == null ? 0 : angel.get();
         }
+
+        public int getDestruction() {
+            return destruction == null ? 0 : destruction.get();
+        }
+
+        public boolean isUpgradeable() {
+            return upgradeable != null && upgradeable.get();
+        }
     }
 
     static {
@@ -85,10 +104,10 @@ public class ConfigServer
                 "in the /saves/myworld/serverconfig folder. If you want to change the serverconfig for all",
                 "new worlds, copy the config files in the /defaultconfigs folder.");
 
-        new WandProperties(BUILDER, ModItems.WAND_STONE, ItemTier.STONE.getMaxUses(), 9, 0);
-        new WandProperties(BUILDER, ModItems.WAND_IRON, ItemTier.IRON.getMaxUses(), 27, 1);
-        new WandProperties(BUILDER, ModItems.WAND_DIAMOND, ItemTier.DIAMOND.getMaxUses(), 128, 4);
-        new WandProperties(BUILDER, ModItems.WAND_INFINITY, 0, 1024, 8);
+        new WandProperties(BUILDER, ModItems.WAND_STONE, ItemTier.STONE.getMaxUses(), 9, 0, 0, false);
+        new WandProperties(BUILDER, ModItems.WAND_IRON, ItemTier.IRON.getMaxUses(), 27, 2, 9, true);
+        new WandProperties(BUILDER, ModItems.WAND_DIAMOND, ItemTier.DIAMOND.getMaxUses(), 128, 8, 25, true);
+        new WandProperties(BUILDER, ModItems.WAND_INFINITY, 0, 1024, 16, 81, true);
 
         BUILDER.push("misc");
         BUILDER.comment("Block limit for Infinity Wand used in creative mode");

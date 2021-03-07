@@ -2,6 +2,7 @@ package thetadev.constructionwand.wand.action;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -25,11 +26,15 @@ import java.util.List;
  */
 public class ActionConstruction implements IWandAction
 {
+    @Override
+    public int getLimit(ItemStack wand) {
+        return ConfigServer.getWandProperties(wand.getItem()).getLimit();
+    }
+
     @Nonnull
     @Override
     public List<ISnapshot> getSnapshots(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
-                                        WandOptions options, ConfigServer.WandProperties properties, int limit,
-                                        IWandSupplier supplier) {
+                                        ItemStack wand, WandOptions options, IWandSupplier supplier, int limit) {
         LinkedList<ISnapshot> placeSnapshots = new LinkedList<>();
         LinkedList<BlockPos> candidates = new LinkedList<>();
         HashSet<BlockPos> allCandidates = new HashSet<>();
@@ -123,8 +128,7 @@ public class ActionConstruction implements IWandAction
     @Nonnull
     @Override
     public List<ISnapshot> getSnapshotsFromAir(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
-                                               WandOptions options, ConfigServer.WandProperties properties, int limit,
-                                               IWandSupplier supplier) {
+                                               ItemStack wand, WandOptions options, IWandSupplier supplier, int limit) {
         return new ArrayList<>();
     }
 }

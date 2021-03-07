@@ -22,8 +22,8 @@ public class ItemWandBasic extends ItemWand
     }
 
     @Override
-    public int getLimit(PlayerEntity player, ItemStack stack) {
-        return Math.min(stack.getMaxDamage() - stack.getDamage(), getLimit());
+    public int remainingDurability(ItemStack stack) {
+        return stack.getMaxDamage() - stack.getDamage();
     }
 
     @Override

@@ -24,7 +24,6 @@ import thetadev.constructionwand.wand.undo.ISnapshot;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +34,6 @@ public class WandJob
     public final World world;
     public final BlockRayTraceResult rayTraceResult;
     public final WandOptions options;
-    public final ConfigServer.WandProperties properties;
     public final ItemStack wand;
     public final ItemWand wandItem;
 
@@ -48,13 +46,12 @@ public class WandJob
         this.player = player;
         this.world = world;
         this.rayTraceResult = rayTraceResult;
-        this.placeSnapshots = new LinkedList<>();
+        this.placeSnapshots = new ArrayList<>();
 
         // Get wand
         this.wand = wand;
         this.wandItem = (ItemWand) wand.getItem();
         options = new WandOptions(wand);
-        properties = ConfigServer.getWandProperties(wandItem);
 
         // Select wand action and supplier based on options
         wandSupplier = options.random.get() ?
@@ -73,13 +70,14 @@ public class WandJob
     }
 
     public void getPlaceSnapshots() {
-        int limit = wandItem.getLimit(player, wand);
+        int limit;
+        if(player.isCreative()) limit = ConfigServer.LIMIT_CREATIVE.get();
+        else limit = Math.min(wandItem.remainingDurability(wand), wandAction.getLimit(wand));
 
-        if(limit == 0) placeSnapshots = new ArrayList<>();
-        else if(rayTraceResult.getType() == RayTraceResult.Type.BLOCK)
-            placeSnapshots = wandAction.getSnapshots(world, player, rayTraceResult, options, properties, limit, wandSupplier);
+        if(rayTraceResult.getType() == RayTraceResult.Type.BLOCK)
+            placeSnapshots = wandAction.getSnapshots(world, player, rayTraceResult, wand, options, wandSupplier, limit);
         else
-            placeSnapshots = wandAction.getSnapshotsFromAir(world, player, rayTraceResult, options, properties, limit, wandSupplier);
+            placeSnapshots = wandAction.getSnapshotsFromAir(world, player, rayTraceResult, wand, options, wandSupplier, limit);
     }
 
     public Set<BlockPos> getBlockPositions() {
@@ -87,10 +85,10 @@ public class WandJob
     }
 
     public boolean doIt() {
-        LinkedList<ISnapshot> executed = new LinkedList<>();
+        ArrayList<ISnapshot> executed = new ArrayList<>();
 
         for(ISnapshot snapshot : placeSnapshots) {
-            if(wand.isEmpty() || wandItem.getLimit(player, wand) == 0) break;
+            if(wand.isEmpty() || wandItem.remainingDurability(wand) == 0) break;
 
             if(snapshot.execute(world, player)) {
                 // If the item cant be taken, undo the placement

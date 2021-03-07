@@ -91,17 +91,14 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         return false;
     }
 
-    public int getLimit(PlayerEntity player, ItemStack stack) {
-        return getLimit();
-    }
-
-    protected int getLimit() {
-        return ConfigServer.getWandProperties(this).getLimit();
+    public int remainingDurability(ItemStack stack) {
+        return Integer.MAX_VALUE;
     }
 
     @OnlyIn(Dist.CLIENT)
     public void addInformation(@Nonnull ItemStack itemstack, World worldIn, @Nonnull List<ITextComponent> lines, @Nonnull ITooltipFlag extraInfo) {
         WandOptions options = new WandOptions(itemstack);
+        int limit = options.cores.get().getWandAction().getLimit(itemstack);
 
         String langTooltip = ConstructionWand.MODID + ".tooltip.";
 
@@ -115,7 +112,7 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         }
         else {
             IOption<?> opt = options.allOptions[0];
-            lines.add(new TranslationTextComponent(langTooltip + "blocks", getLimit()).mergeStyle(TextFormatting.GRAY));
+            lines.add(new TranslationTextComponent(langTooltip + "blocks", limit).mergeStyle(TextFormatting.GRAY));
             lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
                     .append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.WHITE)));
             lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));
