@@ -1,18 +1,22 @@
 package thetadev.constructionwand.wand.action;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.api.IWandSupplier;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.wand.WandJob;
 import thetadev.constructionwand.wand.undo.ISnapshot;
 import thetadev.constructionwand.wand.undo.PlaceSnapshot;
 
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,18 +26,11 @@ import java.util.List;
  */
 public class ActionConstruction implements IWandAction
 {
-    private final World world;
-    private final BlockRayTraceResult rayTraceResult;
-    private final WandOptions options;
-
-    public ActionConstruction(WandJob wandJob) {
-        world = wandJob.world;
-        rayTraceResult = wandJob.rayTraceResult;
-        options = wandJob.options;
-    }
-
+    @Nonnull
     @Override
-    public List<ISnapshot> getSnapshots(IWandSupplier supplier) {
+    public List<ISnapshot> getSnapshots(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+                                        WandOptions options, ConfigServer.WandProperties properties, int limit,
+                                        IWandSupplier supplier) {
         LinkedList<ISnapshot> placeSnapshots = new LinkedList<>();
         LinkedList<BlockPos> candidates = new LinkedList<>();
         HashSet<BlockPos> allCandidates = new HashSet<>();
@@ -51,7 +48,7 @@ public class ActionConstruction implements IWandAction
             if(options.testLock(WandOptions.LOCK.HORIZONTAL) || options.testLock(WandOptions.LOCK.VERTICAL))
                 candidates.add(startingPoint);
 
-        while(!candidates.isEmpty() && placeSnapshots.size() < supplier.getMaxBlocks()) {
+        while(!candidates.isEmpty() && placeSnapshots.size() < limit) {
             BlockPos currentCandidate = candidates.removeFirst();
             try {
                 BlockPos supportingPoint = currentCandidate.offset(placeDirection.getOpposite());
@@ -59,7 +56,7 @@ public class ActionConstruction implements IWandAction
 
                 if(WandUtil.matchBlocks(options, targetBlock.getBlock(), candidateSupportingBlock.getBlock()) &&
                         allCandidates.add(currentCandidate)) {
-                    PlaceSnapshot snapshot = supplier.getPlaceSnapshot(currentCandidate, candidateSupportingBlock);
+                    PlaceSnapshot snapshot = supplier.getPlaceSnapshot(world, currentCandidate, rayTraceResult, candidateSupportingBlock);
                     if(snapshot == null) continue;
                     placeSnapshots.add(snapshot);
 
@@ -123,5 +120,13 @@ public class ActionConstruction implements IWandAction
             }
         }
         return placeSnapshots;
+    }
+
+    @Nonnull
+    @Override
+    public List<ISnapshot> getSnapshotsFromAir(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+                                               WandOptions options, ConfigServer.WandProperties properties, int limit,
+                                               IWandSupplier supplier) {
+        return new ArrayList<>();
     }
 }

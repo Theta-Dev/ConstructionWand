@@ -22,6 +22,12 @@ public class RandomPool<T> implements IPool<T>
         addWithWeight(element, 1);
     }
 
+    @Override
+    public void remove(T element) {
+        elements.remove(element);
+        pool.remove(element);
+    }
+
     public void addWithWeight(T element, int weight) {
         if(weight < 1) return;
         elements.merge(element, weight, Integer::sum);

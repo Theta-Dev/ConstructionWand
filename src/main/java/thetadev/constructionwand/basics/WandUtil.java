@@ -76,8 +76,8 @@ public class WandUtil
     }
 
     public static List<ItemStack> getHotbarWithOffhand(PlayerEntity player) {
-        ArrayList<ItemStack> inventory = new ArrayList<>(player.inventory.offHandInventory);
-        inventory.addAll(player.inventory.mainInventory.subList(0, 9));
+        ArrayList<ItemStack> inventory = new ArrayList<>(player.inventory.mainInventory.subList(0, 9));
+        inventory.addAll(player.inventory.offHandInventory);
         return inventory;
     }
 

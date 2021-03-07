@@ -18,7 +18,7 @@ public class ItemCoreDestruction extends ItemBase implements IWandCore
     }
 
     @Override
-    public IWandAction getWandAction(WandJob job) {
-        return new ActionDestruction(job);
+    public IWandAction getWandAction() {
+        return new ActionDestruction();
     }
 }

@@ -18,7 +18,7 @@ public class ItemCoreAngel extends ItemBase implements IWandCore
     }
 
     @Override
-    public IWandAction getWandAction(WandJob job) {
-        return new ActionAngel(job);
+    public IWandAction getWandAction() {
+        return new ActionAngel();
     }
 }

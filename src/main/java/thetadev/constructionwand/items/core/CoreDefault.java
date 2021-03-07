@@ -15,8 +15,8 @@ public class CoreDefault implements IWandCore
     }
 
     @Override
-    public IWandAction getWandAction(WandJob job) {
-        return new ActionConstruction(job);
+    public IWandAction getWandAction() {
+        return new ActionConstruction();
     }
 
     @Override

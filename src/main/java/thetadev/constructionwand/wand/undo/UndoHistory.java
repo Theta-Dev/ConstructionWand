@@ -77,13 +77,12 @@ public class UndoHistory
         if(historyEntries.isEmpty()) return false;
         HistoryEntry entry = historyEntries.getLast();
 
-        if(entry.world.equals(world) && entry.getBlockPositions().contains(pos)) {
-            // Remove history entry, sent update to client and undo it
-            historyEntries.remove(entry);
-            updateClient(player, true);
-            return entry.undo(player);
-        }
-        return false;
+        // Player has to be in the same world and near the blocks
+        if(!entry.world.equals(world) || !entry.withinRange(pos)) return false;
+
+        historyEntries.remove(entry);
+        updateClient(player, true);
+        return entry.undo(player);
     }
 
     private static class PlayerEntry
@@ -109,6 +108,17 @@ public class UndoHistory
 
         public Set<BlockPos> getBlockPositions() {
             return placeSnapshots.stream().map(ISnapshot::getPos).collect(Collectors.toSet());
+        }
+
+        public boolean withinRange(BlockPos pos) {
+            Set<BlockPos> positions = getBlockPositions();
+
+            if(positions.contains(pos)) return true;
+
+            for(BlockPos p: positions) {
+                if(pos.withinDistance(p, 2)) return true;
+            }
+            return false;
         }
 
         public boolean undo(PlayerEntity player) {

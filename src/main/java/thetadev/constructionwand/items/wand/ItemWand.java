@@ -67,8 +67,8 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
             if(world.isRemote) return ActionResult.resultFail(stack);
 
             // Right click: Place angel block
-            WandJob job = getWandJob(player, world, new BlockRayTraceResult(player.getLookVec(),
-                    WandUtil.fromVector(player.getLookVec()), WandUtil.playerPos(player), false), stack);
+            WandJob job = getWandJob(player, world, BlockRayTraceResult.createMiss(player.getLookVec(),
+                    WandUtil.fromVector(player.getLookVec()), WandUtil.playerPos(player)), stack);
             return job.doIt() ? ActionResult.resultSuccess(stack) : ActionResult.resultFail(stack);
         }
         return ActionResult.resultFail(stack);

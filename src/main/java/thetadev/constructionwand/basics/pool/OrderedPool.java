@@ -18,6 +18,11 @@ public class OrderedPool<T> implements IPool<T>
         elements.add(element);
     }
 
+    @Override
+    public void remove(T element) {
+        elements.remove(element);
+    }
+
     @Nullable
     @Override
     public T draw() {

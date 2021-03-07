@@ -8,9 +8,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IWandAction;
+import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -21,6 +23,7 @@ import thetadev.constructionwand.wand.supplier.SupplierRandom;
 import thetadev.constructionwand.wand.undo.ISnapshot;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -32,36 +35,33 @@ public class WandJob
     public final World world;
     public final BlockRayTraceResult rayTraceResult;
     public final WandOptions options;
+    public final ConfigServer.WandProperties properties;
     public final ItemStack wand;
     public final ItemWand wandItem;
-
-    @Nullable
-    public final BlockItem targetItem;
 
     private final IWandAction wandAction;
     private final IWandSupplier wandSupplier;
 
     private List<ISnapshot> placeSnapshots;
 
-    public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand, @Nullable BlockItem targetItem) {
+    public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand) {
         this.player = player;
         this.world = world;
         this.rayTraceResult = rayTraceResult;
         this.placeSnapshots = new LinkedList<>();
-        this.targetItem = targetItem;
 
         // Get wand
         this.wand = wand;
         this.wandItem = (ItemWand) wand.getItem();
         options = new WandOptions(wand);
+        properties = ConfigServer.getWandProperties(wandItem);
 
         // Select wand action and supplier based on options
-        wandSupplier = options.random.get() ? new SupplierRandom(this) : new SupplierInventory(this);
-        wandAction = options.cores.get().getWandAction(this);
-    }
+        wandSupplier = options.random.get() ?
+                new SupplierRandom(player, options) : new SupplierInventory(player, options);
+        wandAction = options.cores.get().getWandAction();
 
-    public WandJob(PlayerEntity player, World world, BlockRayTraceResult rayTraceResult, ItemStack wand) {
-        this(player, world, rayTraceResult, wand, getTargetItem(world, rayTraceResult));
+        wandSupplier.getSupply(getTargetItem(world, rayTraceResult));
     }
 
     @Nullable
@@ -73,7 +73,13 @@ public class WandJob
     }
 
     public void getPlaceSnapshots() {
-        placeSnapshots = wandAction.getSnapshots(wandSupplier);
+        int limit = wandItem.getLimit(player, wand);
+
+        if(limit == 0) placeSnapshots = new ArrayList<>();
+        else if(rayTraceResult.getType() == RayTraceResult.Type.BLOCK)
+            placeSnapshots = wandAction.getSnapshots(world, player, rayTraceResult, options, properties, limit, wandSupplier);
+        else
+            placeSnapshots = wandAction.getSnapshotsFromAir(world, player, rayTraceResult, options, properties, limit, wandSupplier);
     }
 
     public Set<BlockPos> getBlockPositions() {

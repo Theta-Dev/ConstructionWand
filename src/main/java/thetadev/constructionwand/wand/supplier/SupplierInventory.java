@@ -17,8 +17,6 @@ import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.basics.pool.IPool;
 import thetadev.constructionwand.basics.pool.OrderedPool;
 import thetadev.constructionwand.containers.ContainerManager;
-import thetadev.constructionwand.items.ModItems;
-import thetadev.constructionwand.wand.WandJob;
 import thetadev.constructionwand.wand.undo.PlaceSnapshot;
 
 import javax.annotation.Nullable;
@@ -32,25 +30,17 @@ import java.util.List;
 public class SupplierInventory implements IWandSupplier
 {
     protected final PlayerEntity player;
-    protected final World world;
-    protected final BlockRayTraceResult rayTraceResult;
     protected final WandOptions options;
-    protected final int wandLimit;
 
     protected HashMap<BlockItem, Integer> itemCounts;
     protected IPool<BlockItem> itemPool;
-    protected int maxBlocks;
 
-    public SupplierInventory(WandJob job) {
-        player = job.player;
-        world = job.world;
-        rayTraceResult = job.rayTraceResult;
-        options = job.options;
-        wandLimit = job.wandItem.getLimit(player, job.wand);
-        getSupply(job.targetItem);
+    public SupplierInventory(PlayerEntity player, WandOptions options) {
+        this.player = player;
+        this.options = options;
     }
 
-    protected void getSupply(@Nullable BlockItem target) {
+    public void getSupply(@Nullable BlockItem target) {
         itemCounts = new LinkedHashMap<>();
         ItemStack offhandStack = player.getHeldItem(Hand.OFF_HAND);
 
@@ -71,28 +61,6 @@ public class SupplierInventory implements IWandSupplier
                 }
             }
         }
-
-        // Count inventory supply
-        countSupply();
-    }
-
-    protected void countSupply() {
-        maxBlocks = 0;
-        for(int v : itemCounts.values()) {
-            try {
-                maxBlocks = Math.addExact(maxBlocks, v);
-            } catch(ArithmeticException e) {
-                maxBlocks = Integer.MAX_VALUE;
-                break;
-            }
-        }
-
-        maxBlocks = Math.min(maxBlocks, wandLimit);
-    }
-
-    @Override
-    public int getMaxBlocks() {
-        return maxBlocks;
     }
 
     protected void addBlockItem(BlockItem item) {
@@ -105,7 +73,8 @@ public class SupplierInventory implements IWandSupplier
 
     @Override
     @Nullable
-    public PlaceSnapshot getPlaceSnapshot(BlockPos pos, @Nullable BlockState supportingBlock) {
+    public PlaceSnapshot getPlaceSnapshot(World world, BlockPos pos, BlockRayTraceResult rayTraceResult,
+                                          @Nullable BlockState supportingBlock) {
         if(!WandUtil.isPositionPlaceable(world, player, pos, rayTraceResult, options)) return null;
         itemPool.reset();
 
@@ -118,7 +87,15 @@ public class SupplierInventory implements IWandSupplier
             if(count == 0) continue;
 
             PlaceSnapshot placeSnapshot = PlaceSnapshot.get(world, player, rayTraceResult, pos, item, supportingBlock, options);
-            if(placeSnapshot != null) return placeSnapshot;
+            if(placeSnapshot != null) {
+                int ncount = count - 1;
+                itemCounts.put(item, ncount);
+
+                // Remove item from pool if there are no items left
+                if(ncount == 0) itemPool.remove(item);
+
+                return placeSnapshot;
+            }
         }
     }
 
