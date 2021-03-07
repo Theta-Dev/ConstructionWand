@@ -3,13 +3,20 @@
   "item.constructionwand.iron_wand": "Eiserner Stab",
   "item.constructionwand.diamond_wand": "Diamantener Stab",
   "item.constructionwand.infinity_wand": "Stab der Unendlichkeit",
+  "item.constructionwand.core_angel": "Kristall der Engel",
+  "item.constructionwand.core_destruction": "Kristall der Zerstörung",
+
   "constructionwand.tooltip.blocks": "Max. %d Blöcke",
   "constructionwand.tooltip.shift": "Drücke [SHIFT]",
-  "constructionwand.option.mode": "",
-  "constructionwand.option.mode.default": "Standardmodus",
-  "constructionwand.option.mode.default.desc": "Erweitere dein Gebäude auf der dir zugewandten Seite",
-  "constructionwand.option.mode.angel": "§6Engelsmodus",
-  "constructionwand.option.mode.angel.desc": "Platziere hinter Blöcken sowie in der Luft",
+
+  "constructionwand.option.cores": "",
+  "constructionwand.option.cores.constructionwand:default": "Kristall der Konstruktion",
+  "constructionwand.option.cores.constructionwand:default.desc": "Platziere Blöcke, wohin du zeigst",
+  "constructionwand.option.cores.constructionwand:core_angel": "§6Kristall der Engel",
+  "constructionwand.option.cores.constructionwand:core_angel.desc": "Platziere hinter Blöcken sowie in der Luft",
+  "constructionwand.option.cores.constructionwand:core_destruction": "§cKristall der Zerstörung",
+  "constructionwand.option.cores.constructionwand:core_destruction.desc": "Zerstöre Blöcke, wohin du zeigst",
+
   "constructionwand.option.lock": "Beschränkung: ",
   "constructionwand.option.lock.horizontal": "§aHorizontal",
   "constructionwand.option.lock.horizontal.desc": "Baut eine horizontale Säule vor dem Originalblock",
@@ -21,16 +28,19 @@
   "constructionwand.option.lock.eastwest.desc": "Baut eine Reihe in OW-Richtung auf dem Originalblock",
   "constructionwand.option.lock.nolock": "§cKeine",
   "constructionwand.option.lock.nolock.desc": "Erweitert in jede Richtung",
+
   "constructionwand.option.direction": "Ausrichtung: ",
   "constructionwand.option.direction.target": "§6Zielblock",
   "constructionwand.option.direction.target.desc": "Platziert Blöcke mit der selben Ausrichtung wie der Zielblock",
   "constructionwand.option.direction.player": "§aSpieler",
   "constructionwand.option.direction.player.desc": "Platziert Blöcke in der Richtung, auf die der Spieler zeigt",
+
   "constructionwand.option.replace": "Ersetzen: ",
   "constructionwand.option.replace.yes": "§aJa",
   "constructionwand.option.replace.yes.desc": "Ersetzt bestimmte Blöcke wie Flüssigkeiten, Schnee und hohes Gras",
   "constructionwand.option.replace.no": "§cNein",
   "constructionwand.option.replace.no.desc": "Ersetzt keine Blöcke",
+
   "constructionwand.option.match": "Vergleich: ",
   "constructionwand.option.match.exact": "§aExakt",
   "constructionwand.option.match.exact.desc": "Erweitert nur Blöcke, die gleich dem Startblock sind",
@@ -38,10 +48,12 @@
   "constructionwand.option.match.similar.desc": "Behandle ähnliche Blöcke (Erde/Gras) gleich",
   "constructionwand.option.match.any": "§cAlle",
   "constructionwand.option.match.any.desc": "Erweitert alle Blöcke",
+
   "constructionwand.option.random": "Zufallsmodus: ",
   "constructionwand.option.random.yes": "§aEin",
   "constructionwand.option.random.yes.desc": "Platziere zufällige Blöcke aus der Hotbar",
   "constructionwand.option.random.no": "§cAus",
   "constructionwand.option.random.no.desc": "Platziere Blöcke normal",
+
   "stat.constructionwand.use_wand": "Blöcke mithilfe des Stabs platziert"
 }
