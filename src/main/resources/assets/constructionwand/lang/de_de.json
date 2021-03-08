@@ -8,6 +8,8 @@
 
   "constructionwand.tooltip.blocks": "Max. %d Blöcke",
   "constructionwand.tooltip.shift": "Drücke [SHIFT]",
+  "constructionwand.tooltip.cores": "Kristalle im Stab:",
+  "constructionwand.tooltip.core_tip": "Kombiniere den Kristall mit deinem Stab im Craftingfeld",
 
   "constructionwand.option.cores": "",
   "constructionwand.option.cores.constructionwand:default": "Kristall der Konstruktion",

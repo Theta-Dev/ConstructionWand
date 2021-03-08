@@ -1,6 +1,7 @@
 package thetadev.constructionwand.data;
 
 import net.minecraft.data.*;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.IItemProvider;
@@ -27,6 +28,9 @@ public class RecipeGenerator extends RecipeProvider
         wandRecipe(consumer, ModItems.WAND_DIAMOND, Inp.fromTag(Tags.Items.GEMS_DIAMOND));
         wandRecipe(consumer, ModItems.WAND_INFINITY, Inp.fromTag(Tags.Items.NETHER_STARS));
 
+        coreRecipe(consumer, ModItems.CORE_ANGEL, Inp.fromTag(Tags.Items.FEATHERS), Inp.fromTag(Tags.Items.INGOTS_GOLD));
+        coreRecipe(consumer, ModItems.CORE_DESTRUCTION, Inp.fromItem(Items.DIAMOND_PICKAXE), Inp.fromTag(Tags.Items.GEMS_DIAMOND));
+
         specialRecipe(consumer, RecipeWandUpgrade.SERIALIZER);
     }
 
@@ -38,6 +42,18 @@ public class RecipeGenerator extends RecipeProvider
                 .patternLine(" # ")
                 .patternLine("#  ")
                 .addCriterion("has_item", hasItem(material.predicate))
+                .build(consumer);
+    }
+
+    private void coreRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider core, Inp item1, Inp item2) {
+        ShapedRecipeBuilder.shapedRecipe(core)
+                .key('O', item1.ingredient)
+                .key('X', item2.ingredient)
+                .key('#', Tags.Items.GLASS_PANES)
+                .patternLine(" #X")
+                .patternLine("#O#")
+                .patternLine("X# ")
+                .addCriterion("has_item", hasItem(item1.predicate))
                 .build(consumer);
     }
 

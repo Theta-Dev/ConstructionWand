@@ -72,4 +72,8 @@ public class WandUpgrades<T extends IWandUpgrade>
     public boolean hasUpgrade(T upgrade) {
         return upgrades.contains(upgrade);
     }
+
+    public ArrayList<T> getUpgrades() {
+        return upgrades;
+    }
 }

@@ -1,6 +1,5 @@
 package thetadev.constructionwand.items.wand;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemTier;
 import net.minecraft.item.ItemStack;
 import thetadev.constructionwand.basics.ConfigServer;

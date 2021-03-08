@@ -19,7 +19,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.generators.ModelFile;
 import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.basics.ConfigServer;
+import thetadev.constructionwand.api.IWandCore;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -102,6 +102,7 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
 
         String langTooltip = ConstructionWand.MODID + ".tooltip.";
 
+        // +SHIFT tooltip: show all options + installed cores
         if(Screen.hasShiftDown()) {
             for(int i = 1; i < options.allOptions.length; i++) {
                 IOption<?> opt = options.allOptions[i];
@@ -109,7 +110,16 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
                         .append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.GRAY))
                 );
             }
+            if(!options.cores.getUpgrades().isEmpty()) {
+                lines.add(new StringTextComponent(""));
+                lines.add(new TranslationTextComponent(langTooltip + "cores").mergeStyle(TextFormatting.GRAY));
+
+                for(IWandCore core : options.cores.getUpgrades()) {
+                    lines.add(new TranslationTextComponent(options.cores.getKeyTranslation() + "." + core.getRegistryName().toString()));
+                }
+            }
         }
+        // Default tooltip: show block limit + active wand core
         else {
             IOption<?> opt = options.allOptions[0];
             lines.add(new TranslationTextComponent(langTooltip + "blocks", limit).mergeStyle(TextFormatting.GRAY));

@@ -30,14 +30,14 @@ import java.util.HashSet;
 public class ModItems
 {
     // Wands
-    public static final Item WAND_STONE = new ItemWandBasic("stone_wand", itemprops(), ItemTier.STONE);
-    public static final Item WAND_IRON = new ItemWandBasic("iron_wand", itemprops(), ItemTier.IRON);
-    public static final Item WAND_DIAMOND = new ItemWandBasic("diamond_wand", itemprops(), ItemTier.DIAMOND);
-    public static final Item WAND_INFINITY = new ItemWandInfinity("infinity_wand", itemprops());
+    public static final Item WAND_STONE = new ItemWandBasic("stone_wand", propWand(), ItemTier.STONE);
+    public static final Item WAND_IRON = new ItemWandBasic("iron_wand", propWand(), ItemTier.IRON);
+    public static final Item WAND_DIAMOND = new ItemWandBasic("diamond_wand", propWand(), ItemTier.DIAMOND);
+    public static final Item WAND_INFINITY = new ItemWandInfinity("infinity_wand", propWand());
 
-    // Upgrades
-    public static final Item CORE_ANGEL = new ItemCoreAngel("core_angel", unstackable());
-    public static final Item CORE_DESTRUCTION = new ItemCoreDestruction("core_destruction", unstackable());
+    // Cores
+    public static final Item CORE_ANGEL = new ItemCoreAngel("core_angel", propUpgrade());
+    public static final Item CORE_DESTRUCTION = new ItemCoreDestruction("core_destruction", propUpgrade());
 
     // Collections
     public static final Item[] WANDS = {WAND_STONE, WAND_IRON, WAND_DIAMOND, WAND_INFINITY};
@@ -55,12 +55,12 @@ public class ModItems
         registerItem(r, CORE_DESTRUCTION);
     }
 
-    public static Item.Properties itemprops() {
+    public static Item.Properties propWand() {
         return new Item.Properties().group(ItemGroup.TOOLS);
     }
 
-    private static Item.Properties unstackable() {
-        return itemprops().maxStackSize(1);
+    private static Item.Properties propUpgrade() {
+        return new Item.Properties().group(ItemGroup.MISC).maxStackSize(1);
     }
 
     private static void registerItem(IForgeRegistry<Item> reg, Item item) {

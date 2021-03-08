@@ -8,6 +8,8 @@
 
   "constructionwand.tooltip.blocks": "Max. %d blocks",
   "constructionwand.tooltip.shift": "Press [SHIFT]",
+  "constructionwand.tooltip.cores": "Wand cores:",
+  "constructionwand.tooltip.core_tip": "Combine the core with your wand in a crafting grid",
 
   "constructionwand.option.cores": "",
   "constructionwand.option.cores.constructionwand:default": "Construction Core",
