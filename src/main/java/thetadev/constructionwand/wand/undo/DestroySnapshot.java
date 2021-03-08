@@ -47,6 +47,12 @@ public class DestroySnapshot implements ISnapshot
     }
 
     @Override
+    public boolean canRestore(World world, PlayerEntity player) {
+        return WandUtil.isPositionPlaceable(world, player, pos, false, null) &&
+                !WandUtil.entitiesCollidingWithBlock(world, block, pos);
+    }
+
+    @Override
     public boolean restore(World world, PlayerEntity player) {
         return WandUtil.placeBlock(world, player, block, pos, null);
     }

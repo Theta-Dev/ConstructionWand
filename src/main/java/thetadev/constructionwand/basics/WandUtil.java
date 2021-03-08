@@ -90,7 +90,7 @@ public class WandUtil
         return inventory;
     }
 
-    public static int maxRange(BlockPos p1, BlockPos p2) {
+    public static int blockDistance(BlockPos p1, BlockPos p2) {
         return Math.max(Math.abs(p1.getX() - p2.getX()), Math.abs(p1.getZ() - p2.getZ()));
     }
 
@@ -197,7 +197,7 @@ public class WandUtil
      * This check is independent from the used block.
      */
     public static boolean isPositionPlaceable(World world, PlayerEntity player, BlockPos pos,
-                                              BlockRayTraceResult rayTraceResult, WandOptions options) {
+                                              boolean replace, @Nullable BlockRayTraceResult rayTraceResult) {
         // Is position out of world?
         if(!world.isBlockPresent(pos)) return false;
 
@@ -205,11 +205,13 @@ public class WandUtil
         if(!world.isBlockModifiable(player, pos)) return false;
 
         // If replace mode is off, target has to be air
-        if(!options.replace.get() && !world.isAirBlock(pos)) return false;
+        if(!replace && !world.isAirBlock(pos)) return false;
 
         // Limit placement range
-        return ConfigServer.MAX_RANGE.get() <= 0 ||
-                WandUtil.maxRange(rayTraceResult.getPos(), pos) <= ConfigServer.MAX_RANGE.get();
+        if(rayTraceResult != null && ConfigServer.MAX_RANGE.get() > 0 &&
+                WandUtil.blockDistance(rayTraceResult.getPos(), pos) > ConfigServer.MAX_RANGE.get()) return false;
+
+        return true;
     }
 
     public static boolean isBlockRemovable(World world, PlayerEntity player, BlockPos pos) {
@@ -221,6 +223,16 @@ public class WandUtil
             if(currentBlock.getBlockHardness(world, pos) <= -1 || world.getTileEntity(pos) != null) return false;
         }
         return true;
+    }
+
+    public static boolean entitiesCollidingWithBlock(World world, BlockState blockState, BlockPos pos) {
+        VoxelShape shape = blockState.getCollisionShape(world, pos);
+        if(!shape.isEmpty()) {
+            AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
+            if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty())
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -244,12 +256,7 @@ public class WandUtil
         if(!isTEAllowed(blockState)) return null;
 
         // No entities colliding?
-        VoxelShape shape = blockState.getCollisionShape(world, pos);
-        if(!shape.isEmpty()) {
-            AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
-            if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty())
-                return null;
-        }
+        if(entitiesCollidingWithBlock(world, blockState, pos)) return null;
 
         // Adjust blockstate to neighbors
         blockState = Block.getValidBlockForPosition(blockState, world, pos);

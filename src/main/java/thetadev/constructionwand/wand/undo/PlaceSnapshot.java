@@ -54,6 +54,11 @@ public class PlaceSnapshot implements ISnapshot
     }
 
     @Override
+    public boolean canRestore(World world, PlayerEntity player) {
+        return true;
+    }
+
+    @Override
     public boolean restore(World world, PlayerEntity player) {
         return WandUtil.removeBlock(world, player, block, pos);
     }

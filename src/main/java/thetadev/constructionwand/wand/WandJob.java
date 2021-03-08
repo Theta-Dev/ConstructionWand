@@ -69,7 +69,7 @@ public class WandJob
         return (BlockItem) tgitem;
     }
 
-    public void getPlaceSnapshots() {
+    public void getSnapshots() {
         int limit;
         if(player.isCreative()) limit = ConfigServer.LIMIT_CREATIVE.get();
         else limit = Math.min(wandItem.remainingDurability(wand), wandAction.getLimit(wand));

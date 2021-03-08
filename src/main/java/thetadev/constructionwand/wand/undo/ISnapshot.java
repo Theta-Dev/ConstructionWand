@@ -16,6 +16,8 @@ public interface ISnapshot
 
     boolean execute(World world, PlayerEntity player);
 
+    boolean canRestore(World world, PlayerEntity player);
+
     boolean restore(World world, PlayerEntity player);
 
     void forceRestore(World world);

@@ -80,9 +80,12 @@ public class UndoHistory
         // Player has to be in the same world and near the blocks
         if(!entry.world.equals(world) || !entry.withinRange(pos)) return false;
 
-        historyEntries.remove(entry);
-        updateClient(player, true);
-        return entry.undo(player);
+        if(entry.undo(player)) {
+            historyEntries.remove(entry);
+            updateClient(player, true);
+            return true;
+        }
+        return false;
     }
 
     private static class PlayerEntry
@@ -116,12 +119,16 @@ public class UndoHistory
             if(positions.contains(pos)) return true;
 
             for(BlockPos p : positions) {
-                if(pos.withinDistance(p, 2)) return true;
+                if(pos.withinDistance(p, 3)) return true;
             }
             return false;
         }
 
         public boolean undo(PlayerEntity player) {
+            // Check first if all snapshots can be restored
+            for(ISnapshot snapshot : placeSnapshots) {
+                if(!snapshot.canRestore(world, player)) return false;
+            }
             for(ISnapshot snapshot : placeSnapshots) {
                 if(snapshot.restore(world, player) && !player.isCreative()) {
                     ItemStack stack = snapshot.getRequiredItems();

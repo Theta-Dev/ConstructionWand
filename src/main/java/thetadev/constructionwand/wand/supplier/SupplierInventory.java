@@ -75,7 +75,7 @@ public class SupplierInventory implements IWandSupplier
     @Nullable
     public PlaceSnapshot getPlaceSnapshot(World world, BlockPos pos, BlockRayTraceResult rayTraceResult,
                                           @Nullable BlockState supportingBlock) {
-        if(!WandUtil.isPositionPlaceable(world, player, pos, rayTraceResult, options)) return null;
+        if(!WandUtil.isPositionPlaceable(world, player, pos, options.replace.get(), rayTraceResult)) return null;
         itemPool.reset();
 
         while(true) {
