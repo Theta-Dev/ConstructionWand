@@ -2,13 +2,9 @@ package thetadev.constructionwand.wand.undo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.WandUtil;
 
@@ -59,12 +55,13 @@ public class DestroySnapshot implements ISnapshot
         // Is block modifiable?
         if(!world.isBlockModifiable(player, pos)) return false;
 
-        // Entities colliding
-        if(WandUtil.entitiesCollidingWithBlock(world, block, pos)) return false;
+        // Ignore blocks and entities when in creative
+        if(player.isCreative()) return true;
 
-        return world.isAirBlock(pos) || world.getBlockState(pos).isReplaceable(
-                new BlockItemUseContext(world, player, Hand.MAIN_HAND, new ItemStack(block.getBlock().asItem()),
-                        new BlockRayTraceResult(new Vector3d(0,-1,0), Direction.DOWN, pos, false)));
+        // Is block empty or fluid?
+        if(!world.isAirBlock(pos) && !world.getBlockState(pos).isReplaceable(Fluids.EMPTY)) return false;
+
+        return !WandUtil.entitiesCollidingWithBlock(world, block, pos);
     }
 
     @Override
