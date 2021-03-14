@@ -113,7 +113,7 @@ public class PlaceSnapshot implements ISnapshot
         if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) return null;
 
         // Copy block properties from supporting block
-        if(targetMode) {
+        if(targetMode && supportingBlock != null) {
             // Block properties to be copied (alignment/rotation properties)
 
             for(Property property : new Property[]{
