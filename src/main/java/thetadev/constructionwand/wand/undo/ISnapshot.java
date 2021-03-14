@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 
 public interface ISnapshot
@@ -14,7 +15,7 @@ public interface ISnapshot
 
     ItemStack getRequiredItems();
 
-    boolean execute(World world, PlayerEntity player);
+    boolean execute(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult);
 
     boolean canRestore(World world, PlayerEntity player);
 
