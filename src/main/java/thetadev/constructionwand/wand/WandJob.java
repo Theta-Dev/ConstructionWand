@@ -92,7 +92,7 @@ public class WandJob
         for(ISnapshot snapshot : placeSnapshots) {
             if(wand.isEmpty() || wandItem.remainingDurability(wand) == 0) break;
 
-            if(snapshot.execute(world, player)) {
+            if(snapshot.execute(world, player, rayTraceResult)) {
                 // If the item cant be taken, undo the placement
                 if(wandSupplier.takeItemStack(snapshot.getRequiredItems()) == 0) executed.add(snapshot);
                 else {

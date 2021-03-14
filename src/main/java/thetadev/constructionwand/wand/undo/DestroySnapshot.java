@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.WandUtil;
 
@@ -12,8 +13,8 @@ import javax.annotation.Nullable;
 
 public class DestroySnapshot implements ISnapshot
 {
-    public final BlockState block;
-    public final BlockPos pos;
+    private final BlockState block;
+    private final BlockPos pos;
 
     public DestroySnapshot(BlockState block, BlockPos pos) {
         this.pos = pos;
@@ -43,7 +44,7 @@ public class DestroySnapshot implements ISnapshot
     }
 
     @Override
-    public boolean execute(World world, PlayerEntity player) {
+    public boolean execute(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult) {
         return WandUtil.removeBlock(world, player, block, pos);
     }
 
