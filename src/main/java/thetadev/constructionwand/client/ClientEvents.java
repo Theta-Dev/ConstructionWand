@@ -1,85 +1,103 @@
 package thetadev.constructionwand.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
-import thetadev.constructionwand.items.ItemWand;
+import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketWandOption;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ClientEvents
 {
-	private static boolean ctrlPressed = false;
+    private boolean optPressed;
 
-	@SubscribeEvent
-	public static void KeyEvent(InputEvent.KeyInputEvent event) {
-		PlayerEntity player = Minecraft.getInstance().player;
-		if(player == null) return;
-		if(WandUtil.holdingWand(player) == null) return;
+    public ClientEvents() {
+        optPressed = false;
+    }
 
-		boolean ctrlState = Screen.hasControlDown();
-		if(ctrlPressed != ctrlState) {
-			ctrlPressed = ctrlState;
-			PacketQueryUndo packet = new PacketQueryUndo(ctrlPressed);
-			ConstructionWand.instance.HANDLER.sendToServer(packet);
-			//ConstructionWand.LOGGER.debug("CTRL key update: "+ctrlPressed);
-		}
-	}
+    // Send state of OPT key to server
+    @SubscribeEvent
+    public void KeyEvent(InputEvent.KeyInputEvent event) {
+        PlayerEntity player = Minecraft.getInstance().player;
+        if(player == null) return;
+        if(WandUtil.holdingWand(player) == null) return;
 
-	// SHIFT+(CTRL)+Scroll to change direction lock
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public static void MouseScrollEvent(InputEvent.MouseScrollEvent event) {
-		PlayerEntity player = Minecraft.getInstance().player;
-		double scroll = event.getScrollDelta();
+        boolean optState = isOptKeyDown();
+        if(optPressed != optState) {
+            optPressed = optState;
+            PacketQueryUndo packet = new PacketQueryUndo(optPressed);
+            ConstructionWand.instance.HANDLER.sendToServer(packet);
+            //ConstructionWand.LOGGER.debug("OPT key update: " + optPressed);
+        }
+    }
 
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL_MODE.get()) || scroll == 0) return;
+    // Sneak+(OPT)+Scroll to change direction lock
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void MouseScrollEvent(InputEvent.MouseScrollEvent event) {
+        PlayerEntity player = Minecraft.getInstance().player;
+        double scroll = event.getScrollDelta();
 
-		ItemStack wand = WandUtil.holdingWand(player);
-		if(wand == null) return;
+        if(player == null || !modeKeyCombDown(player) || scroll == 0) return;
 
-		WandOptions wandOptions = new WandOptions(wand);
-		wandOptions.lock.next(scroll<0);
-		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.lock, true));
-		event.setCanceled(true);
-	}
+        ItemStack wand = WandUtil.holdingWand(player);
+        if(wand == null) return;
 
-	// SHIFT+(CTRL)+Left click wand to change mode
-	@SubscribeEvent
-	public static void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
-		PlayerEntity player = event.getPlayer();
+        WandOptions wandOptions = new WandOptions(wand);
+        wandOptions.lock.next(scroll < 0);
+        ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.lock, true));
+        event.setCanceled(true);
+    }
 
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL_MODE.get())) return;
+    // Sneak+(OPT)+Left click wand to change core
+    @SubscribeEvent
+    public void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
+        PlayerEntity player = event.getPlayer();
 
-		ItemStack wand = event.getItemStack();
-		if(!(wand.getItem() instanceof ItemWand)) return;
+        if(player == null || !modeKeyCombDown(player)) return;
 
-		WandOptions wandOptions = new WandOptions(wand);
-		wandOptions.mode.next();
-		ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.mode, true));
-	}
+        ItemStack wand = event.getItemStack();
+        if(!(wand.getItem() instanceof ItemWand)) return;
 
-	// SHIFT+Right click wand to open GUI
-	@SubscribeEvent
-	public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-		PlayerEntity player = event.getPlayer();
-		if(player == null || !player.isSneaking() || (!Screen.hasControlDown() && ConfigClient.SHIFTCTRL_GUI.get())) return;
+        WandOptions wandOptions = new WandOptions(wand);
+        wandOptions.cores.next();
+        ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.cores, true));
+    }
 
-		ItemStack wand = event.getItemStack();
-		if(!(wand.getItem() instanceof ItemWand)) return;
+    // Sneak+(OPT)+Right click wand to open GUI
+    @SubscribeEvent
+    public void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        PlayerEntity player = event.getPlayer();
+        if(player == null || !guiKeyCombDown(player)) return;
 
-		Minecraft.getInstance().displayGuiScreen(new ScreenWand(wand));
-		event.setCanceled(true);
-	}
+        ItemStack wand = event.getItemStack();
+        if(!(wand.getItem() instanceof ItemWand)) return;
+
+        Minecraft.getInstance().displayGuiScreen(new ScreenWand(wand));
+        event.setCanceled(true);
+    }
+
+    private static boolean isKeyDown(int id) {
+        return InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), id);
+    }
+
+    public static boolean isOptKeyDown() {
+        return isKeyDown(ConfigClient.OPT_KEY.get());
+    }
+
+    public static boolean modeKeyCombDown(PlayerEntity player) {
+        return player.isSneaking() && (isOptKeyDown() || !ConfigClient.SHIFTOPT_MODE.get());
+    }
+
+    public static boolean guiKeyCombDown(PlayerEntity player) {
+        return player.isSneaking() && (isOptKeyDown() || !ConfigClient.SHIFTOPT_GUI.get());
+    }
 }
