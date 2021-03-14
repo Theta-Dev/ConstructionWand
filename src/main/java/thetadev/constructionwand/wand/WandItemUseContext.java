@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.WandUtil;
 
@@ -18,10 +18,10 @@ public class WandItemUseContext extends BlockItemUseContext
                 new BlockRayTraceResult(getBlockHitVec(rayTraceResult, pos), rayTraceResult.getFace(), pos, false));
     }
 
-    private static Vector3d getBlockHitVec(BlockRayTraceResult rayTraceResult, BlockPos pos) {
-        Vector3d hitVec = rayTraceResult.getHitVec(); // Absolute coords of hit target
+    private static Vec3d getBlockHitVec(BlockRayTraceResult rayTraceResult, BlockPos pos) {
+        Vec3d hitVec = rayTraceResult.getHitVec(); // Absolute coords of hit target
 
-        Vector3d blockDelta = WandUtil.blockPosVec(rayTraceResult.getPos()).subtract(WandUtil.blockPosVec(pos)); // Vector between start and current block
+        Vec3d blockDelta = WandUtil.blockPosVec(rayTraceResult.getPos()).subtract(WandUtil.blockPosVec(pos)); // Vector between start and current block
 
         return blockDelta.add(hitVec); // Absolute coords of current block hit target
     }

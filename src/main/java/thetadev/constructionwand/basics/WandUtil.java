@@ -10,7 +10,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.Property;
+import net.minecraft.state.IProperty;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.state.properties.SlabType;
 import net.minecraft.stats.Stats;
@@ -20,8 +20,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -110,17 +110,15 @@ public class WandUtil
     }
 
     public static boolean placeBlock(World world, PlayerEntity player, BlockState block, BlockPos pos, @Nullable BlockItem item) {
-        if(!world.setBlockState(pos, block)) {
-            ConstructionWand.LOGGER.info("Block could not be placed");
-            return false;
-        }
-
-        // Remove block if placeEvent is canceled
-        BlockSnapshot snapshot = BlockSnapshot.create(world.func_234923_W_(), world, pos);
+        // Abort if placeEvent is canceled
+        BlockSnapshot snapshot = new BlockSnapshot(world, pos, block);
         BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, block, player);
         MinecraftForge.EVENT_BUS.post(placeEvent);
-        if(placeEvent.isCanceled()) {
-            world.removeBlock(pos, false);
+        if(placeEvent.isCanceled()) return false;
+
+        // Place the block
+        if(!world.setBlockState(pos, block)) {
+            ConstructionWand.LOGGER.info("Block could not be placed");
             return false;
         }
 
@@ -211,14 +209,14 @@ public class WandUtil
      * This check is independent from the used block.
      */
     public static boolean isPositionPlaceable(World world, PlayerEntity player, BlockPos pos, boolean replace) {
-        if(!isPositionModifiable(world,player, pos)) return false;
+        if(!isPositionModifiable(world, player, pos)) return false;
 
         // If replace mode is off, target has to be air
         return replace || world.isAirBlock(pos);
     }
 
     public static boolean isBlockRemovable(World world, PlayerEntity player, BlockPos pos) {
-        if(!isPositionModifiable(world,player, pos)) return false;
+        if(!isPositionModifiable(world, player, pos)) return false;
 
         if(!player.isCreative()) {
             return !(world.getBlockState(pos).getBlockHardness(world, pos) <= -1) && world.getTileEntity(pos) == null;
@@ -265,17 +263,16 @@ public class WandUtil
         // Copy block properties from supporting block
         if(options != null && supportingBlock != null && options.direction.get() == WandOptions.DIRECTION.TARGET) {
             // Block properties to be copied (alignment/rotation properties)
-
-            for(Property property : new Property[]{
+            for(IProperty property : new IProperty[]{
                     BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
                     BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE}) {
-                if(supportingBlock.hasProperty(property) && blockState.hasProperty(property)) {
+                if(supportingBlock.has(property) && blockState.has(property)) {
                     blockState = blockState.with(property, supportingBlock.get(property));
                 }
             }
 
             // Dont dupe double slabs
-            if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE) && blockState.hasProperty(BlockStateProperties.SLAB_TYPE)) {
+            if(supportingBlock.has(BlockStateProperties.SLAB_TYPE) && blockState.has(BlockStateProperties.SLAB_TYPE)) {
                 SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
                 if(slabType != SlabType.DOUBLE) blockState = blockState.with(BlockStateProperties.SLAB_TYPE, slabType);
             }

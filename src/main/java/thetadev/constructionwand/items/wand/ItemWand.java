@@ -9,6 +9,7 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -36,6 +37,9 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
 {
     public ItemWand(String name, Properties properties) {
         super(name, properties);
+        addPropertyOverride(new ResourceLocation(ConstructionWand.MODID, "using_core"),
+                (stack, world, entity) -> entity == null || !(stack.getItem() instanceof ItemWand) ? 0 :
+                        new WandOptions(stack).cores.get().getColor() > -1 ? 1 : 0);
     }
 
     @Nonnull
@@ -106,13 +110,13 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         if(Screen.hasShiftDown()) {
             for(int i = 1; i < options.allOptions.length; i++) {
                 IOption<?> opt = options.allOptions[i];
-                lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                        .append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.GRAY))
+                lines.add(new TranslationTextComponent(opt.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+                        .appendSibling(new TranslationTextComponent(opt.getValueTranslation()).applyTextStyle(TextFormatting.GRAY))
                 );
             }
             if(!options.cores.getUpgrades().isEmpty()) {
                 lines.add(new StringTextComponent(""));
-                lines.add(new TranslationTextComponent(langTooltip + "cores").mergeStyle(TextFormatting.GRAY));
+                lines.add(new TranslationTextComponent(langTooltip + "cores").applyTextStyle(TextFormatting.GRAY));
 
                 for(IWandCore core : options.cores.getUpgrades()) {
                     lines.add(new TranslationTextComponent(options.cores.getKeyTranslation() + "." + core.getRegistryName().toString()));
@@ -122,19 +126,19 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         // Default tooltip: show block limit + active wand core
         else {
             IOption<?> opt = options.allOptions[0];
-            lines.add(new TranslationTextComponent(langTooltip + "blocks", limit).mergeStyle(TextFormatting.GRAY));
-            lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                    .append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.WHITE)));
-            lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));
+            lines.add(new TranslationTextComponent(langTooltip + "blocks", limit).applyTextStyle(TextFormatting.GRAY));
+            lines.add(new TranslationTextComponent(opt.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+                    .appendSibling(new TranslationTextComponent(opt.getValueTranslation()).applyTextStyle(TextFormatting.WHITE)));
+            lines.add(new TranslationTextComponent(langTooltip + "shift").applyTextStyle(TextFormatting.AQUA));
         }
     }
 
     public static void optionMessage(PlayerEntity player, IOption<?> option) {
         player.sendStatusMessage(
-                new TranslationTextComponent(option.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                        .append(new TranslationTextComponent(option.getValueTranslation()).mergeStyle(TextFormatting.WHITE))
-                        .append(new StringTextComponent(" - ").mergeStyle(TextFormatting.GRAY))
-                        .append(new TranslationTextComponent(option.getDescTranslation()).mergeStyle(TextFormatting.WHITE))
+                new TranslationTextComponent(option.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+                        .appendSibling(new TranslationTextComponent(option.getValueTranslation()).applyTextStyle(TextFormatting.WHITE))
+                        .appendSibling(new StringTextComponent(" - ").applyTextStyle(TextFormatting.GRAY))
+                        .appendSibling(new TranslationTextComponent(option.getDescTranslation()).applyTextStyle(TextFormatting.WHITE))
                 , true);
     }
 

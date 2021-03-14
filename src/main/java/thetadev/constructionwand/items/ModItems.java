@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -72,17 +71,6 @@ public class ModItems
     public static void registerRecipeSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
         IForgeRegistry<IRecipeSerializer<?>> r = event.getRegistry();
         register(r, "wand_upgrade", RecipeWandUpgrade.SERIALIZER);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public static void registerModelProperties() {
-        for(Item item : WANDS) {
-            ItemModelsProperties.func_239418_a_(
-                    item, ConstructionWand.loc("using_core"),
-                    (stack, world, entity) -> entity == null || !(stack.getItem() instanceof ItemWand) ? 0 :
-                            new WandOptions(stack).cores.get().getColor() > -1 ? 1 : 0
-            );
-        }
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -82,7 +82,6 @@ public class ConstructionWand
         renderBlockPreview = new RenderBlockPreview();
         MinecraftForge.EVENT_BUS.register(renderBlockPreview);
         MinecraftForge.EVENT_BUS.register(new ClientEvents());
-        ModItems.registerModelProperties();
         ModItems.registerItemColors();
     }
 

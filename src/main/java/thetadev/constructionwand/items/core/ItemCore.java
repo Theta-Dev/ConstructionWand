@@ -24,8 +24,8 @@ public abstract class ItemCore extends ItemBase implements IWandCore
     @OnlyIn(Dist.CLIENT)
     public void addInformation(@Nonnull ItemStack itemstack, World worldIn, @Nonnull List<ITextComponent> lines, @Nonnull ITooltipFlag extraInfo) {
         lines.add(new TranslationTextComponent(ConstructionWand.MODID + ".option.cores." + getRegistryName().toString() + ".desc")
-                .mergeStyle(TextFormatting.GRAY));
+                .applyTextStyle(TextFormatting.GRAY));
         lines.add(new TranslationTextComponent(ConstructionWand.MODID + ".tooltip.core_tip")
-                .mergeStyle(TextFormatting.AQUA));
+                .applyTextStyle(TextFormatting.AQUA));
     }
 }
