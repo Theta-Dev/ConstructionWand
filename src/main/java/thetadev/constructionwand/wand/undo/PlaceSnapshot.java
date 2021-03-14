@@ -92,8 +92,8 @@ public class PlaceSnapshot implements ISnapshot
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     private static BlockState getPlaceBlockstate(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
-                                                BlockPos pos, BlockItem item,
-                                                @Nullable BlockState supportingBlock, boolean targetMode) {
+                                                 BlockPos pos, BlockItem item,
+                                                 @Nullable BlockState supportingBlock, boolean targetMode) {
         // Is block at pos replaceable?
         BlockItemUseContext ctx = new WandItemUseContext(world, player, rayTraceResult, pos, item);
         if(!ctx.canPlace()) return null;
@@ -119,13 +119,13 @@ public class PlaceSnapshot implements ISnapshot
             for(Property property : new Property[]{
                     BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
                     BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE}) {
-                if(supportingBlock.hasProperty(property) && blockState.hasProperty(property)) {
+                if(supportingBlock.has(property) && blockState.has(property)) {
                     blockState = blockState.with(property, supportingBlock.get(property));
                 }
             }
 
             // Dont dupe double slabs
-            if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE) && blockState.hasProperty(BlockStateProperties.SLAB_TYPE)) {
+            if(supportingBlock.has(BlockStateProperties.SLAB_TYPE) && blockState.has(BlockStateProperties.SLAB_TYPE)) {
                 SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
                 if(slabType != SlabType.DOUBLE) blockState = blockState.with(BlockStateProperties.SLAB_TYPE, slabType);
             }
