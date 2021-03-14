@@ -26,9 +26,9 @@ public class HandlerCapability implements IContainerHandler
 
         IItemHandler itemHandler = itemHandlerLazyOptional.orElse(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.getDefaultInstance());
 
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
+        for(int i = 0; i < itemHandler.getSlots(); i++) {
             ItemStack containerStack = itemHandler.getStackInSlot(i);
-            if (containerStack != null && itemStack.isItemEqual(containerStack)) {
+            if(containerStack != null && itemStack.isItemEqual(containerStack)) {
                 total += Math.max(0, containerStack.getCount());
             }
 
@@ -46,7 +46,7 @@ public class HandlerCapability implements IContainerHandler
 
         IItemHandler itemHandler = itemHandlerLazyOptional.orElse(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.getDefaultInstance());
 
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
+        for(int i = 0; i < itemHandler.getSlots(); i++) {
             ItemStack handlerStack = itemHandler.getStackInSlot(i);
             if(handlerStack != null && handlerStack.isItemEqual(itemStack)) {
                 ItemStack extracted = itemHandler.extractItem(i, count, false);

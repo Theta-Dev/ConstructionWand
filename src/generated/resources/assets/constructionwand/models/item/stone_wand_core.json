@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "constructionwand:item/stone_wand",
+    "layer1": "constructionwand:item/overlay_core"
+  }
+}

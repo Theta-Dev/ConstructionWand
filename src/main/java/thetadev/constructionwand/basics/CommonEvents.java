@@ -9,10 +9,10 @@ import thetadev.constructionwand.ConstructionWand;
 @Mod.EventBusSubscriber(modid = ConstructionWand.MODID)
 public class CommonEvents
 {
-	@SubscribeEvent
-	public static void logOut(PlayerEvent.PlayerLoggedOutEvent e) {
-		PlayerEntity player = e.getPlayer();
-		if(player.getEntityWorld().isRemote) return;
-		ConstructionWand.instance.undoHistory.removePlayer(player);
-	}
+    @SubscribeEvent
+    public static void logOut(PlayerEvent.PlayerLoggedOutEvent e) {
+        PlayerEntity player = e.getPlayer();
+        if(player.getEntityWorld().isRemote) return;
+        ConstructionWand.instance.undoHistory.removePlayer(player);
+    }
 }

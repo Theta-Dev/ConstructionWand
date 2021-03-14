@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "constructionwand:item/infinity_wand"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "constructionwand:using_core": 1.0
+      },
+      "model": "constructionwand:item/infinity_wand_core"
+    }
+  ]
+}
