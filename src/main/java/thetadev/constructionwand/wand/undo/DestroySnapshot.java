@@ -2,8 +2,13 @@ package thetadev.constructionwand.wand.undo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import thetadev.constructionwand.basics.WandUtil;
 
@@ -48,8 +53,18 @@ public class DestroySnapshot implements ISnapshot
 
     @Override
     public boolean canRestore(World world, PlayerEntity player) {
-        return WandUtil.isPositionPlaceable(world, player, pos, false, null) &&
-                !WandUtil.entitiesCollidingWithBlock(world, block, pos);
+        // Is position out of world?
+        if(!world.isBlockPresent(pos)) return false;
+
+        // Is block modifiable?
+        if(!world.isBlockModifiable(player, pos)) return false;
+
+        // Entities colliding
+        if(WandUtil.entitiesCollidingWithBlock(world, block, pos)) return false;
+
+        return world.isAirBlock(pos) || world.getBlockState(pos).isReplaceable(
+                new BlockItemUseContext(world, player, Hand.MAIN_HAND, new ItemStack(block.getBlock().asItem()),
+                        new BlockRayTraceResult(new Vector3d(0,-1,0), Direction.DOWN, pos, false)));
     }
 
     @Override

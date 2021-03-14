@@ -67,7 +67,7 @@ Restrictions work just like with the Construction core. Destroyed blocks disappe
 you can use the undo feature if you've made a mistake.
 
 ## Options
-SHIFT+Right clicking empty space opens the option screen of your wand.
+SNEAK+OPTKEY+Right clicking empty space opens the option screen of your wand.
 
 ![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.15/images/options.png)
 
