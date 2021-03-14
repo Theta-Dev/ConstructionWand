@@ -14,44 +14,49 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import thetadev.constructionwand.basics.WandUtil;
-import thetadev.constructionwand.job.WandJob;
+import thetadev.constructionwand.items.wand.ItemWand;
+import thetadev.constructionwand.wand.WandJob;
 
 import java.util.Set;
 
 public class RenderBlockPreview
 {
-	public WandJob wandJob;
-	public Set<BlockPos> undoBlocks;
+    public WandJob wandJob;
+    public Set<BlockPos> undoBlocks;
 
-	@SubscribeEvent
-	public void renderBlockHighlight(DrawBlockHighlightEvent event)
-	{
-		if(event.getTarget().getType() != RayTraceResult.Type.BLOCK) return;
+    @SubscribeEvent
+    public void renderBlockHighlight(DrawBlockHighlightEvent event) {
+        if(event.getTarget().getType() != RayTraceResult.Type.BLOCK) return;
 
-		BlockRayTraceResult rtr = (BlockRayTraceResult) event.getTarget();
-		Entity entity = event.getInfo().getRenderViewEntity();
-		if(!(entity instanceof PlayerEntity)) return;
-		PlayerEntity player = (PlayerEntity) entity;
-		Set<BlockPos> blocks;
-		float colorR=0, colorG=0, colorB=0;
+        BlockRayTraceResult rtr = (BlockRayTraceResult) event.getTarget();
+        Entity entity = event.getInfo().getRenderViewEntity();
+        if(!(entity instanceof PlayerEntity)) return;
+        PlayerEntity player = (PlayerEntity) entity;
+        Set<BlockPos> blocks = null;
+        float colorR = 0, colorG = 0, colorB = 0;
 
-		ItemStack wand = WandUtil.holdingWand(player);
-		if(wand == null) return;
+        ItemStack wand = WandUtil.holdingWand(player);
+        if(wand == null) return;
 
-		if(!(player.isSneaking() && Screen.hasControlDown())) {
-			if(wandJob == null || !(wandJob.getRayTraceResult().equals(rtr)) || !(wandJob.getWand().equals(wand))) {
-				wandJob = WandJob.getJob(player, player.getEntityWorld(), rtr, wand);
-			}
+        if(!(player.isSneaking() && ClientEvents.isOptKeyDown())) {
+            if(wandJob == null || !compareRTR(wandJob.rayTraceResult, rtr) || !(wandJob.wand.equals(wand))) {
+                wandJob = ItemWand.getWandJob(player, player.getEntityWorld(), rtr, wand);
+            }
+            blocks = wandJob.getBlockPositions();
+        }
+        else {
+            blocks = undoBlocks;
+            colorG = 1;
+        }
 
-			blocks = wandJob.getBlockPositions();
-		}
-		else {
-			blocks = undoBlocks;
-			colorG = 1;
-		}
+        if(blocks == null || blocks.isEmpty()) return;
 
-		if(blocks == null || blocks.isEmpty()) return;
+		renderBlockList(blocks, colorR, colorG, colorB);
 
+		event.setCanceled(true);
+	}
+
+	private void renderBlockList(Set<BlockPos> blocks, float red, float green, float blue) {
 		for(BlockPos block : blocks) {
 			double partialTicks = event.getPartialTicks();
 			double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
@@ -59,10 +64,8 @@ public class RenderBlockPreview
 			double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
 
 			AxisAlignedBB aabb = new AxisAlignedBB(block).offset(-d0, -d1, -d2);
-			drawBoundingBox(aabb, colorR, colorG, colorB, 0.4F);
+			drawBoundingBox(aabb, red, green, blue, 0.4F);
 		}
-
-		event.setCanceled(true);
 	}
 
 	private static void drawBoundingBox(AxisAlignedBB box, float red, float green, float blue, float alpha) {

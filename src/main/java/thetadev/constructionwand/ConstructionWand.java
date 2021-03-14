@@ -16,20 +16,23 @@ import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.basics.ReplacementRegistry;
+import thetadev.constructionwand.client.ClientEvents;
 import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
 import thetadev.constructionwand.items.ModItems;
-import thetadev.constructionwand.job.UndoHistory;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 import thetadev.constructionwand.network.PacketWandOption;
+import thetadev.constructionwand.wand.undo.UndoHistory;
 
 
 @Mod(ConstructionWand.MODID)
 public class ConstructionWand
 {
     public static final String MODID = "constructionwand";
+    public static final String MODNAME = "ConstructionWand";
+
     public static ConstructionWand instance;
     public static final Logger LOGGER = LogManager.getLogger();
     private static final String PROTOCOL_VERSION = "1";
@@ -55,12 +58,11 @@ public class ConstructionWand
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ConfigClient.SPEC);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
+    private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("ConstructionWand says hello - may the odds be ever in your favor.");
 
         // Register packets
-        HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, "main"), ()->PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
+        HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, "main"), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
         int packetIndex = 0;
         HANDLER.registerMessage(packetIndex++, PacketUndoBlocks.class, PacketUndoBlocks::encode, PacketUndoBlocks::decode, PacketUndoBlocks.Handler::handle);
         HANDLER.registerMessage(packetIndex++, PacketQueryUndo.class, PacketQueryUndo::encode, PacketQueryUndo::decode, PacketQueryUndo.Handler::handle);
@@ -76,10 +78,11 @@ public class ConstructionWand
         ModStats.register();
     }
 
-    private void clientSetup(final FMLClientSetupEvent event)
-    {
+    private void clientSetup(final FMLClientSetupEvent event) {
         renderBlockPreview = new RenderBlockPreview();
         MinecraftForge.EVENT_BUS.register(renderBlockPreview);
+        MinecraftForge.EVENT_BUS.register(new ClientEvents());
+        ModItems.registerItemColors();
     }
 
     public static ResourceLocation loc(String name) {
