@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.api.IWandSupplier;
@@ -57,9 +57,9 @@ public class ActionAngel implements IWandAction
 
         if(!player.isCreative() && !ConfigServer.ANGEL_FALLING.get() && player.fallDistance > 10) return placeSnapshots;
 
-        Vector3d playerVec = WandUtil.entityPositionVec(player);
-        Vector3d lookVec = player.getLookVec().mul(2, 2, 2);
-        Vector3d placeVec = playerVec.add(lookVec);
+        Vec3d playerVec = WandUtil.entityPositionVec(player);
+        Vec3d lookVec = player.getLookVec().mul(2, 2, 2);
+        Vec3d placeVec = playerVec.add(lookVec);
 
         BlockPos currentPos = new BlockPos(placeVec);
 

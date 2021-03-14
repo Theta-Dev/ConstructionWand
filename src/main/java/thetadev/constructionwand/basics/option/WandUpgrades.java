@@ -56,7 +56,8 @@ public class WandUpgrades<T extends IWandUpgrade>
 
         for(T item : upgrades) {
             if(item == dval) continue;
-            listnbt.add(StringNBT.valueOf(item.getRegistryName().toString()));
+            listnbt.add(new StringNBT(item.getRegistryName().toString()));
+
         }
         tag.put(key, listnbt);
     }

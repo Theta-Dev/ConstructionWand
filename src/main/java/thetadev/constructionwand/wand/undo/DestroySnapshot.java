@@ -2,7 +2,6 @@ package thetadev.constructionwand.wand.undo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -59,8 +58,8 @@ public class DestroySnapshot implements ISnapshot
         // Ignore blocks and entities when in creative
         if(player.isCreative()) return true;
 
-        // Is block empty or fluid?
-        if(!world.isAirBlock(pos) && !world.getBlockState(pos).isReplaceable(Fluids.EMPTY)) return false;
+        // Is block empty?
+        if(!world.isAirBlock(pos)) return false;
 
         return !WandUtil.entitiesCollidingWithBlock(world, block, pos);
     }

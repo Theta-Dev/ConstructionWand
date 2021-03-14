@@ -3,7 +3,6 @@ package thetadev.constructionwand.data;
 import net.minecraft.data.*;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
@@ -23,7 +22,7 @@ public class RecipeGenerator extends RecipeProvider
 
     @Override
     protected void registerRecipes(@Nonnull Consumer<IFinishedRecipe> consumer) {
-        wandRecipe(consumer, ModItems.WAND_STONE, Inp.fromTag(ItemTags.field_232909_aa_)); //stone_tool_materials
+        wandRecipe(consumer, ModItems.WAND_STONE, Inp.fromTag(Tags.Items.COBBLESTONE));
         wandRecipe(consumer, ModItems.WAND_IRON, Inp.fromTag(Tags.Items.INGOTS_IRON));
         wandRecipe(consumer, ModItems.WAND_DIAMOND, Inp.fromTag(Tags.Items.GEMS_DIAMOND));
         wandRecipe(consumer, ModItems.WAND_INFINITY, Inp.fromTag(Tags.Items.NETHER_STARS));
@@ -59,7 +58,7 @@ public class RecipeGenerator extends RecipeProvider
 
     private void specialRecipe(Consumer<IFinishedRecipe> consumer, SpecialRecipeSerializer<?> serializer) {
         ResourceLocation name = Registry.RECIPE_SERIALIZER.getKey(serializer);
-        CustomRecipeBuilder.customRecipe(serializer).build(consumer, ConstructionWand.loc("dynamic/" + name.getPath()).toString());
+        CustomRecipeBuilder.func_218656_a(serializer).build(consumer, ConstructionWand.loc("dynamic/" + name.getPath()).toString());
     }
 
     @Nonnull

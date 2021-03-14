@@ -86,7 +86,7 @@ public class ClientEvents
     }
 
     private static boolean isKeyDown(int id) {
-        return InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), id);
+        return InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), id);
     }
 
     public static boolean isOptKeyDown() {

@@ -13,7 +13,6 @@ import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.network.PacketWandOption;
 
 import java.util.HashMap;
-import javax.annotation.Nonnull;
 
 public class ScreenWand extends Screen
 {

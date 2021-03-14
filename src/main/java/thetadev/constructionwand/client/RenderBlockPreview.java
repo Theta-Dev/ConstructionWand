@@ -1,6 +1,5 @@
 package thetadev.constructionwand.client;
 
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -51,50 +50,50 @@ public class RenderBlockPreview
 
         if(blocks == null || blocks.isEmpty()) return;
 
-		renderBlockList(blocks, colorR, colorG, colorB);
+        for(BlockPos block : blocks) {
+            double partialTicks = event.getPartialTicks();
+            double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+            double d1 = player.lastTickPosY + player.getEyeHeight() + (player.posY - player.lastTickPosY) * partialTicks;
+            double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
 
-		event.setCanceled(true);
-	}
+            AxisAlignedBB aabb = new AxisAlignedBB(block).offset(-d0, -d1, -d2);
+            drawBoundingBox(aabb, colorR, colorG, colorB, 0.4F);
+        }
 
-	private void renderBlockList(Set<BlockPos> blocks, float red, float green, float blue) {
-		for(BlockPos block : blocks) {
-			double partialTicks = event.getPartialTicks();
-			double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
-			double d1 = player.lastTickPosY + player.getEyeHeight() + (player.posY - player.lastTickPosY) * partialTicks;
-			double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+        event.setCanceled(true);
+    }
 
-			AxisAlignedBB aabb = new AxisAlignedBB(block).offset(-d0, -d1, -d2);
-			drawBoundingBox(aabb, red, green, blue, 0.4F);
-		}
-	}
+    private static boolean compareRTR(BlockRayTraceResult rtr1, BlockRayTraceResult rtr2) {
+        return rtr1.getPos().equals(rtr2.getPos()) && rtr1.getFace().equals(rtr2.getFace());
+    }
 
-	private static void drawBoundingBox(AxisAlignedBB box, float red, float green, float blue, float alpha) {
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
-		buffer.begin(3, DefaultVertexFormats.POSITION_COLOR);
+    private static void drawBoundingBox(AxisAlignedBB box, float red, float green, float blue, float alpha) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(3, DefaultVertexFormats.POSITION_COLOR);
 
-		//Base
-		buffer.pos(box.minX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.maxX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.maxX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.minX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.minX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
-		//Side1
-		buffer.pos(box.minX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.minX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.minX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
-		//Side2
-		buffer.pos(box.minX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.maxX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.maxX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
-		//Side3
-		buffer.pos(box.maxX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.maxX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.maxX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
-		//Side4
-		buffer.pos(box.maxX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
-		buffer.pos(box.minX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
+        //Base
+        buffer.pos(box.minX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.maxX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.maxX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.minX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.minX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
+        //Side1
+        buffer.pos(box.minX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.minX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.minX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
+        //Side2
+        buffer.pos(box.minX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.maxX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.maxX, box.minY, box.maxZ).color(red, green, blue, alpha).endVertex();
+        //Side3
+        buffer.pos(box.maxX, box.maxY, box.maxZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.maxX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.maxX, box.minY, box.minZ).color(red, green, blue, alpha).endVertex();
+        //Side4
+        buffer.pos(box.maxX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
+        buffer.pos(box.minX, box.maxY, box.minZ).color(red, green, blue, alpha).endVertex();
 
-		tessellator.draw();
-	}
+        tessellator.draw();
+    }
 }

@@ -1,6 +1,5 @@
 package thetadev.constructionwand.basics;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -8,12 +7,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.Property;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.SlabType;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EntityPredicates;
@@ -22,9 +17,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -33,7 +26,6 @@ import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.wand.ItemWand;
-import thetadev.constructionwand.wand.WandItemUseContext;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -65,7 +57,7 @@ public class WandUtil
     }
 
     public static Vec3d entityPositionVec(Entity entity) {
-        return new Vec3d(entity.getPosX(), entity.getPosY() - entity.getYOffset() + entity.getHeight() / 2, entity.getPosZ());
+        return new Vec3d(entity.posX, entity.posY - entity.getYOffset() + entity.getHeight() / 2, entity.posZ);
     }
 
     public static Vec3d blockPosVec(BlockPos pos) {
@@ -113,13 +105,13 @@ public class WandUtil
 
     public static boolean placeBlock(World world, PlayerEntity player, BlockState block, BlockPos pos, @Nullable BlockItem item) {
         // Abort if placeEvent is canceled
-        BlockSnapshot snapshot = new BlockSnapshot(world, blockPos, placeBlock);
-        BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placeBlock, player);
+        BlockSnapshot snapshot = new BlockSnapshot(world, pos, block);
+        BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, block, player);
         MinecraftForge.EVENT_BUS.post(placeEvent);
         if(placeEvent.isCanceled()) return false;
 
         // Place the block
-        if(!world.setBlockState(blockPos, placeBlock)) {
+        if(!world.setBlockState(pos, block)) {
             ConstructionWand.LOGGER.info("Block could not be placed");
             return false;
         }
@@ -211,14 +203,14 @@ public class WandUtil
      * This check is independent from the used block.
      */
     public static boolean isPositionPlaceable(World world, PlayerEntity player, BlockPos pos, boolean replace) {
-        if(!isPositionModifiable(world,player, pos)) return false;
+        if(!isPositionModifiable(world, player, pos)) return false;
 
         // If replace mode is off, target has to be air
         return replace || world.isAirBlock(pos);
     }
 
     public static boolean isBlockRemovable(World world, PlayerEntity player, BlockPos pos) {
-        if(!isPositionModifiable(world,player, pos)) return false;
+        if(!isPositionModifiable(world, player, pos)) return false;
 
         if(!player.isCreative()) {
             return !(world.getBlockState(pos).getBlockHardness(world, pos) <= -1) && world.getTileEntity(pos) == null;
@@ -235,7 +227,7 @@ public class WandUtil
         return false;
     }
 
-    public static Direction fromVector(Vector3d vector) {
+    public static Direction fromVector(Vec3d vector) {
         return Direction.getFacingFromVector(vector.x, vector.y, vector.z);
     }
 }

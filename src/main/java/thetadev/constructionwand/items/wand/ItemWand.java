@@ -9,6 +9,7 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -17,14 +18,11 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.generators.ModelFile;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IWandCore;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
-import thetadev.constructionwand.data.ICustomItemModel;
-import thetadev.constructionwand.data.ItemModelGenerator;
 import thetadev.constructionwand.items.ItemBase;
 import thetadev.constructionwand.wand.WandJob;
 
@@ -32,10 +30,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public abstract class ItemWand extends ItemBase implements ICustomItemModel
+public abstract class ItemWand extends ItemBase
 {
     public ItemWand(String name, Properties properties) {
         super(name, properties);
+        addPropertyOverride(new ResourceLocation(ConstructionWand.MODID, "using_core"),
+                (stack, world, entity) -> entity == null || !(stack.getItem() instanceof ItemWand) ? 0 :
+                        new WandOptions(stack).cores.get().getColor() > -1 ? 1 : 0);
     }
 
     @Nonnull
@@ -64,14 +65,14 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         ItemStack stack = player.getHeldItem(hand);
 
         if(!player.isSneaking()) {
-            if(world.isRemote) return ActionResult.resultFail(stack);
+            if(world.isRemote) return new ActionResult<>(ActionResultType.FAIL, stack);
 
             // Right click: Place angel block
             WandJob job = getWandJob(player, world, BlockRayTraceResult.createMiss(player.getLookVec(),
                     WandUtil.fromVector(player.getLookVec()), WandUtil.playerPos(player)), stack);
-            return job.doIt() ? ActionResult.resultSuccess(stack) : ActionResult.resultFail(stack);
+            return new ActionResult<>(job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL, stack);
         }
-        return ActionResult.resultFail(stack);
+        return new ActionResult<>(ActionResultType.FAIL, stack);
     }
 
     public static WandJob getWandJob(PlayerEntity player, World world, @Nullable BlockRayTraceResult rayTraceResult, ItemStack wand) {
@@ -106,13 +107,13 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         if(Screen.hasShiftDown()) {
             for(int i = 1; i < options.allOptions.length; i++) {
                 IOption<?> opt = options.allOptions[i];
-                lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                        .append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.GRAY))
+                lines.add(new TranslationTextComponent(opt.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+                        .appendSibling(new TranslationTextComponent(opt.getValueTranslation()).applyTextStyle(TextFormatting.GRAY))
                 );
             }
             if(!options.cores.getUpgrades().isEmpty()) {
                 lines.add(new StringTextComponent(""));
-                lines.add(new TranslationTextComponent(langTooltip + "cores").mergeStyle(TextFormatting.GRAY));
+                lines.add(new TranslationTextComponent(langTooltip + "cores").applyTextStyle(TextFormatting.GRAY));
 
                 for(IWandCore core : options.cores.getUpgrades()) {
                     lines.add(new TranslationTextComponent(options.cores.getKeyTranslation() + "." + core.getRegistryName().toString()));
@@ -122,33 +123,19 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         // Default tooltip: show block limit + active wand core
         else {
             IOption<?> opt = options.allOptions[0];
-            lines.add(new TranslationTextComponent(langTooltip + "blocks", limit).mergeStyle(TextFormatting.GRAY));
-            lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                    .append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.WHITE)));
-            lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));
+            lines.add(new TranslationTextComponent(langTooltip + "blocks", limit).applyTextStyle(TextFormatting.GRAY));
+            lines.add(new TranslationTextComponent(opt.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+                    .appendSibling(new TranslationTextComponent(opt.getValueTranslation()).applyTextStyle(TextFormatting.WHITE)));
+            lines.add(new TranslationTextComponent(langTooltip + "shift").applyTextStyle(TextFormatting.AQUA));
         }
     }
 
     public static void optionMessage(PlayerEntity player, IOption<?> option) {
         player.sendStatusMessage(
-                new TranslationTextComponent(option.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                        .append(new TranslationTextComponent(option.getValueTranslation()).mergeStyle(TextFormatting.WHITE))
-                        .append(new StringTextComponent(" - ").mergeStyle(TextFormatting.GRAY))
-                        .append(new TranslationTextComponent(option.getDescTranslation()).mergeStyle(TextFormatting.WHITE))
+                new TranslationTextComponent(option.getKeyTranslation()).applyTextStyle(TextFormatting.AQUA)
+                        .appendSibling(new TranslationTextComponent(option.getValueTranslation()).applyTextStyle(TextFormatting.WHITE))
+                        .appendSibling(new StringTextComponent(" - ").applyTextStyle(TextFormatting.GRAY))
+                        .appendSibling(new TranslationTextComponent(option.getDescTranslation()).applyTextStyle(TextFormatting.WHITE))
                 , true);
-    }
-
-    @Override
-    public void generateCustomItemModel(ItemModelGenerator generator, String name) {
-        ModelFile wandWithCore = generator.withExistingParent(name + "_core", "item/handheld")
-                .texture("layer0", generator.modLoc("item/" + name))
-                .texture("layer1", generator.modLoc("item/overlay_core"));
-
-        generator.withExistingParent(name, "item/handheld")
-                .texture("layer0", generator.modLoc("item/" + name))
-                .override()
-                .predicate(generator.modLoc("using_core"), 1)
-                .model(wandWithCore).end();
-
     }
 }
