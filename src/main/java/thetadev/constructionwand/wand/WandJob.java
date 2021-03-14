@@ -114,7 +114,7 @@ public class WandJob
         }
 
         // Add to job history for undo
-        if(placeSnapshots.size() > 1) ConstructionWand.instance.undoHistory.add(player, world, placeSnapshots);
+        ConstructionWand.instance.undoHistory.add(player, world, placeSnapshots);
 
         return !placeSnapshots.isEmpty();
     }
