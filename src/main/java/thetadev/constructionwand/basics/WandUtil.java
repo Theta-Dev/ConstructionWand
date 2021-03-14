@@ -235,54 +235,6 @@ public class WandUtil
         return false;
     }
 
-    /**
-     * Tests if a certain block can be placed by the wand.
-     * If it can, returns the blockstate to be placed.
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Nullable
-    public static BlockState getPlaceBlockstate(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
-                                                BlockPos pos, BlockItem item,
-                                                @Nullable BlockState supportingBlock, @Nullable WandOptions options) {
-        // Is block at pos replaceable?
-        BlockItemUseContext ctx = new WandItemUseContext(world, player, rayTraceResult, pos, item);
-        if(!ctx.canPlace()) return null;
-
-        // Can block be placed?
-        BlockState blockState = item.getBlock().getStateForPlacement(ctx);
-        if(blockState == null) return null;
-
-        // Forbidden Tile Entity?
-        if(!isTEAllowed(blockState)) return null;
-
-        // No entities colliding?
-        if(entitiesCollidingWithBlock(world, blockState, pos)) return null;
-
-        // Adjust blockstate to neighbors
-        blockState = Block.getValidBlockForPosition(blockState, world, pos);
-        if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) return null;
-
-        // Copy block properties from supporting block
-        if(options != null && supportingBlock != null && options.direction.get() == WandOptions.DIRECTION.TARGET) {
-            // Block properties to be copied (alignment/rotation properties)
-
-            for(Property property : new Property[]{
-                    BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
-                    BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE}) {
-                if(supportingBlock.hasProperty(property) && blockState.hasProperty(property)) {
-                    blockState = blockState.with(property, supportingBlock.get(property));
-                }
-            }
-
-            // Dont dupe double slabs
-            if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE) && blockState.hasProperty(BlockStateProperties.SLAB_TYPE)) {
-                SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
-                if(slabType != SlabType.DOUBLE) blockState = blockState.with(BlockStateProperties.SLAB_TYPE, slabType);
-            }
-        }
-        return blockState;
-    }
-
     public static Direction fromVector(Vector3d vector) {
         return Direction.getFacingFromVector(vector.x, vector.y, vector.z);
     }
