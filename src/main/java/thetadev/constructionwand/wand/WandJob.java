@@ -17,6 +17,7 @@ import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ModStats;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
+import thetadev.constructionwand.items.ModItems;
 import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.wand.supplier.SupplierInventory;
 import thetadev.constructionwand.wand.supplier.SupplierRandom;
@@ -71,7 +72,8 @@ public class WandJob
 
     public void getSnapshots() {
         int limit;
-        if(player.isCreative()) limit = ConfigServer.LIMIT_CREATIVE.get();
+        // Infinity wand gets enhanced limit in creative mode
+        if(player.isCreative() && wandItem == ModItems.WAND_INFINITY) limit = ConfigServer.LIMIT_CREATIVE.get();
         else limit = Math.min(wandItem.remainingDurability(wand), wandAction.getLimit(wand));
 
         if(rayTraceResult.getType() == RayTraceResult.Type.BLOCK)

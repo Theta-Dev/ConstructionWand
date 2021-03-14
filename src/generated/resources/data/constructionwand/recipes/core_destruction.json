@@ -7,10 +7,10 @@
   ],
   "key": {
     "O": {
-      "item": "minecraft:diamond_pickaxe"
+      "tag": "forge:storage_blocks/diamond"
     },
     "X": {
-      "tag": "forge:gems/diamond"
+      "item": "minecraft:diamond_pickaxe"
     },
     "#": {
       "tag": "forge:glass_panes"

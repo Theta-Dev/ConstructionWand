@@ -29,7 +29,7 @@ public class RecipeGenerator extends RecipeProvider
         wandRecipe(consumer, ModItems.WAND_INFINITY, Inp.fromTag(Tags.Items.NETHER_STARS));
 
         coreRecipe(consumer, ModItems.CORE_ANGEL, Inp.fromTag(Tags.Items.FEATHERS), Inp.fromTag(Tags.Items.INGOTS_GOLD));
-        coreRecipe(consumer, ModItems.CORE_DESTRUCTION, Inp.fromItem(Items.DIAMOND_PICKAXE), Inp.fromTag(Tags.Items.GEMS_DIAMOND));
+        coreRecipe(consumer, ModItems.CORE_DESTRUCTION, Inp.fromTag(Tags.Items.STORAGE_BLOCKS_DIAMOND), Inp.fromItem(Items.DIAMOND_PICKAXE));
 
         specialRecipe(consumer, RecipeWandUpgrade.SERIALIZER);
     }
