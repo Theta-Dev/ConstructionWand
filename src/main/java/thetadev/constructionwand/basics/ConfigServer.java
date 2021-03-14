@@ -113,7 +113,7 @@ public class ConfigServer
         BUILDER.comment("Block limit for Infinity Wand used in creative mode");
         LIMIT_CREATIVE = BUILDER.defineInRange("InfinityWandCreative", 2048, 1, Integer.MAX_VALUE);
         BUILDER.comment("Maximum placement range (0: unlimited). Affects all wands and is meant for lag prevention, not game balancing.");
-        MAX_RANGE = BUILDER.defineInRange("MaxRange", 256, 0, Integer.MAX_VALUE);
+        MAX_RANGE = BUILDER.defineInRange("MaxRange", 100, 0, Integer.MAX_VALUE);
         BUILDER.comment("Number of operations that can be undone");
         UNDO_HISTORY = BUILDER.defineInRange("UndoHistory", 3, 0, Integer.MAX_VALUE);
         BUILDER.comment("Place blocks below you while falling > 10 blocks with angel mode (Can be used to save you from drops/the void)");

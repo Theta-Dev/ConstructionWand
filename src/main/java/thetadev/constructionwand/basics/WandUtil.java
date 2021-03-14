@@ -192,35 +192,36 @@ public class WandUtil
         return false;
     }
 
-    /**
-     * Tests if a wand can place a block at a certain position.
-     * This check is independent from the used block.
-     */
-    public static boolean isPositionPlaceable(World world, PlayerEntity player, BlockPos pos,
-                                              boolean replace, @Nullable BlockRayTraceResult rayTraceResult) {
+    private static boolean isPositionModifiable(World world, PlayerEntity player, BlockPos pos) {
         // Is position out of world?
         if(!world.isBlockPresent(pos)) return false;
 
         // Is block modifiable?
         if(!world.isBlockModifiable(player, pos)) return false;
 
-        // If replace mode is off, target has to be air
-        if(!replace && !world.isAirBlock(pos)) return false;
-
-        // Limit placement range
-        if(rayTraceResult != null && ConfigServer.MAX_RANGE.get() > 0 &&
-                WandUtil.blockDistance(rayTraceResult.getPos(), pos) > ConfigServer.MAX_RANGE.get()) return false;
+        // Limit range
+        if(ConfigServer.MAX_RANGE.get() > 0 &&
+                WandUtil.blockDistance(player.getPosition(), pos) > ConfigServer.MAX_RANGE.get()) return false;
 
         return true;
     }
 
-    public static boolean isBlockRemovable(World world, PlayerEntity player, BlockPos pos) {
-        BlockState currentBlock = world.getBlockState(pos);
+    /**
+     * Tests if a wand can place a block at a certain position.
+     * This check is independent from the used block.
+     */
+    public static boolean isPositionPlaceable(World world, PlayerEntity player, BlockPos pos, boolean replace) {
+        if(!isPositionModifiable(world,player, pos)) return false;
 
-        if(!world.isBlockModifiable(player, pos)) return false;
+        // If replace mode is off, target has to be air
+        return replace || world.isAirBlock(pos);
+    }
+
+    public static boolean isBlockRemovable(World world, PlayerEntity player, BlockPos pos) {
+        if(!isPositionModifiable(world,player, pos)) return false;
 
         if(!player.isCreative()) {
-            if(currentBlock.getBlockHardness(world, pos) <= -1 || world.getTileEntity(pos) != null) return false;
+            return !(world.getBlockState(pos).getBlockHardness(world, pos) <= -1) && world.getTileEntity(pos) == null;
         }
         return true;
     }
@@ -229,8 +230,7 @@ public class WandUtil
         VoxelShape shape = blockState.getCollisionShape(world, pos);
         if(!shape.isEmpty()) {
             AxisAlignedBB blockBB = shape.getBoundingBox().offset(pos);
-            if(!world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty())
-                return true;
+            return !world.getEntitiesWithinAABB(LivingEntity.class, blockBB, EntityPredicates.NOT_SPECTATING).isEmpty();
         }
         return false;
     }
