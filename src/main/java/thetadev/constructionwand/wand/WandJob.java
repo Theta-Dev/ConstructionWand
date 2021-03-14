@@ -111,10 +111,10 @@ public class WandJob
         if(!placeSnapshots.isEmpty()) {
             SoundType sound = placeSnapshots.get(0).getBlockState().getSoundType();
             world.playSound(null, WandUtil.playerPos(player), sound.getPlaceSound(), SoundCategory.BLOCKS, sound.volume, sound.pitch);
-        }
 
-        // Add to job history for undo
-        ConstructionWand.instance.undoHistory.add(player, world, placeSnapshots);
+            // Add to job history for undo
+            ConstructionWand.instance.undoHistory.add(player, world, placeSnapshots);
+        }
 
         return !placeSnapshots.isEmpty();
     }
