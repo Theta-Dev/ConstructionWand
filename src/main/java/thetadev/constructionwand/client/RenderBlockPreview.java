@@ -2,7 +2,6 @@ package thetadev.constructionwand.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.Entity;
@@ -33,7 +32,7 @@ public class RenderBlockPreview
         Entity entity = event.getInfo().getRenderViewEntity();
         if(!(entity instanceof PlayerEntity)) return;
         PlayerEntity player = (PlayerEntity) entity;
-        Set<BlockPos> blocks = null;
+        Set<BlockPos> blocks;
         float colorR = 0, colorG = 0, colorB = 0;
 
         ItemStack wand = WandUtil.holdingWand(player);
@@ -52,28 +51,27 @@ public class RenderBlockPreview
 
         if(blocks == null || blocks.isEmpty()) return;
 
-        renderBlockList(blocks, event.getMatrix(), event.getBuffers(), colorR, colorG, colorB);
+        MatrixStack ms = event.getMatrix();
+        IRenderTypeBuffer buffer = event.getBuffers();
+        IVertexBuilder lineBuilder = buffer.getBuffer(RenderTypes.TRANSLUCENT_LINES);
+
+        double partialTicks = event.getPartialTicks();
+        double d0 = player.lastTickPosX + (player.getPosX() - player.lastTickPosX) * partialTicks;
+        double d1 = player.lastTickPosY + player.getEyeHeight() + (player.getPosY() - player.lastTickPosY) * partialTicks;
+        double d2 = player.lastTickPosZ + (player.getPosZ() - player.lastTickPosZ) * partialTicks;
+
+        ms.push();
+
+        for(BlockPos block : blocks) {
+            AxisAlignedBB aabb = new AxisAlignedBB(block).offset(-d0, -d1, -d2);
+            WorldRenderer.drawBoundingBox(ms, lineBuilder, aabb, colorR, colorG, colorB, 0.4F);
+        }
+        ms.pop();
 
         event.setCanceled(true);
     }
 
     private static boolean compareRTR(BlockRayTraceResult rtr1, BlockRayTraceResult rtr2) {
         return rtr1.getPos().equals(rtr2.getPos()) && rtr1.getFace().equals(rtr2.getFace());
-    }
-
-    private void renderBlockList(Set<BlockPos> blocks, MatrixStack ms, IRenderTypeBuffer buffer, float red, float green, float blue) {
-        double renderPosX = Minecraft.getInstance().getRenderManager().info.getProjectedView().getX();
-        double renderPosY = Minecraft.getInstance().getRenderManager().info.getProjectedView().getY();
-        double renderPosZ = Minecraft.getInstance().getRenderManager().info.getProjectedView().getZ();
-
-        ms.push();
-        ms.translate(-renderPosX, -renderPosY, -renderPosZ);
-
-        for(BlockPos block : blocks) {
-            AxisAlignedBB aabb = new AxisAlignedBB(block);
-            IVertexBuilder lineBuilder = buffer.getBuffer(RenderTypes.TRANSLUCENT_LINES);
-            WorldRenderer.drawBoundingBox(ms, lineBuilder, aabb, red, green, blue, 0.4F);
-        }
-        ms.pop();
     }
 }
