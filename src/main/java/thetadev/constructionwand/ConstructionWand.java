@@ -2,6 +2,7 @@ package thetadev.constructionwand;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -83,8 +84,10 @@ public class ConstructionWand
         MinecraftForge.EVENT_BUS.register(renderBlockPreview);
         MinecraftForge.EVENT_BUS.register(new ClientEvents());
 
-        event.enqueueWork(ModItems::registerModelProperties);
-        event.enqueueWork(ModItems::registerItemColors);
+        DeferredWorkQueue.runLater(() -> {
+            ModItems.registerModelProperties();
+            ModItems.registerItemColors();
+        });
     }
 
     public static ResourceLocation loc(String name) {
