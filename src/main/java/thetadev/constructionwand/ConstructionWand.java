@@ -66,7 +66,7 @@ public class ConstructionWand
         int packetIndex = 0;
         HANDLER.registerMessage(packetIndex++, PacketUndoBlocks.class, PacketUndoBlocks::encode, PacketUndoBlocks::decode, PacketUndoBlocks.Handler::handle);
         HANDLER.registerMessage(packetIndex++, PacketQueryUndo.class, PacketQueryUndo::encode, PacketQueryUndo::decode, PacketQueryUndo.Handler::handle);
-        HANDLER.registerMessage(packetIndex++, PacketWandOption.class, PacketWandOption::encode, PacketWandOption::decode, PacketWandOption.Handler::handle);
+        HANDLER.registerMessage(packetIndex, PacketWandOption.class, PacketWandOption::encode, PacketWandOption::decode, PacketWandOption.Handler::handle);
 
         // Container registry
         ContainerRegistrar.register();
@@ -82,8 +82,9 @@ public class ConstructionWand
         renderBlockPreview = new RenderBlockPreview();
         MinecraftForge.EVENT_BUS.register(renderBlockPreview);
         MinecraftForge.EVENT_BUS.register(new ClientEvents());
-        ModItems.registerModelProperties();
-        ModItems.registerItemColors();
+
+        event.enqueueWork(ModItems::registerModelProperties);
+        event.enqueueWork(ModItems::registerItemColors);
     }
 
     public static ResourceLocation loc(String name) {
