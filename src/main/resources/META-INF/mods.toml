@@ -1,6 +1,6 @@
-modLoader="javafml"
-loaderVersion="[33,)"
-license="MIT License"
+modLoader = "javafml"
+loaderVersion = "[37,)"
+license = "MIT License"
 [[mods]]
 modId="constructionwand"
 version="${file.jarVersion}"
@@ -19,13 +19,13 @@ This is my first minecraft mod. May the odds be ever in your favor.
 '''
 [[dependencies.constructionwand]]
     modId="forge"
-    mandatory=true
-    versionRange="[33,)"
-    ordering="NONE"
+mandatory = true
+versionRange = "[37,)"
+ordering = "NONE"
     side="BOTH"
 [[dependencies.constructionwand]]
     modId="minecraft"
-    mandatory = true
-versionRange = "[1.16.2, 1.17)"
+mandatory = true
+versionRange = "[1.17.1, 1.18)"
 ordering = "NONE"
     side="BOTH"

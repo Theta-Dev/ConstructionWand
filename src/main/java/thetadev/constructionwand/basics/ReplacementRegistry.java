@@ -1,8 +1,10 @@
 package thetadev.constructionwand.basics;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.ForgeRegistries;
 import thetadev.constructionwand.ConstructionWand;
 
@@ -20,7 +22,7 @@ public class ReplacementRegistry
 
             for(String id : ((String) key).split(";")) {
                 Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
-                if(item == null) {
+                if(item == null || item == Items.AIR) {
                     ConstructionWand.LOGGER.warn("Replacement Registry: Could not find item " + id);
                     continue;
                 }
@@ -42,6 +44,7 @@ public class ReplacementRegistry
 
     public static boolean matchBlocks(Block b1, Block b2) {
         if(b1 == b2) return true;
+        if(b1 == Blocks.AIR || b2 == Blocks.AIR) return false;
 
         for(HashSet<Item> set : replacements) {
             if(set.contains(b1.asItem()) && set.contains(b2.asItem())) return true;

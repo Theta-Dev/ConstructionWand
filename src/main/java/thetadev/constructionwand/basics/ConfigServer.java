@@ -1,7 +1,7 @@
 package thetadev.constructionwand.basics;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemTier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.ForgeConfigSpec;
 import thetadev.constructionwand.items.ModItems;
 
@@ -20,7 +20,7 @@ public class ConfigServer
 
     public static final ForgeConfigSpec.ConfigValue<List<?>> SIMILAR_BLOCKS;
     private static final String[] SIMILAR_BLOCKS_DEFAULT = {
-            "minecraft:dirt;minecraft:grass_block;minecraft:coarse_dirt;minecraft:podzol;minecraft:mycelium;minecraft:farmland;minecraft:grass_path"
+            "minecraft:dirt;minecraft:grass_block;minecraft:coarse_dirt;minecraft:podzol;minecraft:mycelium;minecraft:farmland;minecraft:dirt_path;minecraft:rooted_dirt"
     };
 
     public static final ForgeConfigSpec.BooleanValue TE_WHITELIST;
@@ -104,9 +104,9 @@ public class ConfigServer
                 "in the /saves/myworld/serverconfig folder. If you want to change the serverconfig for all",
                 "new worlds, copy the config files in the /defaultconfigs folder.");
 
-        new WandProperties(BUILDER, ModItems.WAND_STONE, ItemTier.STONE.getMaxUses(), 9, 0, 0, false);
-        new WandProperties(BUILDER, ModItems.WAND_IRON, ItemTier.IRON.getMaxUses(), 27, 2, 9, true);
-        new WandProperties(BUILDER, ModItems.WAND_DIAMOND, ItemTier.DIAMOND.getMaxUses(), 128, 8, 25, true);
+        new WandProperties(BUILDER, ModItems.WAND_STONE, Tiers.STONE.getUses(), 9, 0, 0, false);
+        new WandProperties(BUILDER, ModItems.WAND_IRON, Tiers.IRON.getUses(), 27, 2, 9, true);
+        new WandProperties(BUILDER, ModItems.WAND_DIAMOND, Tiers.DIAMOND.getUses(), 128, 8, 25, true);
         new WandProperties(BUILDER, ModItems.WAND_INFINITY, 0, 1024, 16, 81, true);
 
         BUILDER.push("misc");

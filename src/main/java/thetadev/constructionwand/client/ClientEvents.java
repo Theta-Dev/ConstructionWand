@@ -1,9 +1,9 @@
 package thetadev.constructionwand.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -27,7 +27,7 @@ public class ClientEvents
     // Send state of OPT key to server
     @SubscribeEvent
     public void KeyEvent(InputEvent.KeyInputEvent event) {
-        PlayerEntity player = Minecraft.getInstance().player;
+        Player player = Minecraft.getInstance().player;
         if(player == null) return;
         if(WandUtil.holdingWand(player) == null) return;
 
@@ -43,7 +43,7 @@ public class ClientEvents
     // Sneak+(OPT)+Scroll to change direction lock
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void MouseScrollEvent(InputEvent.MouseScrollEvent event) {
-        PlayerEntity player = Minecraft.getInstance().player;
+        Player player = Minecraft.getInstance().player;
         double scroll = event.getScrollDelta();
 
         if(player == null || !modeKeyCombDown(player) || scroll == 0) return;
@@ -60,7 +60,7 @@ public class ClientEvents
     // Sneak+(OPT)+Left click wand to change core
     @SubscribeEvent
     public void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
 
         if(player == null || !modeKeyCombDown(player)) return;
 
@@ -75,29 +75,29 @@ public class ClientEvents
     // Sneak+(OPT)+Right click wand to open GUI
     @SubscribeEvent
     public void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         if(player == null || !guiKeyCombDown(player)) return;
 
         ItemStack wand = event.getItemStack();
         if(!(wand.getItem() instanceof ItemWand)) return;
 
-        Minecraft.getInstance().displayGuiScreen(new ScreenWand(wand));
+        Minecraft.getInstance().setScreen(new ScreenWand(wand));
         event.setCanceled(true);
     }
 
     private static boolean isKeyDown(int id) {
-        return InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), id);
+        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), id);
     }
 
     public static boolean isOptKeyDown() {
         return isKeyDown(ConfigClient.OPT_KEY.get());
     }
 
-    public static boolean modeKeyCombDown(PlayerEntity player) {
-        return player.isSneaking() && (isOptKeyDown() || !ConfigClient.SHIFTOPT_MODE.get());
+    public static boolean modeKeyCombDown(Player player) {
+        return player.isCrouching() && (isOptKeyDown() || !ConfigClient.SHIFTOPT_MODE.get());
     }
 
-    public static boolean guiKeyCombDown(PlayerEntity player) {
-        return player.isSneaking() && (isOptKeyDown() || !ConfigClient.SHIFTOPT_GUI.get());
+    public static boolean guiKeyCombDown(Player player) {
+        return player.isCrouching() && (isOptKeyDown() || !ConfigClient.SHIFTOPT_GUI.get());
     }
 }

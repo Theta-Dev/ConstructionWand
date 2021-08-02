@@ -1,13 +1,17 @@
 package thetadev.constructionwand.data;
 
-import net.minecraft.data.*;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.SpecialRecipeSerializer;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.SpecialRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.registries.ForgeRegistries;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.crafting.RecipeWandUpgrade;
 import thetadev.constructionwand.items.ModItems;
@@ -22,8 +26,8 @@ public class RecipeGenerator extends RecipeProvider
     }
 
     @Override
-    protected void registerRecipes(@Nonnull Consumer<IFinishedRecipe> consumer) {
-        wandRecipe(consumer, ModItems.WAND_STONE, Inp.fromTag(ItemTags.field_232909_aa_)); //stone_tool_materials
+    protected void buildCraftingRecipes(@Nonnull Consumer<FinishedRecipe> consumer) {
+        wandRecipe(consumer, ModItems.WAND_STONE, Inp.fromTag(ItemTags.STONE_TOOL_MATERIALS));
         wandRecipe(consumer, ModItems.WAND_IRON, Inp.fromTag(Tags.Items.INGOTS_IRON));
         wandRecipe(consumer, ModItems.WAND_DIAMOND, Inp.fromTag(Tags.Items.GEMS_DIAMOND));
         wandRecipe(consumer, ModItems.WAND_INFINITY, Inp.fromTag(Tags.Items.NETHER_STARS));
@@ -34,32 +38,32 @@ public class RecipeGenerator extends RecipeProvider
         specialRecipe(consumer, RecipeWandUpgrade.SERIALIZER);
     }
 
-    private void wandRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider wand, Inp material) {
-        ShapedRecipeBuilder.shapedRecipe(wand)
-                .key('X', material.ingredient)
-                .key('#', Tags.Items.RODS_WOODEN)
-                .patternLine("  X")
-                .patternLine(" # ")
-                .patternLine("#  ")
-                .addCriterion("has_item", hasItem(material.predicate))
-                .build(consumer);
+    private void wandRecipe(Consumer<FinishedRecipe> consumer, ItemLike wand, Inp material) {
+        ShapedRecipeBuilder.shaped(wand)
+                .define('X', material.ingredient)
+                .define('#', Tags.Items.RODS_WOODEN)
+                .pattern("  X")
+                .pattern(" # ")
+                .pattern("#  ")
+                .unlockedBy("has_item", inventoryTrigger(material.predicate))
+                .save(consumer);
     }
 
-    private void coreRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider core, Inp item1, Inp item2) {
-        ShapedRecipeBuilder.shapedRecipe(core)
-                .key('O', item1.ingredient)
-                .key('X', item2.ingredient)
-                .key('#', Tags.Items.GLASS_PANES)
-                .patternLine(" #X")
-                .patternLine("#O#")
-                .patternLine("X# ")
-                .addCriterion("has_item", hasItem(item1.predicate))
-                .build(consumer);
+    private void coreRecipe(Consumer<FinishedRecipe> consumer, ItemLike core, Inp item1, Inp item2) {
+        ShapedRecipeBuilder.shaped(core)
+                .define('O', item1.ingredient)
+                .define('X', item2.ingredient)
+                .define('#', Tags.Items.GLASS_PANES)
+                .pattern(" #X")
+                .pattern("#O#")
+                .pattern("X# ")
+                .unlockedBy("has_item", inventoryTrigger(item1.predicate))
+                .save(consumer);
     }
 
-    private void specialRecipe(Consumer<IFinishedRecipe> consumer, SpecialRecipeSerializer<?> serializer) {
-        ResourceLocation name = Registry.RECIPE_SERIALIZER.getKey(serializer);
-        CustomRecipeBuilder.customRecipe(serializer).build(consumer, ConstructionWand.loc("dynamic/" + name.getPath()).toString());
+    private void specialRecipe(Consumer<FinishedRecipe> consumer, SimpleRecipeSerializer<?> serializer) {
+        ResourceLocation name = ForgeRegistries.RECIPE_SERIALIZERS.getKey(serializer);
+        SpecialRecipeBuilder.special(serializer).save(consumer, ConstructionWand.loc("dynamic/" + name.getPath()).toString());
     }
 
     @Nonnull

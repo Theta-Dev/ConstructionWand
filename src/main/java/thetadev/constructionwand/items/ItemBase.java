@@ -1,6 +1,6 @@
 package thetadev.constructionwand.items;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import thetadev.constructionwand.ConstructionWand;
 
 public class ItemBase extends Item

@@ -1,9 +1,9 @@
 package thetadev.constructionwand.basics.option;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import thetadev.constructionwand.api.IWandCore;
 import thetadev.constructionwand.api.IWandUpgrade;
 import thetadev.constructionwand.basics.ReplacementRegistry;
@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 public class WandOptions
 {
-    public final CompoundNBT tag;
+    public final CompoundTag tag;
 
     private static final String TAG_ROOT = "wand_options";
 
@@ -50,7 +50,7 @@ public class WandOptions
     public final IOption<?>[] allOptions;
 
     public WandOptions(ItemStack wandStack) {
-        tag = wandStack.getOrCreateChildTag(TAG_ROOT);
+        tag = wandStack.getOrCreateTagElement(TAG_ROOT);
 
         cores = new WandUpgradesSelectable<>(tag, "cores", new CoreDefault());
 

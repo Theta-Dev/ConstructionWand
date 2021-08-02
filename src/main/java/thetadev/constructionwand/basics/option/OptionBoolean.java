@@ -1,15 +1,15 @@
 package thetadev.constructionwand.basics.option;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class OptionBoolean implements IOption<Boolean>
 {
-    private final CompoundNBT tag;
+    private final CompoundTag tag;
     private final String key;
     private final boolean enabled;
     private boolean value;
 
-    public OptionBoolean(CompoundNBT tag, String key, boolean dval, boolean enabled) {
+    public OptionBoolean(CompoundTag tag, String key, boolean dval, boolean enabled) {
         this.tag = tag;
         this.key = key;
         this.enabled = enabled;
@@ -18,7 +18,7 @@ public class OptionBoolean implements IOption<Boolean>
         else value = dval;
     }
 
-    public OptionBoolean(CompoundNBT tag, String key, boolean dval) {
+    public OptionBoolean(CompoundTag tag, String key, boolean dval) {
         this(tag, key, dval, true);
     }
 

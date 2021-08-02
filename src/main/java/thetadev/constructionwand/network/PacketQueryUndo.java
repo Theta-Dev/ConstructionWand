@@ -1,8 +1,8 @@
 package thetadev.constructionwand.network;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import thetadev.constructionwand.ConstructionWand;
 
 import java.util.function.Supplier;
@@ -15,11 +15,11 @@ public class PacketQueryUndo
         this.undoPressed = undoPressed;
     }
 
-    public static void encode(PacketQueryUndo msg, PacketBuffer buffer) {
+    public static void encode(PacketQueryUndo msg, FriendlyByteBuf buffer) {
         buffer.writeBoolean(msg.undoPressed);
     }
 
-    public static PacketQueryUndo decode(PacketBuffer buffer) {
+    public static PacketQueryUndo decode(FriendlyByteBuf buffer) {
         return new PacketQueryUndo(buffer.readBoolean());
     }
 
@@ -28,7 +28,7 @@ public class PacketQueryUndo
         public static void handle(final PacketQueryUndo msg, final Supplier<NetworkEvent.Context> ctx) {
             if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
 
-            ServerPlayerEntity player = ctx.get().getSender();
+            ServerPlayer player = ctx.get().getSender();
             if(player == null) return;
 
             ConstructionWand.instance.undoHistory.updateClient(player, msg.undoPressed);

@@ -1,9 +1,9 @@
 package thetadev.constructionwand.api;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.wand.undo.ISnapshot;
 
@@ -15,10 +15,10 @@ public interface IWandAction
     int getLimit(ItemStack wand);
 
     @Nonnull
-    List<ISnapshot> getSnapshots(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+    List<ISnapshot> getSnapshots(Level world, Player player, BlockHitResult rayTraceResult,
                                  ItemStack wand, WandOptions options, IWandSupplier supplier, int limit);
 
     @Nonnull
-    List<ISnapshot> getSnapshotsFromAir(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+    List<ISnapshot> getSnapshotsFromAir(Level world, Player player, BlockHitResult rayTraceResult,
                                         ItemStack wand, WandOptions options, IWandSupplier supplier, int limit);
 }

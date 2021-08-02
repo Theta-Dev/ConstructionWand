@@ -1,27 +1,27 @@
 package thetadev.constructionwand.wand;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import thetadev.constructionwand.basics.WandUtil;
 
-public class WandItemUseContext extends BlockItemUseContext
+public class WandItemUseContext extends BlockPlaceContext
 {
-    public WandItemUseContext(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult, BlockPos pos, BlockItem item) {
-        super(world, player, Hand.MAIN_HAND, new ItemStack(item),
-                new BlockRayTraceResult(getBlockHitVec(rayTraceResult, pos), rayTraceResult.getFace(), pos, false));
+    public WandItemUseContext(Level world, Player player, BlockHitResult rayTraceResult, BlockPos pos, BlockItem item) {
+        super(world, player, InteractionHand.MAIN_HAND, new ItemStack(item),
+                new BlockHitResult(getBlockHitVec(rayTraceResult, pos), rayTraceResult.getDirection(), pos, false));
     }
 
-    private static Vector3d getBlockHitVec(BlockRayTraceResult rayTraceResult, BlockPos pos) {
-        Vector3d hitVec = rayTraceResult.getHitVec(); // Absolute coords of hit target
+    private static Vec3 getBlockHitVec(BlockHitResult rayTraceResult, BlockPos pos) {
+        Vec3 hitVec = rayTraceResult.getLocation(); // Absolute coords of hit target
 
-        Vector3d blockDelta = WandUtil.blockPosVec(rayTraceResult.getPos()).subtract(WandUtil.blockPosVec(pos)); // Vector between start and current block
+        Vec3 blockDelta = WandUtil.blockPosVec(rayTraceResult.getBlockPos()).subtract(WandUtil.blockPosVec(pos)); // Vector between start and current block
 
         return blockDelta.add(hitVec); // Absolute coords of current block hit target
     }

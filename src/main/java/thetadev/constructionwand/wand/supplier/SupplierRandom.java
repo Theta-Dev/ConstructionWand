@@ -1,8 +1,8 @@
 package thetadev.constructionwand.wand.supplier;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.basics.pool.RandomPool;
@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 
 public class SupplierRandom extends SupplierInventory
 {
-    public SupplierRandom(PlayerEntity player, WandOptions options) {
+    public SupplierRandom(Player player, WandOptions options) {
         super(player, options);
     }
 
@@ -21,7 +21,7 @@ public class SupplierRandom extends SupplierInventory
         itemCounts = new LinkedHashMap<>();
 
         // Random mode -> add all items from hotbar
-        itemPool = new RandomPool<>(player.getRNG());
+        itemPool = new RandomPool<>(player.getRandom());
 
         for(ItemStack stack : WandUtil.getHotbarWithOffhand(player)) {
             if(stack.getItem() instanceof BlockItem) addBlockItem((BlockItem) stack.getItem());

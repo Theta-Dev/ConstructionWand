@@ -1,13 +1,13 @@
 package thetadev.constructionwand.api;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public interface IContainerHandler
 {
-    boolean matches(PlayerEntity player, ItemStack itemStack, ItemStack inventoryStack);
+    boolean matches(Player player, ItemStack itemStack, ItemStack inventoryStack);
 
-    int countItems(PlayerEntity player, ItemStack itemStack, ItemStack inventoryStack);
+    int countItems(Player player, ItemStack itemStack, ItemStack inventoryStack);
 
-    int useItems(PlayerEntity player, ItemStack itemStack, ItemStack inventoryStack, int count);
+    int useItems(Player player, ItemStack itemStack, ItemStack inventoryStack, int count);
 }

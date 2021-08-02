@@ -1,13 +1,13 @@
 package thetadev.constructionwand.basics.option;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import thetadev.constructionwand.api.IWandUpgrade;
 
 public class WandUpgradesSelectable<T extends IWandUpgrade> extends WandUpgrades<T> implements IOption<T>
 {
     private byte selector;
 
-    public WandUpgradesSelectable(CompoundNBT tag, String key, T dval) {
+    public WandUpgradesSelectable(CompoundTag tag, String key, T dval) {
         super(tag, key, dval);
     }
 

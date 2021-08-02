@@ -1,8 +1,6 @@
 package thetadev.constructionwand.containers;
 
-import net.minecraftforge.fml.ModList;
 import thetadev.constructionwand.ConstructionWand;
-import thetadev.constructionwand.containers.handlers.HandlerBotania;
 import thetadev.constructionwand.containers.handlers.HandlerCapability;
 import thetadev.constructionwand.containers.handlers.HandlerShulkerbox;
 
@@ -12,9 +10,13 @@ public class ContainerRegistrar
         ConstructionWand.instance.containerManager.register(new HandlerCapability());
         ConstructionWand.instance.containerManager.register(new HandlerShulkerbox());
 
+        /*
+        TODO: Reenable this when Botania gets ported to 1.17
+
         if(ModList.get().isLoaded("botania")) {
             ConstructionWand.instance.containerManager.register(new HandlerBotania());
             ConstructionWand.LOGGER.info("Botania integration added");
         }
+        */
     }
 }

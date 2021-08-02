@@ -1,13 +1,13 @@
 package thetadev.constructionwand.wand.action;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.ConfigServer;
@@ -29,16 +29,16 @@ public class ActionAngel implements IWandAction
 
     @Nonnull
     @Override
-    public List<ISnapshot> getSnapshots(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+    public List<ISnapshot> getSnapshots(Level world, Player player, BlockHitResult rayTraceResult,
                                         ItemStack wand, WandOptions options, IWandSupplier supplier, int limit) {
         LinkedList<ISnapshot> placeSnapshots = new LinkedList<>();
 
-        Direction placeDirection = rayTraceResult.getFace();
-        BlockPos currentPos = rayTraceResult.getPos();
+        Direction placeDirection = rayTraceResult.getDirection();
+        BlockPos currentPos = rayTraceResult.getBlockPos();
         BlockState supportingBlock = world.getBlockState(currentPos);
 
         for(int i = 0; i < limit; i++) {
-            currentPos = currentPos.offset(placeDirection.getOpposite());
+            currentPos = currentPos.offset(placeDirection.getOpposite().getNormal());
 
             PlaceSnapshot snapshot = supplier.getPlaceSnapshot(world, currentPos, rayTraceResult, supportingBlock);
             if(snapshot != null) {
@@ -51,15 +51,15 @@ public class ActionAngel implements IWandAction
 
     @Nonnull
     @Override
-    public List<ISnapshot> getSnapshotsFromAir(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+    public List<ISnapshot> getSnapshotsFromAir(Level world, Player player, BlockHitResult rayTraceResult,
                                                ItemStack wand, WandOptions options, IWandSupplier supplier, int limit) {
         LinkedList<ISnapshot> placeSnapshots = new LinkedList<>();
 
         if(!player.isCreative() && !ConfigServer.ANGEL_FALLING.get() && player.fallDistance > 10) return placeSnapshots;
 
-        Vector3d playerVec = WandUtil.entityPositionVec(player);
-        Vector3d lookVec = player.getLookVec().mul(2, 2, 2);
-        Vector3d placeVec = playerVec.add(lookVec);
+        Vec3 playerVec = WandUtil.entityPositionVec(player);
+        Vec3 lookVec = player.getLookAngle().multiply(2, 2, 2);
+        Vec3 placeVec = playerVec.add(lookVec);
 
         BlockPos currentPos = new BlockPos(placeVec);
 

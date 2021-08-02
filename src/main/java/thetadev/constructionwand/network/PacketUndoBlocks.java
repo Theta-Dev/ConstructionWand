@@ -1,8 +1,8 @@
 package thetadev.constructionwand.network;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import thetadev.constructionwand.ConstructionWand;
 
 import java.util.HashSet;
@@ -21,13 +21,13 @@ public class PacketUndoBlocks
         this.undoBlocks = undoBlocks;
     }
 
-    public static void encode(PacketUndoBlocks msg, PacketBuffer buffer) {
+    public static void encode(PacketUndoBlocks msg, FriendlyByteBuf buffer) {
         for(BlockPos pos : msg.undoBlocks) {
             buffer.writeBlockPos(pos);
         }
     }
 
-    public static PacketUndoBlocks decode(PacketBuffer buffer) {
+    public static PacketUndoBlocks decode(FriendlyByteBuf buffer) {
         HashSet<BlockPos> undoBlocks = new HashSet<>();
 
         while(buffer.isReadable()) {

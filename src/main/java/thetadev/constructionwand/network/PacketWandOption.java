@@ -1,9 +1,9 @@
 package thetadev.constructionwand.network;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -27,14 +27,14 @@ public class PacketWandOption
         this.notify = notify;
     }
 
-    public static void encode(PacketWandOption msg, PacketBuffer buffer) {
-        buffer.writeString(msg.key);
-        buffer.writeString(msg.value);
+    public static void encode(PacketWandOption msg, FriendlyByteBuf buffer) {
+        buffer.writeUtf(msg.key);
+        buffer.writeUtf(msg.value);
         buffer.writeBoolean(msg.notify);
     }
 
-    public static PacketWandOption decode(PacketBuffer buffer) {
-        return new PacketWandOption(buffer.readString(100), buffer.readString(100), buffer.readBoolean());
+    public static PacketWandOption decode(FriendlyByteBuf buffer) {
+        return new PacketWandOption(buffer.readUtf(100), buffer.readUtf(100), buffer.readBoolean());
     }
 
     public static class Handler
@@ -42,7 +42,7 @@ public class PacketWandOption
         public static void handle(final PacketWandOption msg, final Supplier<NetworkEvent.Context> ctx) {
             if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
 
-            ServerPlayerEntity player = ctx.get().getSender();
+            ServerPlayer player = ctx.get().getSender();
             if(player == null) return;
 
             ItemStack wand = WandUtil.holdingWand(player);
@@ -54,7 +54,7 @@ public class PacketWandOption
             option.setValueString(msg.value);
 
             if(msg.notify) ItemWand.optionMessage(player, option);
-            player.inventory.markDirty();
+            player.getInventory().setChanged();
         }
     }
 }

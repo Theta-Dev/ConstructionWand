@@ -1,9 +1,9 @@
 package thetadev.constructionwand.basics;
 
-import net.minecraft.stats.IStatFormatter;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
 import thetadev.constructionwand.ConstructionWand;
 
 public class ModStats
@@ -17,6 +17,6 @@ public class ModStats
     private static void registerStat(ResourceLocation registryName) {
         // Compare with net.minecraft.stats.Stats#registerCustom
         Registry.register(Registry.CUSTOM_STAT, registryName.getPath(), registryName);
-        Stats.CUSTOM.get(registryName, IStatFormatter.DEFAULT);
+        Stats.CUSTOM.get(registryName, StatFormatter.DEFAULT);
     }
 }

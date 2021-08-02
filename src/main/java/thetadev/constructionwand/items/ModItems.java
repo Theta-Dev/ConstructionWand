@@ -1,12 +1,12 @@
 package thetadev.constructionwand.items;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.color.ItemColors;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.client.color.item.ItemColors;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
@@ -30,9 +30,9 @@ import java.util.HashSet;
 public class ModItems
 {
     // Wands
-    public static final Item WAND_STONE = new ItemWandBasic("stone_wand", propWand(), ItemTier.STONE);
-    public static final Item WAND_IRON = new ItemWandBasic("iron_wand", propWand(), ItemTier.IRON);
-    public static final Item WAND_DIAMOND = new ItemWandBasic("diamond_wand", propWand(), ItemTier.DIAMOND);
+    public static final Item WAND_STONE = new ItemWandBasic("stone_wand", propWand(), Tiers.STONE);
+    public static final Item WAND_IRON = new ItemWandBasic("iron_wand", propWand(), Tiers.IRON);
+    public static final Item WAND_DIAMOND = new ItemWandBasic("diamond_wand", propWand(), Tiers.DIAMOND);
     public static final Item WAND_INFINITY = new ItemWandInfinity("infinity_wand", propWand());
 
     // Cores
@@ -56,11 +56,11 @@ public class ModItems
     }
 
     public static Item.Properties propWand() {
-        return new Item.Properties().group(ItemGroup.TOOLS);
+        return new Item.Properties().tab(CreativeModeTab.TAB_TOOLS);
     }
 
     private static Item.Properties propUpgrade() {
-        return new Item.Properties().group(ItemGroup.MISC).maxStackSize(1);
+        return new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1);
     }
 
     private static void registerItem(IForgeRegistry<Item> reg, Item item) {
@@ -69,17 +69,17 @@ public class ModItems
     }
 
     @SubscribeEvent
-    public static void registerRecipeSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
-        IForgeRegistry<IRecipeSerializer<?>> r = event.getRegistry();
+    public static void registerRecipeSerializers(RegistryEvent.Register<RecipeSerializer<?>> event) {
+        IForgeRegistry<RecipeSerializer<?>> r = event.getRegistry();
         register(r, "wand_upgrade", RecipeWandUpgrade.SERIALIZER);
     }
 
     @OnlyIn(Dist.CLIENT)
     public static void registerModelProperties() {
         for(Item item : WANDS) {
-            ItemModelsProperties.func_239418_a_(
+            ItemProperties.register(
                     item, ConstructionWand.loc("using_core"),
-                    (stack, world, entity) -> entity == null || !(stack.getItem() instanceof ItemWand) ? 0 :
+                    (stack, world, entity, n) -> entity == null || !(stack.getItem() instanceof ItemWand) ? 0 :
                             new WandOptions(stack).cores.get().getColor() > -1 ? 1 : 0
             );
         }

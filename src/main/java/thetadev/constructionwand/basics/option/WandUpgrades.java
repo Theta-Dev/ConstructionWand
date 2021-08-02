@@ -1,10 +1,10 @@
 package thetadev.constructionwand.basics.option;
 
-import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 import thetadev.constructionwand.ConstructionWand;
@@ -14,12 +14,12 @@ import java.util.ArrayList;
 
 public class WandUpgrades<T extends IWandUpgrade>
 {
-    protected final CompoundNBT tag;
+    protected final CompoundTag tag;
     protected final String key;
     protected final ArrayList<T> upgrades;
     protected final T dval;
 
-    public WandUpgrades(CompoundNBT tag, String key, T dval) {
+    public WandUpgrades(CompoundTag tag, String key, T dval) {
         this.tag = tag;
         this.key = key;
         this.dval = dval;
@@ -31,7 +31,7 @@ public class WandUpgrades<T extends IWandUpgrade>
     }
 
     protected void deserialize() {
-        ListNBT listnbt = tag.getList(key, Constants.NBT.TAG_STRING);
+        ListTag listnbt = tag.getList(key, Constants.NBT.TAG_STRING);
         boolean require_fix = false;
 
         for(int i = 0; i < listnbt.size(); i++) {
@@ -52,11 +52,11 @@ public class WandUpgrades<T extends IWandUpgrade>
     }
 
     protected void serialize() {
-        ListNBT listnbt = new ListNBT();
+        ListTag listnbt = new ListTag();
 
         for(T item : upgrades) {
             if(item == dval) continue;
-            listnbt.add(StringNBT.valueOf(item.getRegistryName().toString()));
+            listnbt.add(StringTag.valueOf(item.getRegistryName().toString()));
         }
         tag.put(key, listnbt);
     }

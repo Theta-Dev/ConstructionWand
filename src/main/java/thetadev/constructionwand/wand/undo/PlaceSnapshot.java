@@ -1,18 +1,18 @@
 package thetadev.constructionwand.wand.undo;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.Property;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.SlabType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.phys.BlockHitResult;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.wand.WandItemUseContext;
@@ -35,7 +35,7 @@ public class PlaceSnapshot implements ISnapshot
         this.targetMode = targetMode;
     }
 
-    public static PlaceSnapshot get(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
+    public static PlaceSnapshot get(Level world, Player player, BlockHitResult rayTraceResult,
                                     BlockPos pos, BlockItem item,
                                     @Nullable BlockState supportingBlock, @Nullable WandOptions options) {
         boolean targetMode = options != null && supportingBlock != null && options.direction.get() == WandOptions.DIRECTION.TARGET;
@@ -61,7 +61,7 @@ public class PlaceSnapshot implements ISnapshot
     }
 
     @Override
-    public boolean execute(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult) {
+    public boolean execute(Level world, Player player, BlockHitResult rayTraceResult) {
         // Recalculate PlaceBlockState, because other blocks might be placed nearby
         // Not doing this may cause game crashes (StackOverflowException) when placing lots of blocks
         // with changing orientation like panes, iron bars or redstone.
@@ -71,17 +71,17 @@ public class PlaceSnapshot implements ISnapshot
     }
 
     @Override
-    public boolean canRestore(World world, PlayerEntity player) {
+    public boolean canRestore(Level world, Player player) {
         return true;
     }
 
     @Override
-    public boolean restore(World world, PlayerEntity player) {
+    public boolean restore(Level world, Player player) {
         return WandUtil.removeBlock(world, player, block, pos);
     }
 
     @Override
-    public void forceRestore(World world) {
+    public void forceRestore(Level world) {
         world.removeBlock(pos, false);
     }
 
@@ -91,11 +91,11 @@ public class PlaceSnapshot implements ISnapshot
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
-    private static BlockState getPlaceBlockstate(World world, PlayerEntity player, BlockRayTraceResult rayTraceResult,
-                                                BlockPos pos, BlockItem item,
-                                                @Nullable BlockState supportingBlock, boolean targetMode) {
+    private static BlockState getPlaceBlockstate(Level world, Player player, BlockHitResult rayTraceResult,
+                                                 BlockPos pos, BlockItem item,
+                                                 @Nullable BlockState supportingBlock, boolean targetMode) {
         // Is block at pos replaceable?
-        BlockItemUseContext ctx = new WandItemUseContext(world, player, rayTraceResult, pos, item);
+        BlockPlaceContext ctx = new WandItemUseContext(world, player, rayTraceResult, pos, item);
         if(!ctx.canPlace()) return null;
 
         // Can block be placed?
@@ -109,25 +109,27 @@ public class PlaceSnapshot implements ISnapshot
         if(WandUtil.entitiesCollidingWithBlock(world, blockState, pos)) return null;
 
         // Adjust blockstate to neighbors
-        blockState = Block.getValidBlockForPosition(blockState, world, pos);
-        if(blockState.getBlock() == Blocks.AIR || !blockState.isValidPosition(world, pos)) return null;
+        // TODO: verify that
+        blockState = Block.updateFromNeighbourShapes(blockState, world, pos);
+        if(blockState.getBlock() == Blocks.AIR || !blockState.canSurvive(world, pos)) return null;
 
         // Copy block properties from supporting block
         if(targetMode && supportingBlock != null) {
             // Block properties to be copied (alignment/rotation properties)
 
             for(Property property : new Property[]{
-                    BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_EXCEPT_UP,
-                    BlockStateProperties.ROTATION_0_15, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE}) {
+                    BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.FACING, BlockStateProperties.FACING_HOPPER,
+                    BlockStateProperties.ROTATION_16, BlockStateProperties.AXIS, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE}) {
                 if(supportingBlock.hasProperty(property) && blockState.hasProperty(property)) {
-                    blockState = blockState.with(property, supportingBlock.get(property));
+                    blockState = blockState.setValue(property, supportingBlock.getValue(property));
                 }
             }
 
             // Dont dupe double slabs
             if(supportingBlock.hasProperty(BlockStateProperties.SLAB_TYPE) && blockState.hasProperty(BlockStateProperties.SLAB_TYPE)) {
-                SlabType slabType = supportingBlock.get(BlockStateProperties.SLAB_TYPE);
-                if(slabType != SlabType.DOUBLE) blockState = blockState.with(BlockStateProperties.SLAB_TYPE, slabType);
+                SlabType slabType = supportingBlock.getValue(BlockStateProperties.SLAB_TYPE);
+                if(slabType != SlabType.DOUBLE)
+                    blockState = blockState.setValue(BlockStateProperties.SLAB_TYPE, slabType);
             }
         }
         return blockState;

@@ -1,20 +1,20 @@
 package thetadev.constructionwand.items.wand;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -40,41 +40,41 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
 
     @Nonnull
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
-        PlayerEntity player = context.getPlayer();
-        Hand hand = context.getHand();
-        World world = context.getWorld();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        InteractionHand hand = context.getHand();
+        Level world = context.getLevel();
 
-        if(world.isRemote || player == null) return ActionResultType.FAIL;
+        if(world.isClientSide || player == null) return InteractionResult.FAIL;
 
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getItemInHand(hand);
 
-        if(player.isSneaking() && ConstructionWand.instance.undoHistory.isUndoActive(player)) {
-            return ConstructionWand.instance.undoHistory.undo(player, world, context.getPos()) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+        if(player.isCrouching() && ConstructionWand.instance.undoHistory.isUndoActive(player)) {
+            return ConstructionWand.instance.undoHistory.undo(player, world, context.getClickedPos()) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
         else {
-            WandJob job = getWandJob(player, world, new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false), stack);
-            return job.doIt() ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+            WandJob job = getWandJob(player, world, new BlockHitResult(context.getClickLocation(), context.getClickedFace(), context.getClickedPos(), false), stack);
+            return job.doIt() ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
     }
 
     @Nonnull
     @Override
-    public ActionResult<ItemStack> onItemRightClick(@Nonnull World world, PlayerEntity player, @Nonnull Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public InteractionResultHolder<ItemStack> use(@Nonnull Level world, Player player, @Nonnull InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 
-        if(!player.isSneaking()) {
-            if(world.isRemote) return ActionResult.resultFail(stack);
+        if(!player.isCrouching()) {
+            if(world.isClientSide) return InteractionResultHolder.fail(stack);
 
             // Right click: Place angel block
-            WandJob job = getWandJob(player, world, BlockRayTraceResult.createMiss(player.getLookVec(),
-                    WandUtil.fromVector(player.getLookVec()), WandUtil.playerPos(player)), stack);
-            return job.doIt() ? ActionResult.resultSuccess(stack) : ActionResult.resultFail(stack);
+            WandJob job = getWandJob(player, world, BlockHitResult.miss(player.getLookAngle(),
+                    WandUtil.fromVector(player.getLookAngle()), WandUtil.playerPos(player)), stack);
+            return job.doIt() ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
         }
-        return ActionResult.resultFail(stack);
+        return InteractionResultHolder.fail(stack);
     }
 
-    public static WandJob getWandJob(PlayerEntity player, World world, @Nullable BlockRayTraceResult rayTraceResult, ItemStack wand) {
+    public static WandJob getWandJob(Player player, Level world, @Nullable BlockHitResult rayTraceResult, ItemStack wand) {
         WandJob wandJob = new WandJob(player, world, rayTraceResult, wand);
         wandJob.getSnapshots();
 
@@ -82,12 +82,12 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
     }
 
     @Override
-    public boolean canHarvestBlock(@Nonnull BlockState blockIn) {
+    public boolean isCorrectToolForDrops(@Nonnull BlockState blockIn) {
         return false;
     }
 
     @Override
-    public boolean getIsRepairable(@Nonnull ItemStack toRepair, @Nonnull ItemStack repair) {
+    public boolean isValidRepairItem(@Nonnull ItemStack toRepair, @Nonnull ItemStack repair) {
         return false;
     }
 
@@ -95,8 +95,9 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         return Integer.MAX_VALUE;
     }
 
+    @Override
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(@Nonnull ItemStack itemstack, World worldIn, @Nonnull List<ITextComponent> lines, @Nonnull ITooltipFlag extraInfo) {
+    public void appendHoverText(@Nonnull ItemStack itemstack, Level worldIn, @Nonnull List<Component> lines, @Nonnull TooltipFlag extraInfo) {
         WandOptions options = new WandOptions(itemstack);
         int limit = options.cores.get().getWandAction().getLimit(itemstack);
 
@@ -106,35 +107,36 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         if(Screen.hasShiftDown()) {
             for(int i = 1; i < options.allOptions.length; i++) {
                 IOption<?> opt = options.allOptions[i];
-                lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                        .append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.GRAY))
+                lines.add(new TranslatableComponent(opt.getKeyTranslation()).withStyle(ChatFormatting.AQUA)
+                        .append(new TranslatableComponent(opt.getValueTranslation()).withStyle(ChatFormatting.GRAY))
                 );
             }
             if(!options.cores.getUpgrades().isEmpty()) {
-                lines.add(new StringTextComponent(""));
-                lines.add(new TranslationTextComponent(langTooltip + "cores").mergeStyle(TextFormatting.GRAY));
+                lines.add(new TextComponent(""));
+                lines.add(new TranslatableComponent(langTooltip + "cores").withStyle(ChatFormatting.GRAY));
 
                 for(IWandCore core : options.cores.getUpgrades()) {
-                    lines.add(new TranslationTextComponent(options.cores.getKeyTranslation() + "." + core.getRegistryName().toString()));
+                    lines.add(new TranslatableComponent(options.cores.getKeyTranslation() + "." + core.getRegistryName().toString()));
                 }
             }
         }
         // Default tooltip: show block limit + active wand core
         else {
             IOption<?> opt = options.allOptions[0];
-            lines.add(new TranslationTextComponent(langTooltip + "blocks", limit).mergeStyle(TextFormatting.GRAY));
-            lines.add(new TranslationTextComponent(opt.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                    .append(new TranslationTextComponent(opt.getValueTranslation()).mergeStyle(TextFormatting.WHITE)));
-            lines.add(new TranslationTextComponent(langTooltip + "shift").mergeStyle(TextFormatting.AQUA));
+            lines.add(new TranslatableComponent(langTooltip + "blocks", limit).withStyle(ChatFormatting.GRAY));
+            lines.add(new TranslatableComponent(opt.getKeyTranslation()).withStyle(ChatFormatting.AQUA)
+                    .append(new TranslatableComponent(opt.getValueTranslation()).withStyle(ChatFormatting.WHITE)));
+            lines.add(new TranslatableComponent(langTooltip + "shift").withStyle(ChatFormatting.AQUA));
         }
     }
 
-    public static void optionMessage(PlayerEntity player, IOption<?> option) {
-        player.sendStatusMessage(
-                new TranslationTextComponent(option.getKeyTranslation()).mergeStyle(TextFormatting.AQUA)
-                        .append(new TranslationTextComponent(option.getValueTranslation()).mergeStyle(TextFormatting.WHITE))
-                        .append(new StringTextComponent(" - ").mergeStyle(TextFormatting.GRAY))
-                        .append(new TranslationTextComponent(option.getDescTranslation()).mergeStyle(TextFormatting.WHITE))
+    @OnlyIn(Dist.CLIENT)
+    public static void optionMessage(Player player, IOption<?> option) {
+        player.displayClientMessage(
+                new TranslatableComponent(option.getKeyTranslation()).withStyle(ChatFormatting.AQUA)
+                        .append(new TranslatableComponent(option.getValueTranslation()).withStyle(ChatFormatting.WHITE))
+                        .append(new TextComponent(" - ").withStyle(ChatFormatting.GRAY))
+                        .append(new TranslatableComponent(option.getDescTranslation()).withStyle(ChatFormatting.WHITE))
                 , true);
     }
 

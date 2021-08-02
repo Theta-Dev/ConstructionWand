@@ -1,12 +1,12 @@
 package thetadev.constructionwand.crafting;
 
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.item.crafting.SpecialRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.level.Level;
 import thetadev.constructionwand.api.IWandUpgrade;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -14,21 +14,21 @@ import thetadev.constructionwand.items.wand.ItemWand;
 
 import javax.annotation.Nonnull;
 
-public class RecipeWandUpgrade extends SpecialRecipe
+public class RecipeWandUpgrade extends CustomRecipe
 {
-    public static final SpecialRecipeSerializer<RecipeWandUpgrade> SERIALIZER = new SpecialRecipeSerializer<>(RecipeWandUpgrade::new);
+    public static final SimpleRecipeSerializer<RecipeWandUpgrade> SERIALIZER = new SimpleRecipeSerializer<>(RecipeWandUpgrade::new);
 
     public RecipeWandUpgrade(ResourceLocation resourceLocation) {
         super(resourceLocation);
     }
 
     @Override
-    public boolean matches(@Nonnull CraftingInventory inv, @Nonnull World worldIn) {
+    public boolean matches(@Nonnull CraftingContainer inv, @Nonnull Level worldIn) {
         ItemStack wand = null;
         IWandUpgrade upgrade = null;
 
-        for(int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack stack = inv.getStackInSlot(i);
+        for(int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stack = inv.getItem(i);
             if(!stack.isEmpty()) {
                 if(wand == null && stack.getItem() instanceof ItemWand) wand = stack;
                 else if(upgrade == null && stack.getItem() instanceof IWandUpgrade)
@@ -43,12 +43,12 @@ public class RecipeWandUpgrade extends SpecialRecipe
 
     @Nonnull
     @Override
-    public ItemStack getCraftingResult(@Nonnull CraftingInventory inv) {
+    public ItemStack assemble(@Nonnull CraftingContainer inv) {
         ItemStack wand = null;
         IWandUpgrade upgrade = null;
 
-        for(int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack stack = inv.getStackInSlot(i);
+        for(int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stack = inv.getItem(i);
             if(!stack.isEmpty()) {
                 if(stack.getItem() instanceof ItemWand) wand = stack;
                 else if(stack.getItem() instanceof IWandUpgrade) upgrade = (IWandUpgrade) stack.getItem();
@@ -63,13 +63,13 @@ public class RecipeWandUpgrade extends SpecialRecipe
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return width * height >= 2;
     }
 
     @Nonnull
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return SERIALIZER;
     }
 }

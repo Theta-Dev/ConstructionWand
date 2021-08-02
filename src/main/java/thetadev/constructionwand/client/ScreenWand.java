@@ -1,13 +1,12 @@
 package thetadev.constructionwand.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.ItemStack;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -31,15 +30,13 @@ public class ScreenWand extends Screen
     private static final int FIELD_HEIGHT = N_ROWS * (BUTTON_HEIGHT + SPACING_HEIGHT) - SPACING_HEIGHT;
 
     public ScreenWand(ItemStack wand) {
-        super(new StringTextComponent("ScreenWand"));
+        super(new TextComponent("ScreenWand"));
         this.wand = wand;
         wandOptions = new WandOptions(wand);
     }
 
     @Override
-    public void init(@Nonnull Minecraft minecraft, int width, int height) {
-        super.init(minecraft, width, height);
-
+    protected void init() {
         createButton(0, 0, wandOptions.cores);
         createButton(0, 1, wandOptions.lock);
         createButton(0, 2, wandOptions.direction);
@@ -49,22 +46,22 @@ public class ScreenWand extends Screen
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
         drawCenteredString(matrixStack, font, wand.getDisplayName(), width / 2, height / 2 - FIELD_HEIGHT / 2 - SPACING_HEIGHT, 16777215);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
     public boolean charTyped(char character, int code) {
-        if(character == 'e') closeScreen();
+        if(character == 'e') onClose();
         return super.charTyped(character, code);
     }
 
     private void createButton(int cx, int cy, IOption<?> option) {
         Button button = new Button(getX(cx), getY(cy), BUTTON_WIDTH, BUTTON_HEIGHT, getButtonLabel(option), bt -> clickButton(bt, option), (bt, ms, x, y) -> drawTooltip(ms, x, y, option));
         button.active = option.isEnabled();
-        addButton(button);
+        addRenderableWidget(button);
     }
 
     private void clickButton(Button button, IOption<?> option) {
@@ -73,9 +70,9 @@ public class ScreenWand extends Screen
         button.setMessage(getButtonLabel(option));
     }
 
-    private void drawTooltip(MatrixStack matrixStack, int mouseX, int mouseY, IOption<?> option) {
+    private void drawTooltip(PoseStack matrixStack, int mouseX, int mouseY, IOption<?> option) {
         if(isMouseOver(mouseX, mouseY)) {
-            renderTooltip(matrixStack, new TranslationTextComponent(option.getDescTranslation()), mouseX, mouseY);
+            renderTooltip(matrixStack, new TranslatableComponent(option.getDescTranslation()), mouseX, mouseY);
         }
     }
 
@@ -87,7 +84,7 @@ public class ScreenWand extends Screen
         return height / 2 - FIELD_HEIGHT / 2 + n * (BUTTON_HEIGHT + SPACING_HEIGHT);
     }
 
-    private ITextComponent getButtonLabel(IOption<?> option) {
-        return new TranslationTextComponent(option.getKeyTranslation()).append(new TranslationTextComponent(option.getValueTranslation()));
+    private Component getButtonLabel(IOption<?> option) {
+        return new TranslatableComponent(option.getKeyTranslation()).append(new TranslatableComponent(option.getValueTranslation()));
     }
 }
