@@ -75,6 +75,8 @@ public class ClientEvents
     // Sneak+(OPT)+Right click wand to open GUI
     @SubscribeEvent
     public void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if(event.getSide().isServer()) return;
+
         Player player = event.getPlayer();
         if(player == null || !guiKeyCombDown(player)) return;
 
