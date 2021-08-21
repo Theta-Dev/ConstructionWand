@@ -97,11 +97,11 @@ around them. SHIFT+CTRL+Right clickking any of them will undo the operation, giv
 If you used the Destruction core, it will restore the blocks.
 
 ## Additional features
-- If you have shulker boxes in your inventory filled with blocks, the wand can pull them out and place them
+- If you have shulker boxes (or bundles in MC 1.17+) in your inventory filled with blocks, the wand can pull them out
+  and place them
 
-- Botania compatibility: The Black Hole Talisman can supply blocks just like shulker boxes can.
-  Having a Rod of the Lands / Rod of the Depths in your inventory will provide you with infinite dirt/cobble
-  at the cost of Mana.
+- Botania compatibility: The Black Hole Talisman can supply blocks just like shulker boxes can. Having a Rod of the
+  Lands / Rod of the Depths in your inventory will provide you with infinite dirt/cobble at the cost of Mana.
 
 - Having blocks in your offhand will place them instead of the block you're looking at
 

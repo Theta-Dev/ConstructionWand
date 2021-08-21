@@ -130,7 +130,6 @@ public abstract class ItemWand extends ItemBase implements ICustomItemModel
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void optionMessage(Player player, IOption<?> option) {
         player.displayClientMessage(
                 new TranslatableComponent(option.getKeyTranslation()).withStyle(ChatFormatting.AQUA)
