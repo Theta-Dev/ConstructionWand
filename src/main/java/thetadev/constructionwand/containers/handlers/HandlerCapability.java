@@ -2,15 +2,13 @@ package thetadev.constructionwand.containers.handlers;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import thetadev.constructionwand.api.IContainerHandler;
 import thetadev.constructionwand.basics.WandUtil;
 
-/**
- * Created by james on 28/12/16.
- */
+import java.util.Optional;
+
 public class HandlerCapability implements IContainerHandler
 {
     @Override
@@ -20,32 +18,28 @@ public class HandlerCapability implements IContainerHandler
 
     @Override
     public int countItems(Player player, ItemStack itemStack, ItemStack inventoryStack) {
-        LazyOptional<IItemHandler> itemHandlerLazyOptional = inventoryStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-        if(!itemHandlerLazyOptional.isPresent()) return 0;
+        Optional<IItemHandler> itemHandlerOptional = inventoryStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).resolve();
+        if(itemHandlerOptional.isEmpty()) return 0;
 
         int total = 0;
 
-        IItemHandler itemHandler = itemHandlerLazyOptional.orElse((IItemHandler) CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        IItemHandler itemHandler = itemHandlerOptional.get();
 
         for(int i = 0; i < itemHandler.getSlots(); i++) {
             ItemStack containerStack = itemHandler.getStackInSlot(i);
             if(WandUtil.stackEquals(itemStack, containerStack)) {
                 total += Math.max(0, containerStack.getCount());
             }
-
-            // Already in a container. Don't inception this thing.
         }
         return total;
     }
 
     @Override
     public int useItems(Player player, ItemStack itemStack, ItemStack inventoryStack, int count) {
-        int toUse = itemStack.getCount();
+        Optional<IItemHandler> itemHandlerOptional = inventoryStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).resolve();
+        if(itemHandlerOptional.isEmpty()) return 0;
 
-        LazyOptional<IItemHandler> itemHandlerLazyOptional = inventoryStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-        if(!itemHandlerLazyOptional.isPresent()) return 0;
-
-        IItemHandler itemHandler = itemHandlerLazyOptional.orElse((IItemHandler) CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        IItemHandler itemHandler = itemHandlerOptional.get();
 
         for(int i = 0; i < itemHandler.getSlots(); i++) {
             ItemStack handlerStack = itemHandler.getStackInSlot(i);
