@@ -7,12 +7,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.Property;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.SlabType;
+import net.minecraft.item.Items;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EntityPredicates;
@@ -208,17 +205,23 @@ public class WandUtil
 
     /**
      * Tests if a wand can place a block at a certain position.
-     * This check is independent from the used block.
+     * This check is independent of the used block.
      */
     public static boolean isPositionPlaceable(World world, PlayerEntity player, BlockPos pos, boolean replace) {
-        if(!isPositionModifiable(world,player, pos)) return false;
+        if(!isPositionModifiable(world, player, pos)) return false;
 
         // If replace mode is off, target has to be air
-        return replace || world.isAirBlock(pos);
+        if(world.isAirBlock(pos)) return true;
+
+        // Otherwise, check if the block can be replaced by a generic block
+        return replace && world.getBlockState(pos).isReplaceable(
+                new WandItemUseContext(world, player,
+                        new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.DOWN, pos, false),
+                        pos, (BlockItem) Items.STONE));
     }
 
     public static boolean isBlockRemovable(World world, PlayerEntity player, BlockPos pos) {
-        if(!isPositionModifiable(world,player, pos)) return false;
+        if(!isPositionModifiable(world, player, pos)) return false;
 
         if(!player.isCreative()) {
             return !(world.getBlockState(pos).getBlockHardness(world, pos) <= -1) && world.getTileEntity(pos) == null;
