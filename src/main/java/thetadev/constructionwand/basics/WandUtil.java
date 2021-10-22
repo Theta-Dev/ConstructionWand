@@ -11,9 +11,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.MinecraftForge;
@@ -22,6 +24,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.wand.ItemWand;
+import thetadev.constructionwand.wand.WandItemUseContext;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -187,13 +190,19 @@ public class WandUtil
 
     /**
      * Tests if a wand can place a block at a certain position.
-     * This check is independent from the used block.
+     * This check is independent of the used block.
      */
     public static boolean isPositionPlaceable(Level world, Player player, BlockPos pos, boolean replace) {
         if(!isPositionModifiable(world, player, pos)) return false;
 
         // If replace mode is off, target has to be air
-        return replace || world.isEmptyBlock(pos);
+        if(world.isEmptyBlock(pos)) return true;
+
+        // Otherwise, check if the block can be replaced by a generic block
+        return replace && world.getBlockState(pos).canBeReplaced(
+                new WandItemUseContext(world, player,
+                        new BlockHitResult(new Vec3(0, 0, 0), Direction.DOWN, pos, false),
+                        pos, (BlockItem) Items.STONE));
     }
 
     public static boolean isBlockRemovable(Level world, Player player, BlockPos pos) {

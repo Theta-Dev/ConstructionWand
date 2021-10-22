@@ -38,14 +38,14 @@ public class ActionDestruction implements IWandAction
         HashSet<BlockPos> allCandidates = new HashSet<>();
 
         // Block face the wand was pointed at
-        Direction breakDirection = rayTraceResult.getDirection();
+        Direction breakFace = rayTraceResult.getDirection();
         // Block the wand was pointed at
         BlockPos startingPoint = rayTraceResult.getBlockPos();
         BlockState targetBlock = world.getBlockState(rayTraceResult.getBlockPos());
 
         // Is break direction allowed by lock?
         // Tried to break blocks from top/bottom face, so the wand should allow breaking in NS/EW direction
-        if(breakDirection == Direction.UP || breakDirection == Direction.DOWN) {
+        if(breakFace == Direction.UP || breakFace == Direction.DOWN) {
             if(options.testLock(WandOptions.LOCK.NORTHSOUTH) || options.testLock(WandOptions.LOCK.EASTWEST))
                 candidates.add(startingPoint);
         }
@@ -56,6 +56,10 @@ public class ActionDestruction implements IWandAction
         // Process current candidates, stop when none are avaiable or block limit is reached
         while(!candidates.isEmpty() && destroySnapshots.size() < limit) {
             BlockPos currentCandidate = candidates.removeFirst();
+
+            // Only break blocks facing the player, with no blocks in between
+            if(!world.isEmptyBlock(currentCandidate.offset(breakFace.getNormal()))) continue;
+
             try {
                 BlockState candidateBlock = world.getBlockState(currentCandidate);
 
@@ -66,7 +70,7 @@ public class ActionDestruction implements IWandAction
                     if(snapshot == null) continue;
                     destroySnapshots.add(snapshot);
 
-                    switch(breakDirection) {
+                    switch(breakFace) {
                         case DOWN:
                         case UP:
                             if(options.testLock(WandOptions.LOCK.NORTHSOUTH)) {
