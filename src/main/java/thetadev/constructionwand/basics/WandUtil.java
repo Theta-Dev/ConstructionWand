@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EntityPredicates;
@@ -16,6 +17,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.World;
@@ -26,6 +28,7 @@ import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.wand.ItemWand;
+import thetadev.constructionwand.wand.WandItemUseContext;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -200,13 +203,19 @@ public class WandUtil
 
     /**
      * Tests if a wand can place a block at a certain position.
-     * This check is independent from the used block.
+     * This check is independent of the used block.
      */
     public static boolean isPositionPlaceable(World world, PlayerEntity player, BlockPos pos, boolean replace) {
         if(!isPositionModifiable(world, player, pos)) return false;
 
         // If replace mode is off, target has to be air
-        return replace || world.isAirBlock(pos);
+        if(world.isAirBlock(pos)) return true;
+
+        // Otherwise, check if the block can be replaced by a generic block
+        return replace && world.getBlockState(pos).isReplaceable(
+                new WandItemUseContext(world, player,
+                        new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.DOWN, pos, false),
+                        pos, (BlockItem) Items.STONE));
     }
 
     public static boolean isBlockRemovable(World world, PlayerEntity player, BlockPos pos) {
