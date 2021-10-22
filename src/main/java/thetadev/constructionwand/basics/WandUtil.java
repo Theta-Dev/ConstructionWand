@@ -229,6 +229,10 @@ public class WandUtil
         return true;
     }
 
+    public static boolean isBlockPermeable(World world, BlockPos pos) {
+        return world.isAirBlock(pos) || world.getBlockState(pos).getCollisionShape(world, pos).isEmpty();
+    }
+
     public static boolean entitiesCollidingWithBlock(World world, BlockState blockState, BlockPos pos) {
         VoxelShape shape = blockState.getCollisionShape(world, pos);
         if(!shape.isEmpty()) {
