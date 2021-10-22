@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -51,7 +52,7 @@ public class SupplierInventory implements IWandSupplier
             addBlockItem((BlockItem) offhandStack.getItem());
         }
         // Otherwise use target block
-        else {
+        else if(target != null && target != Items.AIR) {
             addBlockItem(target);
 
             // Add replacement items
