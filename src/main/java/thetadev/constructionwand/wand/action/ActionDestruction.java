@@ -58,8 +58,8 @@ public class ActionDestruction implements IWandAction
         while(!candidates.isEmpty() && destroySnapshots.size() < limit) {
             BlockPos currentCandidate = candidates.removeFirst();
 
-            // Only break blocks facing the player, with no blocks in between
-            if(!world.isAirBlock(currentCandidate.offset(breakFace))) continue;
+            // Only break blocks facing the player, with no collidable blocks in between
+            if(!WandUtil.isBlockPermeable(world, currentCandidate.offset(breakFace))) continue;
 
             try {
                 BlockState candidateBlock = world.getBlockState(currentCandidate);
