@@ -214,6 +214,10 @@ public class WandUtil
         return true;
     }
 
+    public static boolean isBlockPermeable(Level world, BlockPos pos) {
+        return world.isEmptyBlock(pos) || world.getBlockState(pos).getCollisionShape(world, pos).isEmpty();
+    }
+
     public static boolean entitiesCollidingWithBlock(Level world, BlockState blockState, BlockPos pos) {
         VoxelShape shape = blockState.getCollisionShape(world, pos);
         if(!shape.isEmpty()) {

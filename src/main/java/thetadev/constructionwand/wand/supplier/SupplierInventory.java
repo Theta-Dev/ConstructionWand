@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -51,7 +52,7 @@ public class SupplierInventory implements IWandSupplier
             addBlockItem((BlockItem) offhandStack.getItem());
         }
         // Otherwise use target block
-        else {
+        else if(target != null && target != Items.AIR) {
             addBlockItem(target);
 
             // Add replacement items

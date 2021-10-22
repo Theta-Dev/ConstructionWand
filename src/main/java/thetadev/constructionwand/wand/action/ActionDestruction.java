@@ -10,6 +10,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.ConfigServer;
+import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.wand.undo.DestroySnapshot;
 import thetadev.constructionwand.wand.undo.ISnapshot;
@@ -57,8 +58,8 @@ public class ActionDestruction implements IWandAction
         while(!candidates.isEmpty() && destroySnapshots.size() < limit) {
             BlockPos currentCandidate = candidates.removeFirst();
 
-            // Only break blocks facing the player, with no blocks in between
-            if(!world.isEmptyBlock(currentCandidate.offset(breakFace.getNormal()))) continue;
+            // Only break blocks facing the player, with no collidable blocks in between
+            if(!WandUtil.isBlockPermeable(world, currentCandidate.offset(breakFace.getNormal()))) continue;
 
             try {
                 BlockState candidateBlock = world.getBlockState(currentCandidate);
