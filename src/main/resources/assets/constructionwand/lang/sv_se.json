@@ -1,0 +1,61 @@
+{
+  "item.constructionwand.stone_wand": "Stenstav",
+  "item.constructionwand.iron_wand": "Järnstav",
+  "item.constructionwand.diamond_wand": "Diamantstav",
+  "item.constructionwand.infinity_wand": "Oändlighetsstav",
+  "item.constructionwand.core_angel": "Änglastavskärna",
+  "item.constructionwand.core_destruction": "Rivningsstavskärna",
+
+  "constructionwand.tooltip.blocks": "Max. %d block",
+  "constructionwand.tooltip.shift": "Håll ned [SHIFT]",
+  "constructionwand.tooltip.cores": "Stavkärnor:",
+  "constructionwand.tooltip.core_tip": "Kombinera kärnan med din stav i ett tillverkningsrutnät",
+
+  "constructionwand.option.cores": "",
+  "constructionwand.option.cores.constructionwand:default": "Byggkärna",
+  "constructionwand.option.cores.constructionwand:default.desc": "Utvidga din byggnad åt sidan som är riktad mot dig",
+  "constructionwand.option.cores.constructionwand:core_angel": "§6Änglakärna",
+  "constructionwand.option.cores.constructionwand:core_angel.desc": "Placera block bakom befintliga block och i luften",
+  "constructionwand.option.cores.constructionwand:core_destruction": "§cRivningskärna",
+  "constructionwand.option.cores.constructionwand:core_destruction.desc": "Förstör block på sidan som är riktad mot dig",
+
+  "constructionwand.option.lock": "Begränsning: ",
+  "constructionwand.option.lock.horizontal": "§aVänster/Höger",
+  "constructionwand.option.lock.horizontal.desc": "Bygg en horisontal kolumn framför originalblocket",
+  "constructionwand.option.lock.vertical": "§aUppåt/Nedåt",
+  "constructionwand.option.lock.vertical.desc": "Bygg en vertikal kolumn framför originalblocket",
+  "constructionwand.option.lock.northsouth": "§6Nord/Syd",
+  "constructionwand.option.lock.northsouth.desc": "Bygg en nord-/sydriktad rad ovanpå originalblocket",
+  "constructionwand.option.lock.eastwest": "§6Öst/Väst",
+  "constructionwand.option.lock.eastwest.desc": "Bygg en öst-/västriktad rad ovanpå originalblocket",
+  "constructionwand.option.lock.nolock": "§cIngen",
+  "constructionwand.option.lock.nolock.desc": "Utvidga från en valfri sida av originalblocket",
+
+  "constructionwand.option.direction": "Riktning: ",
+  "constructionwand.option.direction.target": "§6Mål",
+  "constructionwand.option.direction.target.desc": "Placera block i samma riktning som målblocket",
+  "constructionwand.option.direction.player": "§aSpelare",
+  "constructionwand.option.direction.player.desc": "Placera block i samma riktning som spelaren tittar åt",
+
+  "constructionwand.option.replace": "Ersättning: ",
+  "constructionwand.option.replace.yes": "§aJa",
+  "constructionwand.option.replace.yes.desc": "Ersätt vissa block, t.ex. vätskor, snö och högt gräs",
+  "constructionwand.option.replace.no": "§cNej",
+  "constructionwand.option.replace.no.desc": "Ersätt inte något block",
+
+  "constructionwand.option.match": "Matchning: ",
+  "constructionwand.option.match.exact": "§aExakt",
+  "constructionwand.option.match.exact.desc": "Utvidga endast block som är exakt likadana",
+  "constructionwand.option.match.similar": "§6Liknande",
+  "constructionwand.option.match.similar.desc": "Behandla liknande block (jord-/grästyper) likadant",
+  "constructionwand.option.match.any": "§cAllting",
+  "constructionwand.option.match.any.desc": "Utvidga alla block",
+
+  "constructionwand.option.random": "Slumpa: ",
+  "constructionwand.option.random.yes": "§aJa",
+  "constructionwand.option.random.yes.desc": "Placera slumpartade block från din föremålsmeny",
+  "constructionwand.option.random.no": "§cNej",
+  "constructionwand.option.random.no.desc": "Slumpa inte block som ska placeras ut",
+
+  "stat.constructionwand.use_wand": "Block placerade med stavar"
+}
