@@ -3,9 +3,9 @@ package thetadev.constructionwand.basics.option;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IWandUpgrade;
@@ -31,7 +31,7 @@ public class WandUpgrades<T extends IWandUpgrade>
     }
 
     protected void deserialize() {
-        ListTag listnbt = tag.getList(key, Constants.NBT.TAG_STRING);
+        ListTag listnbt = tag.getList(key, Tag.TAG_STRING);
         boolean require_fix = false;
 
         for(int i = 0; i < listnbt.size(); i++) {

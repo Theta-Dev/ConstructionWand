@@ -2,7 +2,7 @@ package thetadev.constructionwand.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 import thetadev.constructionwand.ConstructionWand;
 
 import java.util.HashSet;

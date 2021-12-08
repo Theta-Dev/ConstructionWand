@@ -30,7 +30,7 @@ public class RenderBlockPreview
         if(event.getTarget().getType() != HitResult.Type.BLOCK) return;
 
         BlockHitResult rtr = event.getTarget();
-        Entity entity = event.getInfo().getEntity();
+        Entity entity = event.getCamera().getEntity();
         if(!(entity instanceof Player player)) return;
         Set<BlockPos> blocks;
         float colorR = 0, colorG = 0, colorB = 0;
@@ -51,8 +51,8 @@ public class RenderBlockPreview
 
         if(blocks == null || blocks.isEmpty()) return;
 
-        PoseStack ms = event.getMatrix();
-        MultiBufferSource buffer = event.getBuffers();
+        PoseStack ms = event.getPoseStack();
+        MultiBufferSource buffer = event.getMultiBufferSource();
         VertexConsumer lineBuilder = buffer.getBuffer(RenderType.LINES);
 
         double partialTicks = event.getPartialTicks();
