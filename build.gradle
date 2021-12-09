@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -89,6 +88,10 @@ repositories {
     maven {
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+        name = "JEI Maven"
+        url "https://dvs1.progwml6.com/files/maven"
+    }
 }
 
 dependencies {
@@ -97,6 +100,9 @@ dependencies {
             name   : "forge",
             version: "${project.mcversion}-${project.forgeversion}"
     ])
+
+    compileOnly fg.deobf("mezz.jei:${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:${jei_version}")
 
     compileOnly fg.deobf([
             group: "vazkii.botania",

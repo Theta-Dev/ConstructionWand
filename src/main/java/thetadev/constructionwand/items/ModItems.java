@@ -41,6 +41,7 @@ public class ModItems
 
     // Collections
     public static final Item[] WANDS = {WAND_STONE, WAND_IRON, WAND_DIAMOND, WAND_INFINITY};
+    public static final Item[] CORES = {CORE_ANGEL, CORE_DESTRUCTION};
     public static final HashSet<Item> ALL_ITEMS = new HashSet<>();
 
 

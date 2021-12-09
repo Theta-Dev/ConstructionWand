@@ -1,8 +1,8 @@
 # Construction Wand
 
 With a Construction Wand you can place multiple blocks (up to 1024) at once, extending your build on the side you're
-facing. Sneak+Right click to activate angel mode which allows you to place a block at the opposite side of the block
-facing you. If you concentrate enough, you can even conjure a block in mid air!
+facing. If that's not enough: you can upgrade your wand with additional cores, allowing you to place a block behind the
+block you are facing, conjure blocks in mid air or destroy lots of blocks very fast.
 
 ![](images/wands.png)
 
@@ -73,8 +73,8 @@ SNEAK+OPTKEY+Right clicking empty space opens the option screen of your wand.
 
 **Restriction:** If restriction is enabled the wand will only place blocks in one row or column
 (choose between North/South, East/West on a horizontal plane and Horizontal, Vertical on a vertical plane).
-If the direction lock is switched off, the wand will extend the entire face of the building it's pointed at.
-This option has no effect in Angel mode.
+If the direction lock is switched off, the wand will extend the entire face of the building it's pointed at. This option
+has no effect if the angel core is enabled.
 
 **Direction:** If set to "Player" the wand places blocks in the same direction as if they were placed by yourself.
 Target mode places the blocks in the same direction as their supporting block. See the picture below:
@@ -92,16 +92,17 @@ are exactly the same as the selected block.<br>
 ~~Shamelessly stolen~~ Inspired by the Trowel from Quark.
 
 ## Undo
-Holding down SHIFT+CTRL while looking at a blocks will show you the last blocks you placed with a green border
-around them. SHIFT+CTRL+Right clickking any of them will undo the operation, giving you all the items back.
-If you used the Destruction core, it will restore the blocks.
+
+Holding down Sneak+OPTKEY while looking at a block will show you the last blocks you placed with a green border around
+them. Sneak+OPTKEY+Right clicking any of them will undo the operation, giving you all the items back. If you used the
+Destruction core, it will restore the blocks.
 
 ## Additional features
-- If you have shulker boxes in your inventory filled with blocks, the wand can pull them out and place them
 
-- Botania compatibility: The Black Hole Talisman can supply blocks just like shulker boxes can.
-  Having a Rod of the Lands / Rod of the Depths in your inventory will provide you with infinite dirt/cobble
-  at the cost of Mana.
+- Shulker boxes, bundles (MC 1.17+) and many containers from other mods can provide building blocks for the wand
+
+- Botania compatibility: The Black Hole Talisman can supply blocks just like shulker boxes can. Having a Rod of the
+  Lands / Rod of the Depths in your inventory will provide you with infinite dirt/cobble at the cost of Mana.
 
 - Having blocks in your offhand will place them instead of the block you're looking at
 
@@ -109,14 +110,18 @@ If you used the Destruction core, it will restore the blocks.
 
 - **1.16+ only:** The Infinity Wand won't burn in lava just like netherite gear.
 
+- Ingame documentation with Just Enough Items (JEI)
+
 ## Contributions and #Hacktoberfest
+
 As #Hacktoberfest now requires repo owners to opt in, I added the tag to this repository.
 
-I'd really appreciate translations. Currently, ConstructionWand only has English and German,
-so if you speak any other language you can help translate the mod and add a new language file
+I'd really appreciate translations. Currently, ConstructionWand only has English and German, so if you speak any other
+language you can help translate the mod and add a new language file
 under `src/main/resources/assets/constructionwand/lang/`.
 
 ## TileEntity Blacklist
+
 Some modded TileEntitys can cause issues when placed using a wand. They may turn into invisible and
 unremovable ghost blocks, become unbreakable or cause other unwanted effects.
 

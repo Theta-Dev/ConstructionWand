@@ -64,7 +64,7 @@ public class ConfigServer
             else durability = null;
             builder.comment("Wand block limit");
             limit = builder.defineInRange("limit", defLimit, 1, Integer.MAX_VALUE);
-            builder.comment("Max placement distance with angel mode (0 to disable angel core)");
+            builder.comment("Max placement distance with angel core (0 to disable angel core)");
             angel = builder.defineInRange("angel", defAngel, 0, Integer.MAX_VALUE);
             builder.comment("Wand destruction block limit (0 to disable destruction core)");
             destruction = builder.defineInRange("destruction", defDestruction, 0, Integer.MAX_VALUE);
@@ -116,7 +116,7 @@ public class ConfigServer
         MAX_RANGE = BUILDER.defineInRange("MaxRange", 100, 0, Integer.MAX_VALUE);
         BUILDER.comment("Number of operations that can be undone");
         UNDO_HISTORY = BUILDER.defineInRange("UndoHistory", 3, 0, Integer.MAX_VALUE);
-        BUILDER.comment("Place blocks below you while falling > 10 blocks with angel mode (Can be used to save you from drops/the void)");
+        BUILDER.comment("Place blocks below you while falling > 10 blocks with angel core (Can be used to save you from drops/the void)");
         ANGEL_FALLING = BUILDER.define("AngelFalling", false);
         BUILDER.comment("Blocks to treat equally when in Similar mode. Enter block IDs seperated by ;");
         SIMILAR_BLOCKS = BUILDER.defineList("SimilarBlocks", Arrays.asList(SIMILAR_BLOCKS_DEFAULT), obj -> true);
