@@ -30,7 +30,7 @@ and last longer. These properties can be changed in the config.
 ![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.16.2/images/crafting5.png)
 ![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.16.2/images/crafting6.png)
 
-## OPTKEY
+## Keybindings
 
 To change a wand's core and options or undo your placement you need to hold down the wand option key
 (refered as OPTKEY). By default, this is CTRL, but it can be changed in the client config file. To prevent unwanted
@@ -112,14 +112,6 @@ Destruction core, it will restore the blocks.
 
 - Ingame documentation with Just Enough Items (JEI)
 
-## Contributions and #Hacktoberfest
-
-As #Hacktoberfest now requires repo owners to opt in, I added the tag to this repository.
-
-I'd really appreciate translations. Currently, ConstructionWand only has English and German, so if you speak any other
-language you can help translate the mod and add a new language file
-under `src/main/resources/assets/constructionwand/lang/`.
-
 ## TileEntity Blacklist
 
 Some modded TileEntitys can cause issues when placed using a wand. They may turn into invisible and
@@ -132,3 +124,11 @@ If you find some of them you can tell me by creating
 an issue, commenting on Curse or editing the default blacklist yourself
 (it is located at https://github.com/Theta-Dev/ConstructionWand/blob/1.16.2/src/main/java/thetadev/constructionwand/basics/ConfigServer.java#L28)
 and making a PR.
+
+## Contributions and #Hacktoberfest
+
+As #Hacktoberfest now requires repo owners to opt in, I added the tag to this repository.
+
+I'd really appreciate translations. Currently, ConstructionWand is available in English, German and Swedish.
+If you speak any other language you can help translate the mod and add a new language file
+under `src/main/resources/assets/constructionwand/lang/`.
