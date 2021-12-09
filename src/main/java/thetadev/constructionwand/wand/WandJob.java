@@ -94,15 +94,19 @@ public class WandJob
             if(wand.isEmpty() || wandItem.remainingDurability(wand) == 0) break;
 
             if(snapshot.execute(world, player, rayTraceResult)) {
-                // If the item cant be taken, undo the placement
-                if(wandSupplier.takeItemStack(snapshot.getRequiredItems()) == 0) executed.add(snapshot);
+                if(player.isCreative()) executed.add(snapshot);
                 else {
-                    ConstructionWand.LOGGER.info("Item could not be taken. Remove block: " +
-                            snapshot.getBlockState().getBlock().toString());
-                    snapshot.forceRestore(world);
+                    // If the item cant be taken, undo the placement
+                    if(wandSupplier.takeItemStack(snapshot.getRequiredItems()) == 0) {
+                        executed.add(snapshot);
+                        wand.hurt(1, player.getRandom(), (ServerPlayer) player);
+                    }
+                    else {
+                        ConstructionWand.LOGGER.info("Item could not be taken. Remove block: " +
+                                snapshot.getBlockState().getBlock().toString());
+                        snapshot.forceRestore(world);
+                    }
                 }
-
-                wand.hurt(1, player.getRandom(), (ServerPlayer) player);
                 player.awardStat(ModStats.USE_WAND);
             }
         }

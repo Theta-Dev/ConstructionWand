@@ -88,6 +88,10 @@ repositories {
     maven {
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+        name = "JEI Maven"
+        url "https://dvs1.progwml6.com/files/maven"
+    }
 }
 
 dependencies {
@@ -97,12 +101,17 @@ dependencies {
             version: "${project.mcversion}-${project.forgeversion}"
     ])
 
+    compileOnly fg.deobf("mezz.jei:${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:${jei_version}")
+
+    /*
     compileOnly fg.deobf([
             group: "vazkii.botania",
             name: "Botania",
             version: "${project.botania}",
             classifier: "api"
     ])
+    */
 }
 
 jar {
