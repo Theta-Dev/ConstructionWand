@@ -1,6 +1,7 @@
 package thetadev.constructionwand.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -53,9 +54,13 @@ public class ScreenWand extends Screen
     }
 
     @Override
-    public boolean charTyped(char character, int code) {
-        if(character == 'e') onClose();
-        return super.charTyped(character, code);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
+            this.onClose();
+            return true;
+        } else {
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
     }
 
     private void createButton(int cx, int cy, IOption<?> option) {
