@@ -56,9 +56,13 @@ public class ScreenWand extends Screen
     }
 
     @Override
-    public boolean charTyped(char character, int code) {
-        if(character == 'e') closeScreen();
-        return super.charTyped(character, code);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (Minecraft.getInstance().gameSettings.keyBindInventory.matchesKey(keyCode, scanCode)) {
+            this.closeScreen();
+            return true;
+        } else {
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
     }
 
     private void createButton(int cx, int cy, IOption<?> option) {
