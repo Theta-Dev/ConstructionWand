@@ -1,7 +1,7 @@
 package thetadev.constructionwand.data;
 
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
@@ -22,7 +22,7 @@ public class Inp
         return new Inp(in.asItem().getRegistryName().getPath(), Ingredient.of(in), ItemPredicate.Builder.item().of(in).build());
     }
 
-    public static Inp fromTag(Tag.Named<Item> in) {
-        return new Inp(in.getName().getPath(), Ingredient.of(in), ItemPredicate.Builder.item().of(in).build());
+    public static Inp fromTag(TagKey<Item> in) {
+        return new Inp(in.location().getPath(), Ingredient.of(in), ItemPredicate.Builder.item().of(in).build());
     }
 }

@@ -5,8 +5,8 @@ import thetadev.constructionwand.wand.action.ActionDestruction;
 
 public class ItemCoreDestruction extends ItemCore
 {
-    public ItemCoreDestruction(String name, Properties properties) {
-        super(name, properties);
+    public ItemCoreDestruction(Properties properties) {
+        super(properties);
     }
 
     @Override

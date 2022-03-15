@@ -1,8 +1,10 @@
 package thetadev.constructionwand.basics;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.registries.RegistryObject;
 import thetadev.constructionwand.items.ModItems;
 
 import java.util.Arrays;
@@ -27,10 +29,10 @@ public class ConfigServer
     public static final ForgeConfigSpec.ConfigValue<List<?>> TE_LIST;
     private static final String[] TE_LIST_DEFAULT = {"chiselsandbits"};
 
-    private static final HashMap<Item, WandProperties> wandProperties = new HashMap<>();
+    private static final HashMap<ResourceLocation, WandProperties> wandProperties = new HashMap<>();
 
     public static WandProperties getWandProperties(Item wand) {
-        return wandProperties.getOrDefault(wand, WandProperties.DEFAULT);
+        return wandProperties.getOrDefault(wand.getRegistryName(), WandProperties.DEFAULT);
     }
 
     public static class WandProperties
@@ -53,9 +55,10 @@ public class ConfigServer
             this.upgradeable = upgradeable;
         }
 
-        public WandProperties(ForgeConfigSpec.Builder builder, Item wand, int defDurability, int defLimit,
+        public WandProperties(ForgeConfigSpec.Builder builder, RegistryObject<Item> wandSupplier, int defDurability, int defLimit,
                               int defAngel, int defDestruction, boolean defUpgradeable) {
-            builder.push(wand.getRegistryName().getPath());
+            ResourceLocation registryName = wandSupplier.getId();
+            builder.push(registryName.getPath());
 
             if(defDurability > 0) {
                 builder.comment("Wand durability");
@@ -72,7 +75,7 @@ public class ConfigServer
             upgradeable = builder.define("upgradeable", defUpgradeable);
             builder.pop();
 
-            wandProperties.put(wand, this);
+            wandProperties.put(registryName, this);
         }
 
         public int getDurability() {

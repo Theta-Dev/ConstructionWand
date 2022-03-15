@@ -10,8 +10,8 @@ public class ItemWandBasic extends ItemWand
 {
     private final Tier tier;
 
-    public ItemWandBasic(String name, Properties properties, Tier tier) {
-        super(name, properties.durability(tier.getUses()));
+    public ItemWandBasic(Properties properties, Tier tier) {
+        super(properties.durability(tier.getUses()));
         this.tier = tier;
     }
 

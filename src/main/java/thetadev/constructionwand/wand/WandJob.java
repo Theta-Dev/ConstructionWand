@@ -74,7 +74,7 @@ public class WandJob
     public void getSnapshots() {
         int limit;
         // Infinity wand gets enhanced limit in creative mode
-        if(player.isCreative() && wandItem == ModItems.WAND_INFINITY) limit = ConfigServer.LIMIT_CREATIVE.get();
+        if(player.isCreative() && wandItem == ModItems.WAND_INFINITY.get()) limit = ConfigServer.LIMIT_CREATIVE.get();
         else limit = Math.min(wandItem.remainingDurability(wand), wandAction.getLimit(wand));
 
         if(rayTraceResult.getType() == HitResult.Type.BLOCK)

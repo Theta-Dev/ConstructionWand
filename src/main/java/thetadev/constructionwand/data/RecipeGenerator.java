@@ -27,13 +27,13 @@ public class RecipeGenerator extends RecipeProvider
 
     @Override
     protected void buildCraftingRecipes(@Nonnull Consumer<FinishedRecipe> consumer) {
-        wandRecipe(consumer, ModItems.WAND_STONE, Inp.fromTag(ItemTags.STONE_TOOL_MATERIALS));
-        wandRecipe(consumer, ModItems.WAND_IRON, Inp.fromTag(Tags.Items.INGOTS_IRON));
-        wandRecipe(consumer, ModItems.WAND_DIAMOND, Inp.fromTag(Tags.Items.GEMS_DIAMOND));
-        wandRecipe(consumer, ModItems.WAND_INFINITY, Inp.fromTag(Tags.Items.NETHER_STARS));
+        wandRecipe(consumer, ModItems.WAND_STONE.get(), Inp.fromTag(ItemTags.STONE_TOOL_MATERIALS));
+        wandRecipe(consumer, ModItems.WAND_IRON.get(), Inp.fromTag(Tags.Items.INGOTS_IRON));
+        wandRecipe(consumer, ModItems.WAND_DIAMOND.get(), Inp.fromTag(Tags.Items.GEMS_DIAMOND));
+        wandRecipe(consumer, ModItems.WAND_INFINITY.get(), Inp.fromTag(Tags.Items.NETHER_STARS));
 
-        coreRecipe(consumer, ModItems.CORE_ANGEL, Inp.fromTag(Tags.Items.FEATHERS), Inp.fromTag(Tags.Items.INGOTS_GOLD));
-        coreRecipe(consumer, ModItems.CORE_DESTRUCTION, Inp.fromTag(Tags.Items.STORAGE_BLOCKS_DIAMOND), Inp.fromItem(Items.DIAMOND_PICKAXE));
+        coreRecipe(consumer, ModItems.CORE_ANGEL.get(), Inp.fromTag(Tags.Items.FEATHERS), Inp.fromTag(Tags.Items.INGOTS_GOLD));
+        coreRecipe(consumer, ModItems.CORE_DESTRUCTION.get(), Inp.fromTag(Tags.Items.STORAGE_BLOCKS_DIAMOND), Inp.fromItem(Items.DIAMOND_PICKAXE));
 
         specialRecipe(consumer, RecipeWandUpgrade.SERIALIZER);
     }
