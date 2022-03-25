@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -25,17 +26,16 @@ import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.data.ICustomItemModel;
 import thetadev.constructionwand.data.ItemModelGenerator;
-import thetadev.constructionwand.items.ItemBase;
 import thetadev.constructionwand.wand.WandJob;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public abstract class ItemWand extends ItemBase implements ICustomItemModel
+public abstract class ItemWand extends Item implements ICustomItemModel
 {
-    public ItemWand(String name, Properties properties) {
-        super(name, properties);
+    public ItemWand(Properties properties) {
+        super(properties);
     }
 
     @Nonnull

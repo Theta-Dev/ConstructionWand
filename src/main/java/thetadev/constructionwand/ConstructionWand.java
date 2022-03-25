@@ -53,6 +53,9 @@ public class ConstructionWand
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
         MinecraftForge.EVENT_BUS.register(this);
 
+        // Register Item DeferredRegister
+        ModItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+
         // Config setup
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ConfigServer.SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ConfigClient.SPEC);

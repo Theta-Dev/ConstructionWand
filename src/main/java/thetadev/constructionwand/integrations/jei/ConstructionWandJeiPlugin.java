@@ -11,6 +11,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.RegistryObject;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.ConfigServer;
@@ -43,10 +44,11 @@ public class ConstructionWandJeiPlugin implements IModPlugin
         Component wandModeComponent = keyComboComponent(ConfigClient.SHIFTOPT_MODE.get(), optkeyComponent);
         Component wandGuiComponent = keyComboComponent(ConfigClient.SHIFTOPT_GUI.get(), optkeyComponent);
 
-        for(Item wand : ModItems.WANDS) {
+        for(RegistryObject<Item> wandSupplier : ModItems.WANDS) {
+            Item wand = wandSupplier.get();
             ConfigServer.WandProperties wandProperties = ConfigServer.getWandProperties(wand);
 
-            String durabilityKey = wand == ModItems.WAND_INFINITY ? "unlimited" : "limited";
+            String durabilityKey = wand == ModItems.WAND_INFINITY.get() ? "unlimited" : "limited";
             Component durabilityComponent = new TranslatableComponent(baseKey + "durability." + durabilityKey, wandProperties.getDurability());
 
             registration.addIngredientInfo(new ItemStack(wand), VanillaTypes.ITEM,
@@ -57,7 +59,8 @@ public class ConstructionWandJeiPlugin implements IModPlugin
             );
         }
 
-        for(Item core : ModItems.CORES) {
+        for(RegistryObject<Item> coreSupplier : ModItems.CORES) {
+            Item core = coreSupplier.get();
             registration.addIngredientInfo(new ItemStack(core), VanillaTypes.ITEM,
                     new TranslatableComponent(baseKey + core.getRegistryName().getPath()),
                     new TranslatableComponent(baseKey + "core", wandModeComponent)

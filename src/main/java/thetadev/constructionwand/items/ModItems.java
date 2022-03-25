@@ -12,8 +12,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.*;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.crafting.RecipeWandUpgrade;
@@ -23,38 +22,24 @@ import thetadev.constructionwand.items.wand.ItemWand;
 import thetadev.constructionwand.items.wand.ItemWandBasic;
 import thetadev.constructionwand.items.wand.ItemWandInfinity;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 @Mod.EventBusSubscriber(modid = ConstructionWand.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModItems
 {
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ConstructionWand.MODID);
+
     // Wands
-    public static final Item WAND_STONE = new ItemWandBasic("stone_wand", propWand(), Tiers.STONE);
-    public static final Item WAND_IRON = new ItemWandBasic("iron_wand", propWand(), Tiers.IRON);
-    public static final Item WAND_DIAMOND = new ItemWandBasic("diamond_wand", propWand(), Tiers.DIAMOND);
-    public static final Item WAND_INFINITY = new ItemWandInfinity("infinity_wand", propWand());
+    public static final RegistryObject<Item> WAND_STONE = ITEMS.register("stone_wand", () -> new ItemWandBasic(propWand(), Tiers.STONE));
+    public static final RegistryObject<Item> WAND_IRON = ITEMS.register("iron_wand", () -> new ItemWandBasic(propWand(), Tiers.IRON));
+    public static final RegistryObject<Item> WAND_DIAMOND = ITEMS.register("diamond_wand", () -> new ItemWandBasic(propWand(), Tiers.DIAMOND));
+    public static final RegistryObject<Item> WAND_INFINITY = ITEMS.register("infinity_wand", () -> new ItemWandInfinity(propWand()));
 
     // Cores
-    public static final Item CORE_ANGEL = new ItemCoreAngel("core_angel", propUpgrade());
-    public static final Item CORE_DESTRUCTION = new ItemCoreDestruction("core_destruction", propUpgrade());
+    public static final RegistryObject<Item> CORE_ANGEL = ITEMS.register("core_angel", () -> new ItemCoreAngel(propUpgrade()));
+    public static final RegistryObject<Item> CORE_DESTRUCTION = ITEMS.register("core_destruction", () -> new ItemCoreDestruction(propUpgrade()));
 
     // Collections
-    public static final Item[] WANDS = {WAND_STONE, WAND_IRON, WAND_DIAMOND, WAND_INFINITY};
-    public static final Item[] CORES = {CORE_ANGEL, CORE_DESTRUCTION};
-    public static final HashSet<Item> ALL_ITEMS = new HashSet<>();
-
-
-    @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> event) {
-        IForgeRegistry<Item> r = event.getRegistry();
-
-        r.registerAll(WANDS);
-        ALL_ITEMS.addAll(Arrays.asList(WANDS));
-
-        registerItem(r, CORE_ANGEL);
-        registerItem(r, CORE_DESTRUCTION);
-    }
+    public static final RegistryObject<Item>[] WANDS = new RegistryObject[] {WAND_STONE, WAND_IRON, WAND_DIAMOND, WAND_INFINITY};
+    public static final RegistryObject<Item>[] CORES = new RegistryObject[] {CORE_ANGEL, CORE_DESTRUCTION};
 
     public static Item.Properties propWand() {
         return new Item.Properties().tab(CreativeModeTab.TAB_TOOLS);
@@ -62,11 +47,6 @@ public class ModItems
 
     private static Item.Properties propUpgrade() {
         return new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1);
-    }
-
-    private static void registerItem(IForgeRegistry<Item> reg, Item item) {
-        reg.register(item);
-        ALL_ITEMS.add(item);
     }
 
     @SubscribeEvent
@@ -77,7 +57,8 @@ public class ModItems
 
     @OnlyIn(Dist.CLIENT)
     public static void registerModelProperties() {
-        for(Item item : WANDS) {
+        for(RegistryObject<Item> itemSupplier : WANDS) {
+            Item item = itemSupplier.get();
             ItemProperties.register(
                     item, ConstructionWand.loc("using_core"),
                     (stack, world, entity, n) -> entity == null || !(stack.getItem() instanceof ItemWand) ? 0 :
@@ -90,7 +71,8 @@ public class ModItems
     public static void registerItemColors() {
         ItemColors colors = Minecraft.getInstance().getItemColors();
 
-        for(Item item : WANDS) {
+        for(RegistryObject<Item> itemSupplier : WANDS) {
+            Item item = itemSupplier.get();
             colors.register((stack, layer) -> (layer == 1 && stack.getItem() instanceof ItemWand) ?
                     new WandOptions(stack).cores.get().getColor() : -1, item);
         }

@@ -5,6 +5,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.RegistryObject;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.items.ModItems;
 
@@ -18,7 +19,8 @@ public class ItemModelGenerator extends ItemModelProvider
 
     @Override
     protected void registerModels() {
-        for(Item item : ModItems.ALL_ITEMS) {
+        for(RegistryObject<Item> itemObject : ModItems.ITEMS.getEntries()) {
+            Item item = itemObject.get();
             String name = item.getRegistryName().getPath();
 
             if(item instanceof ICustomItemModel)
