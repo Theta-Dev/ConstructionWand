@@ -160,7 +160,7 @@ public class WandUtil
         List<ItemStack> inventory = WandUtil.getFullInv(player);
 
         for(ItemStack stack : inventory) {
-            if(stack == null) continue;
+            if(stack == null || stack.isEmpty()) continue;
 
             if(WandUtil.stackEquals(stack, item)) {
                 total += stack.getCount();
