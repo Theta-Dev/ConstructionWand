@@ -16,6 +16,8 @@ public class ReplacementRegistry
     private static final HashSet<HashSet<Item>> replacements = new HashSet<>();
 
     public static void init() {
+        replacements.clear();
+
         for(Object key : ConfigServer.SIMILAR_BLOCKS.get()) {
             if(!(key instanceof String)) continue;
             HashSet<Item> set = new HashSet<>();

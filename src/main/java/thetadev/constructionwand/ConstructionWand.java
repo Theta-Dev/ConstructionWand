@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ModStats;
-import thetadev.constructionwand.basics.ReplacementRegistry;
 import thetadev.constructionwand.client.ClientEvents;
 import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
@@ -73,9 +72,6 @@ public class ConstructionWand
 
         // Container registry
         ContainerRegistrar.register();
-
-        //Replacement registry
-        ReplacementRegistry.init();
 
         // Stats
         ModStats.register();
