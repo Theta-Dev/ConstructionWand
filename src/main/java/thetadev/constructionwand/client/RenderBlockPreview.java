@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.client.event.DrawSelectionEvent;
+import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.items.wand.ItemWand;
@@ -26,7 +26,7 @@ public class RenderBlockPreview
     public Set<BlockPos> undoBlocks;
 
     @SubscribeEvent
-    public void renderBlockHighlight(DrawSelectionEvent.HighlightBlock event) {
+    public void renderBlockHighlight(RenderHighlightEvent.Block event) {
         if(event.getTarget().getType() != HitResult.Type.BLOCK) return;
 
         BlockHitResult rtr = event.getTarget();
@@ -55,7 +55,7 @@ public class RenderBlockPreview
         MultiBufferSource buffer = event.getMultiBufferSource();
         VertexConsumer lineBuilder = buffer.getBuffer(RenderType.LINES);
 
-        double partialTicks = event.getPartialTicks();
+        double partialTicks = event.getPartialTick();
         double d0 = player.xOld + (player.getX() - player.xOld) * partialTicks;
         double d1 = player.yOld + player.getEyeHeight() + (player.getY() - player.yOld) * partialTicks;
         double d2 = player.zOld + (player.getZ() - player.zOld) * partialTicks;

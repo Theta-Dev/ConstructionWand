@@ -1,21 +1,17 @@
 package thetadev.constructionwand.items;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -54,9 +50,10 @@ public class ModItems
     }
 
     @SubscribeEvent
-    public static void registerRecipeSerializers(RegistryEvent.Register<RecipeSerializer<?>> event) {
-        IForgeRegistry<RecipeSerializer<?>> r = event.getRegistry();
-        register(r, "wand_upgrade", RecipeWandUpgrade.SERIALIZER);
+    public static void registerRecipeSerializers(RegisterEvent event) {
+        event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, registry -> {
+            registry.register("wand_upgrade", RecipeWandUpgrade.SERIALIZER);
+        });
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -71,18 +68,12 @@ public class ModItems
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public static void registerItemColors() {
-        ItemColors colors = Minecraft.getInstance().getItemColors();
-
+    @SubscribeEvent
+    public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         for(RegistryObject<Item> itemSupplier : WANDS) {
             Item item = itemSupplier.get();
-            colors.register((stack, layer) -> (layer == 1 && stack.getItem() instanceof ItemWand) ?
+            event.register((stack, layer) -> (layer == 1 && stack.getItem() instanceof ItemWand) ?
                     new WandOptions(stack).cores.get().getColor() : -1, item);
         }
-    }
-
-    private static <V extends IForgeRegistryEntry<V>> void register(IForgeRegistry<V> reg, String name, IForgeRegistryEntry<V> thing) {
-        reg.register(thing.setRegistryName(ConstructionWand.loc(name)));
     }
 }

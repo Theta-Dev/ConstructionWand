@@ -7,11 +7,14 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.NotNull;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.ConfigServer;
@@ -34,12 +37,12 @@ public class ConstructionWandJeiPlugin implements IModPlugin
 
     private Component keyComboComponent(boolean shiftOpt, Component optkeyComponent) {
         String key = shiftOpt ? "sneak_opt" : "sneak";
-        return new TranslatableComponent(baseKey + "key." + key, optkeyComponent).withStyle(ChatFormatting.BLUE);
+        return MutableComponent.create(new TranslatableContents(baseKey + "key." + key, optkeyComponent)).withStyle(ChatFormatting.BLUE);
     }
 
     @Override
-    public void registerRecipes(IRecipeRegistration registration) {
-        Component optkeyComponent = new TranslatableComponent(InputConstants.getKey(ConfigClient.OPT_KEY.get(), -1).getName())
+    public void registerRecipes(@NotNull IRecipeRegistration registration) {
+        Component optkeyComponent = MutableComponent.create(new TranslatableContents(InputConstants.getKey(ConfigClient.OPT_KEY.get(), -1).getName()))
                 .withStyle(ChatFormatting.BLUE);
         Component wandModeComponent = keyComboComponent(ConfigClient.SHIFTOPT_MODE.get(), optkeyComponent);
         Component wandGuiComponent = keyComboComponent(ConfigClient.SHIFTOPT_GUI.get(), optkeyComponent);
@@ -49,21 +52,25 @@ public class ConstructionWandJeiPlugin implements IModPlugin
             ConfigServer.WandProperties wandProperties = ConfigServer.getWandProperties(wand);
 
             String durabilityKey = wand == ModItems.WAND_INFINITY.get() ? "unlimited" : "limited";
-            Component durabilityComponent = new TranslatableComponent(baseKey + "durability." + durabilityKey, wandProperties.getDurability());
+            Component durabilityComponent = MutableComponent.create(new TranslatableContents(baseKey + "durability." + durabilityKey, wandProperties.getDurability()));
 
-            registration.addIngredientInfo(new ItemStack(wand), VanillaTypes.ITEM,
-                    new TranslatableComponent(baseKey + "wand",
-                            new TranslatableComponent(baseKeyItem + wand.getRegistryName().getPath()),
-                            wandProperties.getLimit(), durabilityComponent,
-                            optkeyComponent, wandModeComponent, wandGuiComponent)
+            registration.addIngredientInfo(new ItemStack(wand), VanillaTypes.ITEM_STACK,
+                    MutableComponent.create(
+                            new TranslatableContents(baseKey + "wand",
+                                    new TranslatableContents(baseKeyItem + ForgeRegistries.ITEMS.getKey(wand).getPath()),
+                                    wandProperties.getLimit(), durabilityComponent,
+                                    optkeyComponent, wandModeComponent, wandGuiComponent)
+                    )
             );
         }
 
         for(RegistryObject<Item> coreSupplier : ModItems.CORES) {
             Item core = coreSupplier.get();
-            registration.addIngredientInfo(new ItemStack(core), VanillaTypes.ITEM,
-                    new TranslatableComponent(baseKey + core.getRegistryName().getPath()),
-                    new TranslatableComponent(baseKey + "core", wandModeComponent)
+            registration.addIngredientInfo(new ItemStack(core), VanillaTypes.ITEM_STACK,
+                    MutableComponent.create(
+                            new TranslatableContents(baseKey + ForgeRegistries.ITEMS.getKey(core).getPath(),
+                                    new TranslatableContents(baseKey + "core", wandModeComponent)
+                            ))
             );
         }
     }

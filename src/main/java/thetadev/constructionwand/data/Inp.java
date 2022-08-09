@@ -5,6 +5,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class Inp
 {
@@ -19,7 +20,7 @@ public class Inp
     }
 
     public static Inp fromItem(ItemLike in) {
-        return new Inp(in.asItem().getRegistryName().getPath(), Ingredient.of(in), ItemPredicate.Builder.item().of(in).build());
+        return new Inp(ForgeRegistries.ITEMS.getKey(in.asItem()).getPath(), Ingredient.of(in), ItemPredicate.Builder.item().of(in).build());
     }
 
     public static Inp fromTag(TagKey<Item> in) {

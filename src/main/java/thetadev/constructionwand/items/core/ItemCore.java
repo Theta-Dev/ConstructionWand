@@ -2,7 +2,8 @@ package thetadev.constructionwand.items.core;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -23,9 +24,15 @@ public abstract class ItemCore extends Item implements IWandCore
 
     @OnlyIn(Dist.CLIENT)
     public void appendHoverText(@Nonnull ItemStack itemstack, Level worldIn, @Nonnull List<Component> lines, @Nonnull TooltipFlag extraInfo) {
-        lines.add(new TranslatableComponent(ConstructionWand.MODID + ".option.cores." + getRegistryName().toString() + ".desc")
-                .withStyle(ChatFormatting.GRAY));
-        lines.add(new TranslatableComponent(ConstructionWand.MODID + ".tooltip.core_tip")
-                .withStyle(ChatFormatting.AQUA));
+        lines.add(
+                MutableComponent.create(new TranslatableContents(
+                        ConstructionWand.MODID + ".option.cores." + getRegistryName().toString() + ".desc"
+                )).withStyle(ChatFormatting.GRAY)
+        );
+        lines.add(
+                MutableComponent.create(new TranslatableContents(
+                        ConstructionWand.MODID + ".tooltip.core_tip"
+                )).withStyle(ChatFormatting.AQUA)
+        );
     }
 }

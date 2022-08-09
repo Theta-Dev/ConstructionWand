@@ -1,5 +1,7 @@
 package thetadev.constructionwand.items.core;
 
+import net.minecraft.resources.ResourceLocation;
+import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.wand.action.ActionDestruction;
 
@@ -17,5 +19,10 @@ public class ItemCoreDestruction extends ItemCore
     @Override
     public IWandAction getWandAction() {
         return new ActionDestruction();
+    }
+
+    @Override
+    public ResourceLocation getRegistryName() {
+        return ConstructionWand.loc("core_angel");
     }
 }

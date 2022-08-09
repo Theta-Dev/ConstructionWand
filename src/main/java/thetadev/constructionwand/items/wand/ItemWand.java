@@ -3,8 +3,9 @@ package thetadev.constructionwand.items.wand;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -107,35 +108,35 @@ public abstract class ItemWand extends Item implements ICustomItemModel
         if(Screen.hasShiftDown()) {
             for(int i = 1; i < options.allOptions.length; i++) {
                 IOption<?> opt = options.allOptions[i];
-                lines.add(new TranslatableComponent(opt.getKeyTranslation()).withStyle(ChatFormatting.AQUA)
-                        .append(new TranslatableComponent(opt.getValueTranslation()).withStyle(ChatFormatting.GRAY))
+                lines.add(MutableComponent.create(new TranslatableContents(opt.getKeyTranslation())).withStyle(ChatFormatting.AQUA)
+                        .append(MutableComponent.create(new TranslatableContents(opt.getValueTranslation())).withStyle(ChatFormatting.GRAY))
                 );
             }
             if(!options.cores.getUpgrades().isEmpty()) {
-                lines.add(new TextComponent(""));
-                lines.add(new TranslatableComponent(langTooltip + "cores").withStyle(ChatFormatting.GRAY));
+                lines.add(MutableComponent.create(new LiteralContents("")));
+                lines.add(MutableComponent.create(new TranslatableContents(langTooltip + "cores")).withStyle(ChatFormatting.GRAY));
 
                 for(IWandCore core : options.cores.getUpgrades()) {
-                    lines.add(new TranslatableComponent(options.cores.getKeyTranslation() + "." + core.getRegistryName().toString()));
+                    lines.add(MutableComponent.create(new TranslatableContents(options.cores.getKeyTranslation() + "." + core.getRegistryName().toString())));
                 }
             }
         }
         // Default tooltip: show block limit + active wand core
         else {
             IOption<?> opt = options.allOptions[0];
-            lines.add(new TranslatableComponent(langTooltip + "blocks", limit).withStyle(ChatFormatting.GRAY));
-            lines.add(new TranslatableComponent(opt.getKeyTranslation()).withStyle(ChatFormatting.AQUA)
-                    .append(new TranslatableComponent(opt.getValueTranslation()).withStyle(ChatFormatting.WHITE)));
-            lines.add(new TranslatableComponent(langTooltip + "shift").withStyle(ChatFormatting.AQUA));
+            lines.add(MutableComponent.create(new TranslatableContents(langTooltip + "blocks", limit)).withStyle(ChatFormatting.GRAY));
+            lines.add(MutableComponent.create(new TranslatableContents(opt.getKeyTranslation())).withStyle(ChatFormatting.AQUA)
+                    .append(MutableComponent.create(new TranslatableContents(opt.getValueTranslation())).withStyle(ChatFormatting.WHITE)));
+            lines.add(MutableComponent.create(new TranslatableContents(langTooltip + "shift")).withStyle(ChatFormatting.AQUA));
         }
     }
 
     public static void optionMessage(Player player, IOption<?> option) {
         player.displayClientMessage(
-                new TranslatableComponent(option.getKeyTranslation()).withStyle(ChatFormatting.AQUA)
-                        .append(new TranslatableComponent(option.getValueTranslation()).withStyle(ChatFormatting.WHITE))
-                        .append(new TextComponent(" - ").withStyle(ChatFormatting.GRAY))
-                        .append(new TranslatableComponent(option.getDescTranslation()).withStyle(ChatFormatting.WHITE))
+                MutableComponent.create(new TranslatableContents(option.getKeyTranslation())).withStyle(ChatFormatting.AQUA)
+                        .append(MutableComponent.create(new TranslatableContents(option.getValueTranslation())).withStyle(ChatFormatting.WHITE))
+                        .append(MutableComponent.create(new TranslatableContents(" - ")).withStyle(ChatFormatting.GRAY))
+                        .append(MutableComponent.create(new TranslatableContents(option.getDescTranslation())).withStyle(ChatFormatting.WHITE))
                 , true);
     }
 

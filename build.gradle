@@ -16,8 +16,10 @@ version = "${mcversion}-${version_major}.${version_minor}"
 group = "${author}.${modid}"
 archivesBaseName = "${modid}"
 
+// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: project.mcp_channel, version: project.mcp_mappings
 
@@ -30,6 +32,9 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
+
+            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            // property 'forge.enabledGameTestNamespaces', modid
 
             mods {
                 constructionwand {
@@ -47,8 +52,29 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
+            // property 'forge.enabledGameTestNamespaces', modid
+
             mods {
                 constructionwand {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        // This run config launches GameTestServer and runs all registered gametests, then exits.
+        // By default, the server will crash when no gametests are provided.
+        // The gametest system is also enabled by default for other run configs under the /test command.
+        gameTestServer {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            property 'forge.enabledGameTestNamespaces', modid
+
+            mods {
+                examplemod {
                     source sourceSets.main
                 }
             }
@@ -101,8 +127,9 @@ dependencies {
             version: "${project.mcversion}-${project.forgeversion}"
     ])
 
-    compileOnly fg.deobf("mezz.jei:${jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:${jei_version}")
+    compileOnly "mezz.jei:jei-${mcversion}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${mcversion}-forge-api:${jei_version}"
+    // runtimeOnly "mezz.jei:jei-${mcversion}-forge:${jei_version}"
 
     compileOnly fg.deobf([
             group: "vazkii.botania",

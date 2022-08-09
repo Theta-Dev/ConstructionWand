@@ -20,7 +20,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.items.wand.ItemWand;
@@ -91,7 +92,7 @@ public class WandUtil
     public static boolean isTEAllowed(BlockState state) {
         if(!state.hasBlockEntity()) return true;
 
-        ResourceLocation name = state.getBlock().getRegistryName();
+        ResourceLocation name = ForgeRegistries.BLOCKS.getKey(state.getBlock());
         if(name == null) return false;
 
         String fullId = name.toString();

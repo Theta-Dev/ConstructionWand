@@ -1,17 +1,18 @@
 package thetadev.constructionwand.basics.pool;
 
+import net.minecraft.util.RandomSource;
+
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Random;
 
 public class RandomPool<T> implements IPool<T>
 {
-    private final Random rng;
+    private final RandomSource rng;
     private final HashMap<T, Integer> elements;
     private HashSet<T> pool;
 
-    public RandomPool(Random rng) {
+    public RandomPool(RandomSource rng) {
         this.rng = rng;
         elements = new HashMap<>();
         reset();

@@ -2,9 +2,9 @@ package thetadev.constructionwand.data;
 
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModData
@@ -15,11 +15,11 @@ public class ModData
         ExistingFileHelper fileHelper = event.getExistingFileHelper();
 
         if(event.includeServer()) {
-            generator.addProvider(new RecipeGenerator(generator));
+            generator.addProvider(true, new RecipeGenerator(generator));
         }
 
         if(event.includeClient()) {
-            generator.addProvider(new ItemModelGenerator(generator, fileHelper));
+            generator.addProvider(true, new ItemModelGenerator(generator, fileHelper));
         }
     }
 }

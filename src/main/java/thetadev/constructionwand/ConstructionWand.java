@@ -87,7 +87,6 @@ public class ConstructionWand
         MinecraftForge.EVENT_BUS.register(new ClientEvents());
 
         event.enqueueWork(ModItems::registerModelProperties);
-        event.enqueueWork(ModItems::registerItemColors);
     }
 
     public static ResourceLocation loc(String name) {

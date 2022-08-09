@@ -5,8 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.IOption;
@@ -31,7 +32,7 @@ public class ScreenWand extends Screen
     private static final int FIELD_HEIGHT = N_ROWS * (BUTTON_HEIGHT + SPACING_HEIGHT) - SPACING_HEIGHT;
 
     public ScreenWand(ItemStack wand) {
-        super(new TextComponent("ScreenWand"));
+        super(MutableComponent.create(new LiteralContents("ScreenWand")));
         this.wand = wand;
         wandOptions = new WandOptions(wand);
     }
@@ -55,16 +56,18 @@ public class ScreenWand extends Screen
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
+        if(Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
             this.onClose();
             return true;
-        } else {
+        }
+        else {
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
     }
 
     private void createButton(int cx, int cy, IOption<?> option) {
-        Button button = new Button(getX(cx), getY(cy), BUTTON_WIDTH, BUTTON_HEIGHT, getButtonLabel(option), bt -> clickButton(bt, option), (bt, ms, x, y) -> drawTooltip(ms, x, y, option));
+        Button button = new Button(getX(cx), getY(cy), BUTTON_WIDTH, BUTTON_HEIGHT,
+                getButtonLabel(option), bt -> clickButton(bt, option), (bt, ms, x, y) -> drawTooltip(ms, x, y, option));
         button.active = option.isEnabled();
         addRenderableWidget(button);
     }
@@ -77,7 +80,8 @@ public class ScreenWand extends Screen
 
     private void drawTooltip(PoseStack matrixStack, int mouseX, int mouseY, IOption<?> option) {
         if(isMouseOver(mouseX, mouseY)) {
-            renderTooltip(matrixStack, new TranslatableComponent(option.getDescTranslation()), mouseX, mouseY);
+            renderTooltip(matrixStack, MutableComponent.create(
+                    new TranslatableContents(option.getDescTranslation())), mouseX, mouseY);
         }
     }
 
@@ -90,6 +94,9 @@ public class ScreenWand extends Screen
     }
 
     private Component getButtonLabel(IOption<?> option) {
-        return new TranslatableComponent(option.getKeyTranslation()).append(new TranslatableComponent(option.getValueTranslation()));
+        return MutableComponent.create(
+                new TranslatableContents(option.getKeyTranslation(),
+                        new TranslatableContents(option.getValueTranslation()))
+        );
     }
 }

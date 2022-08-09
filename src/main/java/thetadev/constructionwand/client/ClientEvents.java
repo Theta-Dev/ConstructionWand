@@ -26,7 +26,7 @@ public class ClientEvents
 
     // Send state of OPT key to server
     @SubscribeEvent
-    public void KeyEvent(InputEvent.KeyInputEvent event) {
+    public void KeyEvent(InputEvent.Key event) {
         Player player = Minecraft.getInstance().player;
         if(player == null) return;
         if(WandUtil.holdingWand(player) == null) return;
@@ -42,7 +42,7 @@ public class ClientEvents
 
     // Sneak+(OPT)+Scroll to change direction lock
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void MouseScrollEvent(InputEvent.MouseScrollEvent event) {
+    public void MouseScrollEvent(InputEvent.MouseScrollingEvent event) {
         Player player = Minecraft.getInstance().player;
         double scroll = event.getScrollDelta();
 
@@ -60,7 +60,7 @@ public class ClientEvents
     // Sneak+(OPT)+Left click wand to change core
     @SubscribeEvent
     public void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
-        Player player = event.getPlayer();
+        Player player = event.getEntity();
 
         if(player == null || !modeKeyCombDown(player)) return;
 
@@ -77,7 +77,7 @@ public class ClientEvents
     public void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if(event.getSide().isServer()) return;
 
-        Player player = event.getPlayer();
+        Player player = event.getEntity();
         if(player == null || !guiKeyCombDown(player)) return;
 
         ItemStack wand = event.getItemStack();
