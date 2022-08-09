@@ -68,6 +68,7 @@ public class ModItems
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         for(RegistryObject<Item> itemSupplier : WANDS) {
