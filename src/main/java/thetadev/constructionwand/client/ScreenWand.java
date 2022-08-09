@@ -5,9 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.LiteralContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.IOption;
@@ -32,7 +29,7 @@ public class ScreenWand extends Screen
     private static final int FIELD_HEIGHT = N_ROWS * (BUTTON_HEIGHT + SPACING_HEIGHT) - SPACING_HEIGHT;
 
     public ScreenWand(ItemStack wand) {
-        super(MutableComponent.create(new LiteralContents("ScreenWand")));
+        super(Component.literal("ScreenWand"));
         this.wand = wand;
         wandOptions = new WandOptions(wand);
     }
@@ -80,8 +77,7 @@ public class ScreenWand extends Screen
 
     private void drawTooltip(PoseStack matrixStack, int mouseX, int mouseY, IOption<?> option) {
         if(isMouseOver(mouseX, mouseY)) {
-            renderTooltip(matrixStack, MutableComponent.create(
-                    new TranslatableContents(option.getDescTranslation())), mouseX, mouseY);
+            renderTooltip(matrixStack, Component.translatable(option.getDescTranslation()), mouseX, mouseY);
         }
     }
 
@@ -94,9 +90,6 @@ public class ScreenWand extends Screen
     }
 
     private Component getButtonLabel(IOption<?> option) {
-        return MutableComponent.create(
-                new TranslatableContents(option.getKeyTranslation(),
-                        new TranslatableContents(option.getValueTranslation()))
-        );
+        return Component.translatable(option.getKeyTranslation()).append(Component.translatable(option.getValueTranslation()));
     }
 }
