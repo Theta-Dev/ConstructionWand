@@ -127,9 +127,9 @@ dependencies {
             version: "${project.mcversion}-${project.forgeversion}"
     ])
 
-    compileOnly "mezz.jei:jei-${mcversion}-common-api:${jei_version}"
-    compileOnly "mezz.jei:jei-${mcversion}-forge-api:${jei_version}"
-    // runtimeOnly "mezz.jei:jei-${mcversion}-forge:${jei_version}"
+    compileOnly "mezz.jei:jei-${jei_mcversion}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${jei_mcversion}-forge-api:${jei_version}"
+    // runtimeOnly "mezz.jei:jei-${jei_mcversion}-forge:${jei_version}"
 
     compileOnly fg.deobf([
             group: "vazkii.botania",
