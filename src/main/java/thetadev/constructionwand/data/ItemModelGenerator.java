@@ -1,6 +1,6 @@
 package thetadev.constructionwand.data;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -14,8 +14,8 @@ import javax.annotation.Nonnull;
 
 public class ItemModelGenerator extends ItemModelProvider
 {
-    public ItemModelGenerator(DataGenerator generator, ExistingFileHelper existingFileHelper) {
-        super(generator, ConstructionWand.MODID, existingFileHelper);
+    public ItemModelGenerator(PackOutput packOutput, ExistingFileHelper existingFileHelper) {
+        super(packOutput, ConstructionWand.MODID, existingFileHelper);
     }
 
     @Override

@@ -3,9 +3,10 @@ package thetadev.constructionwand.crafting;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 import thetadev.constructionwand.api.IWandUpgrade;
 import thetadev.constructionwand.basics.ConfigServer;
@@ -16,10 +17,10 @@ import javax.annotation.Nonnull;
 
 public class RecipeWandUpgrade extends CustomRecipe
 {
-    public static final SimpleRecipeSerializer<RecipeWandUpgrade> SERIALIZER = new SimpleRecipeSerializer<>(RecipeWandUpgrade::new);
+    public static final SimpleCraftingRecipeSerializer<RecipeWandUpgrade> SERIALIZER = new SimpleCraftingRecipeSerializer<>(RecipeWandUpgrade::new);
 
-    public RecipeWandUpgrade(ResourceLocation resourceLocation) {
-        super(resourceLocation);
+    public RecipeWandUpgrade(ResourceLocation resourceLocation, CraftingBookCategory category) {
+        super(resourceLocation, category);
     }
 
     @Override

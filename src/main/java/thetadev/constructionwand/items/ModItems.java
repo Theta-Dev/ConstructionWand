@@ -1,12 +1,13 @@
 package thetadev.constructionwand.items;
 
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
@@ -42,11 +43,11 @@ public class ModItems
     public static final RegistryObject<Item>[] CORES = new RegistryObject[] {CORE_ANGEL, CORE_DESTRUCTION};
 
     public static Item.Properties propWand() {
-        return new Item.Properties().tab(CreativeModeTab.TAB_TOOLS);
+        return new Item.Properties();
     }
 
     private static Item.Properties propUpgrade() {
-        return new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1);
+        return new Item.Properties().stacksTo(1);
     }
 
     @SubscribeEvent
@@ -75,6 +76,19 @@ public class ModItems
             Item item = itemSupplier.get();
             event.register((stack, layer) -> (layer == 1 && stack.getItem() instanceof ItemWand) ?
                     new WandOptions(stack).cores.get().getColor() : -1, item);
+        }
+    }
+
+    @SubscribeEvent
+    public static void addCreative(CreativeModeTabEvent.BuildContents event) {
+        if (event.getTab() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            for(RegistryObject<Item> itemSupplier : WANDS) {
+                event.accept(itemSupplier);
+            }
+        } else if (event.getTab() == CreativeModeTabs.INGREDIENTS) {
+            for(RegistryObject<Item> itemSupplier : CORES) {
+                event.accept(itemSupplier);
+            }
         }
     }
 }
