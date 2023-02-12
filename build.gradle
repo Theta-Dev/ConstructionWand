@@ -129,7 +129,7 @@ dependencies {
 
     compileOnly "mezz.jei:jei-${mcversion}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${mcversion}-forge-api:${jei_version}"
-    // runtimeOnly "mezz.jei:jei-${mcversion}-forge:${jei_version}"
+    runtimeOnly "mezz.jei:jei-${mcversion}-forge:${jei_version}"
 
     compileOnly fg.deobf([
             group: "vazkii.botania",

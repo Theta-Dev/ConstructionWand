@@ -4,7 +4,7 @@ With a Construction Wand you can place multiple blocks (up to 1024) at once, ext
 facing. If that's not enough: you can upgrade your wand with additional cores, allowing you to place a block behind the
 block you are facing, conjure blocks in mid air or destroy lots of blocks very fast.
 
-![](images/wands.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/wands.png)
 
 **Note:** These are the instructions for ConstructionWand version 2.0+, which introduced some new features.
 If you are still using version 1.x, refer to [those](https://github.com/Theta-Dev/ConstructionWand/tree/1.16.2-1.7)
@@ -23,12 +23,12 @@ and last longer. These properties can be changed in the config.
 | Infinity | Unbreakable | 1024        | Yes         | 8              | 81                    |
 
 ## Crafting
-![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.16.2/images/crafting1.png)
-![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.16.2/images/crafting2.png)
-![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.16.2/images/crafting3.png)
-![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.16.2/images/crafting4.png)
-![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.16.2/images/crafting5.png)
-![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.16.2/images/crafting6.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/crafting1.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/crafting2.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/crafting3.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/crafting4.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/crafting5.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/crafting6.png)
 
 ## Keybindings
 
@@ -69,7 +69,7 @@ you can use the undo feature if you've made a mistake.
 ## Options
 SNEAK+OPTKEY+Right clicking empty space opens the option screen of your wand.
 
-![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.15/images/options.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/options.png)
 
 **Restriction:** If restriction is enabled the wand will only place blocks in one row or column
 (choose between North/South, East/West on a horizontal plane and Horizontal, Vertical on a vertical plane).
@@ -79,7 +79,7 @@ has no effect if the angel core is enabled.
 **Direction:** If set to "Player" the wand places blocks in the same direction as if they were placed by yourself.
 Target mode places the blocks in the same direction as their supporting block. See the picture below:
 
-![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.15/images/placedir.png)
+![](https://raw.githubusercontent.com/Theta-Dev/ConstructionWand/1.19/images/placedir.png)
 
 **Replacement:** Enables/disables the replacement of replaceable blocks (Fluids, snow, tallgrass).
 
@@ -122,7 +122,7 @@ for TileEntities in CW Version 1.7. Chisels&Bits blocks are blacklisted by defau
 There are probably a few other tile entities from other mods out there which may cause issues as well.
 If you find some of them you can tell me by creating
 an issue, commenting on Curse or editing the default blacklist yourself
-(it is located at https://github.com/Theta-Dev/ConstructionWand/blob/1.16.2/src/main/java/thetadev/constructionwand/basics/ConfigServer.java#L28)
+(it is located at https://github.com/Theta-Dev/ConstructionWand/blob/1.19/src/main/java/thetadev/constructionwand/basics/ConfigServer.java#L25)
 and making a PR.
 
 ## Contributions and #Hacktoberfest
