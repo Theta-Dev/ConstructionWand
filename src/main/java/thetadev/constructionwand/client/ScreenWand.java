@@ -65,7 +65,7 @@ public class ScreenWand extends Screen {
         Button button = Button.builder(getButtonLabel(option), bt -> clickButton(bt, option))
                 .pos(getX(cx), getY(cy))
                 .size(BUTTON_WIDTH, BUTTON_HEIGHT)
-                .tooltip(Tooltip.create(Component.translatable(option.getDescTranslation())))
+                .tooltip(getButtonTooltip(option))
                 .build();
 
         button.active = option.isEnabled();
@@ -76,6 +76,7 @@ public class ScreenWand extends Screen {
         option.next();
         ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(option, false));
         button.setMessage(getButtonLabel(option));
+        button.setTooltip(getButtonTooltip(option));
     }
 
     private int getX(int n) {
@@ -88,5 +89,9 @@ public class ScreenWand extends Screen {
 
     private Component getButtonLabel(IOption<?> option) {
         return Component.translatable(option.getKeyTranslation()).append(Component.translatable(option.getValueTranslation()));
+    }
+
+    private Tooltip getButtonTooltip(IOption<?> option) {
+        return Tooltip.create(Component.translatable(option.getDescTranslation()));
     }
 }
