@@ -66,7 +66,7 @@ public abstract class ItemWand extends Item implements ICustomItemModel
 
             // Right click: Place angel block
             WandJob job = getWandJob(player, world, BlockHitResult.miss(player.getLookAngle(),
-                    WandUtil.fromVector(player.getLookAngle()), WandUtil.playerPos(player)), stack);
+                    WandUtil.fromVector(player.getLookAngle()), player.blockPosition()), stack);
             return job.doIt() ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
         }
         return InteractionResultHolder.fail(stack);

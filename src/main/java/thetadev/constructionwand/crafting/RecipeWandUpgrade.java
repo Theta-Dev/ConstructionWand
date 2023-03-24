@@ -1,5 +1,6 @@
 package thetadev.constructionwand.crafting;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -44,7 +45,7 @@ public class RecipeWandUpgrade extends CustomRecipe
 
     @Nonnull
     @Override
-    public ItemStack assemble(@Nonnull CraftingContainer inv) {
+    public ItemStack assemble(@Nonnull CraftingContainer inv, @Nonnull RegistryAccess registryAccess) {
         ItemStack wand = null;
         IWandUpgrade upgrade = null;
 

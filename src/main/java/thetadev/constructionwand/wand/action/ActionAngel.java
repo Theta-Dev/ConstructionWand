@@ -60,8 +60,7 @@ public class ActionAngel implements IWandAction
         Vec3 playerVec = WandUtil.entityPositionVec(player);
         Vec3 lookVec = player.getLookAngle().multiply(2, 2, 2);
         Vec3 placeVec = playerVec.add(lookVec);
-
-        BlockPos currentPos = new BlockPos(placeVec);
+        BlockPos currentPos = WandUtil.posFromVec(placeVec);
 
         PlaceSnapshot snapshot = supplier.getPlaceSnapshot(world, currentPos, rayTraceResult, null);
         if(snapshot != null) placeSnapshots.add(snapshot);
