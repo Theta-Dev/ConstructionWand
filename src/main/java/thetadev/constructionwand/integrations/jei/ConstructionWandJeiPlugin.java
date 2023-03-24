@@ -53,7 +53,8 @@ public class ConstructionWandJeiPlugin implements IModPlugin
             Component durabilityComponent = Component.translatable(baseKey + "durability." + durabilityKey, wandProperties.getDurability());
 
             registration.addIngredientInfo(new ItemStack(wand), VanillaTypes.ITEM_STACK,
-                    Component.translatable(baseKey + "wand", baseKeyItem + ForgeRegistries.ITEMS.getKey(wand).getPath(),
+                    Component.translatable(baseKey + "wand",
+                            Component.translatable(baseKeyItem + ForgeRegistries.ITEMS.getKey(wand).getPath()),
                             wandProperties.getLimit(), durabilityComponent, optkeyComponent, wandModeComponent, wandGuiComponent)
             );
         }
@@ -62,6 +63,7 @@ public class ConstructionWandJeiPlugin implements IModPlugin
             Item core = coreSupplier.get();
             registration.addIngredientInfo(new ItemStack(core), VanillaTypes.ITEM_STACK,
                     Component.translatable(baseKey + ForgeRegistries.ITEMS.getKey(core).getPath())
+                            .append("\n\n")
                             .append(Component.translatable(baseKey + "core", wandModeComponent))
             );
         }
