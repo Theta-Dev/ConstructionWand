@@ -53,10 +53,6 @@ public class WandUtil
         return null;
     }
 
-    public static BlockPos playerPos(Player player) {
-        return new BlockPos(player.position());
-    }
-
     public static Vec3 entityPositionVec(Entity entity) {
         return new Vec3(entity.getX(), entity.getY() - entity.getMyRidingOffset() + entity.getBbHeight() / 2, entity.getZ());
     }

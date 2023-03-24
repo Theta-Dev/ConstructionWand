@@ -16,7 +16,6 @@ import thetadev.constructionwand.api.IWandAction;
 import thetadev.constructionwand.api.IWandSupplier;
 import thetadev.constructionwand.basics.ConfigServer;
 import thetadev.constructionwand.basics.ModStats;
-import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.ModItems;
 import thetadev.constructionwand.items.wand.ItemWand;
@@ -115,7 +114,7 @@ public class WandJob
         // Play place sound
         if(!placeSnapshots.isEmpty()) {
             SoundType sound = placeSnapshots.get(0).getBlockState().getSoundType();
-            world.playSound(null, WandUtil.playerPos(player), sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
+            world.playSound(null, player.blockPosition(), sound.getPlaceSound(), SoundSource.BLOCKS, sound.volume, sound.pitch);
 
             // Add to job history for undo
             ConstructionWand.instance.undoHistory.add(player, world, placeSnapshots);

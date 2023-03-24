@@ -11,7 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.PacketDistributor;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigServer;
-import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 
 import java.util.*;
@@ -142,7 +141,7 @@ public class UndoHistory
 
             // Play teleport sound
             SoundEvent sound = SoundEvents.CHORUS_FRUIT_TELEPORT;
-            world.playSound(null, WandUtil.playerPos(player), sound, SoundSource.PLAYERS, 1.0F, 1.0F);
+            world.playSound(null, player.blockPosition(), sound, SoundSource.PLAYERS, 1.0F, 1.0F);
 
             return true;
         }
