@@ -86,6 +86,10 @@ public class WandJob
         return placeSnapshots.stream().map(ISnapshot::getPos).collect(Collectors.toSet());
     }
 
+    public int blockCount() {
+        return placeSnapshots.size();
+    }
+
     public boolean doIt() {
         ArrayList<ISnapshot> executed = new ArrayList<>();
 
