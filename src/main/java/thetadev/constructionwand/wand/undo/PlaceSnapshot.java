@@ -6,8 +6,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -100,18 +98,13 @@ public class PlaceSnapshot implements ISnapshot
 
         // Can block be placed?
         BlockState blockState = item.getBlock().getStateForPlacement(ctx);
-        if(blockState == null) return null;
+        if(blockState == null || !blockState.canSurvive(world, pos)) return null;
 
         // Forbidden Tile Entity?
         if(!WandUtil.isTEAllowed(blockState)) return null;
 
         // No entities colliding?
         if(WandUtil.entitiesCollidingWithBlock(world, blockState, pos)) return null;
-
-        // Adjust blockstate to neighbors
-        // TODO: verify that
-        blockState = Block.updateFromNeighbourShapes(blockState, world, pos);
-        if(blockState.getBlock() == Blocks.AIR || !blockState.canSurvive(world, pos)) return null;
 
         // Copy block properties from supporting block
         if(targetMode && supportingBlock != null) {
