@@ -39,7 +39,7 @@ public class UndoHistory
     }
 
     public void updateClient(Player player, boolean ctrlDown) {
-        Level world = player.level;
+        Level world = player.level();
         if(world.isClientSide) return;
 
         // Set state of CTRL key

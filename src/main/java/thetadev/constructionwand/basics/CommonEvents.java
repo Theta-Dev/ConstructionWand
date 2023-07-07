@@ -18,7 +18,7 @@ public class CommonEvents
     @SubscribeEvent
     public static void logOut(PlayerEvent.PlayerLoggedOutEvent e) {
         Player player = e.getEntity();
-        if(player.level.isClientSide) return;
+        if(player.level().isClientSide) return;
         ConstructionWand.instance.undoHistory.removePlayer(player);
     }
 }

@@ -44,7 +44,7 @@ public class RenderBlockPreview
             // from the last placement are lagging
             if(wandJob == null || !compareRTR(wandJob.rayTraceResult, rtr) || !(wandJob.wand.equals(wand))
                 || wandJob.blockCount() < 2) {
-                wandJob = ItemWand.getWandJob(player, player.level, rtr, wand);
+                wandJob = ItemWand.getWandJob(player, player.level(), rtr, wand);
             }
             blocks = wandJob.getBlockPositions();
         }

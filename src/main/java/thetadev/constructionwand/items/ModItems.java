@@ -7,7 +7,7 @@ import net.minecraft.world.item.Tiers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
@@ -80,12 +80,12 @@ public class ModItems
     }
 
     @SubscribeEvent
-    public static void addCreative(CreativeModeTabEvent.BuildContents event) {
-        if (event.getTab() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+    public static void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             for(RegistryObject<Item> itemSupplier : WANDS) {
                 event.accept(itemSupplier);
             }
-        } else if (event.getTab() == CreativeModeTabs.INGREDIENTS) {
+        } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             for(RegistryObject<Item> itemSupplier : CORES) {
                 event.accept(itemSupplier);
             }
