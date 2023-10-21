@@ -59,7 +59,7 @@ public class WandUtil
     }
 
     public static Vec3 entityPositionVec(Entity entity) {
-        return new Vec3(entity.getX(), entity.getY() - entity.getMyRidingOffset() + entity.getBbHeight() / 2, entity.getZ());
+        return new Vec3(entity.getX(), entity.getY() + entity.getBbHeight() / 2, entity.getZ());
     }
 
     public static Vec3 blockPosVec(BlockPos pos) {

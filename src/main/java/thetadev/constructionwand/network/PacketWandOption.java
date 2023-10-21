@@ -3,13 +3,11 @@ package thetadev.constructionwand.network;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.wand.ItemWand;
-
-import java.util.function.Supplier;
 
 public class PacketWandOption
 {
@@ -39,10 +37,10 @@ public class PacketWandOption
 
     public static class Handler
     {
-        public static void handle(final PacketWandOption msg, final Supplier<NetworkEvent.Context> ctx) {
-            if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
+        public static void handle(final PacketWandOption msg, final CustomPayloadEvent.Context ctx) {
+            if(!ctx.getDirection().getReceptionSide().isServer()) return;
 
-            ServerPlayer player = ctx.get().getSender();
+            ServerPlayer player = ctx.getSender();
             if(player == null) return;
 
             ItemStack wand = WandUtil.holdingWand(player);

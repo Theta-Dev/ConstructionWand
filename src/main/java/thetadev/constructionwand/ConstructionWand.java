@@ -8,8 +8,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thetadev.constructionwand.basics.ConfigClient;
@@ -20,22 +18,17 @@ import thetadev.constructionwand.client.RenderBlockPreview;
 import thetadev.constructionwand.containers.ContainerManager;
 import thetadev.constructionwand.containers.ContainerRegistrar;
 import thetadev.constructionwand.items.ModItems;
-import thetadev.constructionwand.network.PacketQueryUndo;
-import thetadev.constructionwand.network.PacketUndoBlocks;
-import thetadev.constructionwand.network.PacketWandOption;
+import thetadev.constructionwand.network.ModMessages;
 import thetadev.constructionwand.wand.undo.UndoHistory;
 
 
 @Mod(ConstructionWand.MODID)
-public class ConstructionWand
-{
+public class ConstructionWand {
     public static final String MODID = "constructionwand";
     public static final String MODNAME = "ConstructionWand";
 
     public static ConstructionWand instance;
     public static final Logger LOGGER = LogManager.getLogger();
-    private static final String PROTOCOL_VERSION = "1";
-    public SimpleChannel HANDLER;
 
     public ContainerManager containerManager;
     public UndoHistory undoHistory;
@@ -64,11 +57,7 @@ public class ConstructionWand
         LOGGER.info("ConstructionWand says hello - may the odds be ever in your favor.");
 
         // Register packets
-        HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, "main"), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
-        int packetIndex = 0;
-        HANDLER.registerMessage(packetIndex++, PacketUndoBlocks.class, PacketUndoBlocks::encode, PacketUndoBlocks::decode, PacketUndoBlocks.Handler::handle);
-        HANDLER.registerMessage(packetIndex++, PacketQueryUndo.class, PacketQueryUndo::encode, PacketQueryUndo::decode, PacketQueryUndo.Handler::handle);
-        HANDLER.registerMessage(packetIndex, PacketWandOption.class, PacketWandOption::encode, PacketWandOption::decode, PacketWandOption.Handler::handle);
+        ModMessages.register();
 
         // Container registry
         ContainerRegistrar.register();

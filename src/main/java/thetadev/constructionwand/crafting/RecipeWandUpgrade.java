@@ -1,7 +1,6 @@
 package thetadev.constructionwand.crafting;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -20,8 +19,8 @@ public class RecipeWandUpgrade extends CustomRecipe
 {
     public static final SimpleCraftingRecipeSerializer<RecipeWandUpgrade> SERIALIZER = new SimpleCraftingRecipeSerializer<>(RecipeWandUpgrade::new);
 
-    public RecipeWandUpgrade(ResourceLocation resourceLocation, CraftingBookCategory category) {
-        super(resourceLocation, category);
+    public RecipeWandUpgrade(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override

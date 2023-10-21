@@ -2,10 +2,8 @@ package thetadev.constructionwand.network;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import thetadev.constructionwand.ConstructionWand;
-
-import java.util.function.Supplier;
 
 public class PacketQueryUndo
 {
@@ -25,10 +23,10 @@ public class PacketQueryUndo
 
     public static class Handler
     {
-        public static void handle(final PacketQueryUndo msg, final Supplier<NetworkEvent.Context> ctx) {
-            if(!ctx.get().getDirection().getReceptionSide().isServer()) return;
+        public static void handle(final PacketQueryUndo msg, final CustomPayloadEvent.Context ctx) {
+            if(!ctx.getDirection().getReceptionSide().isServer()) return;
 
-            ServerPlayer player = ctx.get().getSender();
+            ServerPlayer player = ctx.getSender();
             if(player == null) return;
 
             ConstructionWand.instance.undoHistory.updateClient(player, msg.undoPressed);

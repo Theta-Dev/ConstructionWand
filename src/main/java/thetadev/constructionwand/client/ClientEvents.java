@@ -8,11 +8,11 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
 import thetadev.constructionwand.items.wand.ItemWand;
+import thetadev.constructionwand.network.ModMessages;
 import thetadev.constructionwand.network.PacketQueryUndo;
 import thetadev.constructionwand.network.PacketWandOption;
 
@@ -34,8 +34,7 @@ public class ClientEvents
         boolean optState = isOptKeyDown();
         if(optPressed != optState) {
             optPressed = optState;
-            PacketQueryUndo packet = new PacketQueryUndo(optPressed);
-            ConstructionWand.instance.HANDLER.sendToServer(packet);
+            ModMessages.sendToServer(new PacketQueryUndo(optPressed));
             //ConstructionWand.LOGGER.debug("OPT key update: " + optPressed);
         }
     }
@@ -44,7 +43,7 @@ public class ClientEvents
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void MouseScrollEvent(InputEvent.MouseScrollingEvent event) {
         Player player = Minecraft.getInstance().player;
-        double scroll = event.getScrollDelta();
+        double scroll = event.getDeltaY();
 
         if(player == null || !modeKeyCombDown(player) || scroll == 0) return;
 
@@ -53,7 +52,7 @@ public class ClientEvents
 
         WandOptions wandOptions = new WandOptions(wand);
         wandOptions.lock.next(scroll < 0);
-        ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.lock, true));
+        ModMessages.sendToServer(new PacketWandOption(wandOptions.lock, true));
         event.setCanceled(true);
     }
 
@@ -69,7 +68,7 @@ public class ClientEvents
 
         WandOptions wandOptions = new WandOptions(wand);
         wandOptions.cores.next();
-        ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(wandOptions.cores, true));
+        ModMessages.sendToServer(new PacketWandOption(wandOptions.cores, true));
     }
 
     // Sneak+(OPT)+Right click wand to open GUI

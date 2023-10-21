@@ -7,9 +7,9 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.option.IOption;
 import thetadev.constructionwand.basics.option.WandOptions;
+import thetadev.constructionwand.network.ModMessages;
 import thetadev.constructionwand.network.PacketWandOption;
 
 import javax.annotation.Nonnull;
@@ -46,7 +46,7 @@ public class ScreenWand extends Screen {
 
     @Override
     public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        renderBackground(guiGraphics);
+        renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         guiGraphics.drawCenteredString(font, wand.getDisplayName(), width / 2, height / 2 - FIELD_HEIGHT / 2 - SPACING_HEIGHT, 16777215);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
@@ -74,7 +74,7 @@ public class ScreenWand extends Screen {
 
     private void clickButton(Button button, IOption<?> option) {
         option.next();
-        ConstructionWand.instance.HANDLER.sendToServer(new PacketWandOption(option, false));
+        ModMessages.sendToServer(new PacketWandOption(option, false));
         button.setMessage(getButtonLabel(option));
         button.setTooltip(getButtonTooltip(option));
     }

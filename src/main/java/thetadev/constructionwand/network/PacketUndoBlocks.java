@@ -2,12 +2,11 @@ package thetadev.constructionwand.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import thetadev.constructionwand.ConstructionWand;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class PacketUndoBlocks
 {
@@ -38,13 +37,13 @@ public class PacketUndoBlocks
 
     public static class Handler
     {
-        public static void handle(final PacketUndoBlocks msg, final Supplier<NetworkEvent.Context> ctx) {
-            if(!ctx.get().getDirection().getReceptionSide().isClient()) return;
+        public static void handle(final PacketUndoBlocks msg, final CustomPayloadEvent.Context ctx) {
+            if(!ctx.getDirection().getReceptionSide().isClient()) return;
 
             //ConstructionWand.LOGGER.debug("PacketUndoBlocks received, Blocks: " + msg.undoBlocks.size());
             ConstructionWand.instance.renderBlockPreview.undoBlocks = msg.undoBlocks;
 
-            ctx.get().setPacketHandled(true);
+            ctx.setPacketHandled(true);
         }
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.PacketDistributor;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigServer;
+import thetadev.constructionwand.network.ModMessages;
 import thetadev.constructionwand.network.PacketUndoBlocks;
 
 import java.util.*;
@@ -59,7 +60,7 @@ public class UndoHistory
         }
 
         PacketUndoBlocks packet = new PacketUndoBlocks(positions);
-        ConstructionWand.instance.HANDLER.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), packet);
+        ModMessages.sendToPlayer(packet, (ServerPlayer) player);
     }
 
     public boolean isUndoActive(Player player) {
