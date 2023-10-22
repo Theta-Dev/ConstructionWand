@@ -66,5 +66,5 @@
   "constructionwand.description.core_angel": "天使のコアはブロックの反対側にブロックを設置します。最大距離は杖の段階に依存します。オフハンドにブロックを持った状態で、何もない空間に使用すると空中にそのブロックを設置できます。",
   "constructionwand.description.core_destruction": "破壊のコアは正面のブロック(タイルエンティティは不可)を破壊できます。破壊できる最大ブロック数は杖の段階に依存します。破壊されたブロックは消滅しますが、間違えたときは取り消すことができます。",
 
-  "stat.constructionwand.use_wand": "杖を用いてブロックを設置しました。"
+  "stat.constructionwand.use_wand": "杖を用いてブロックを設置"
 }
