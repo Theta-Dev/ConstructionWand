@@ -1,11 +1,11 @@
 package thetadev.constructionwand.basics;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import thetadev.constructionwand.items.ModItems;
 
 import java.util.Arrays;
@@ -14,41 +14,41 @@ import java.util.List;
 
 public class ConfigServer
 {
-    public static final ForgeConfigSpec SPEC;
+    public static final ModConfigSpec SPEC;
 
-    public static final ForgeConfigSpec.IntValue LIMIT_CREATIVE;
-    public static final ForgeConfigSpec.IntValue MAX_RANGE;
-    public static final ForgeConfigSpec.IntValue UNDO_HISTORY;
-    public static final ForgeConfigSpec.BooleanValue ANGEL_FALLING;
+    public static final ModConfigSpec.IntValue LIMIT_CREATIVE;
+    public static final ModConfigSpec.IntValue MAX_RANGE;
+    public static final ModConfigSpec.IntValue UNDO_HISTORY;
+    public static final ModConfigSpec.BooleanValue ANGEL_FALLING;
 
-    public static final ForgeConfigSpec.ConfigValue<List<?>> SIMILAR_BLOCKS;
+    public static final ModConfigSpec.ConfigValue<List<?>> SIMILAR_BLOCKS;
     private static final String[] SIMILAR_BLOCKS_DEFAULT = {
             "minecraft:dirt;minecraft:grass_block;minecraft:coarse_dirt;minecraft:podzol;minecraft:mycelium;minecraft:farmland;minecraft:dirt_path;minecraft:rooted_dirt"
     };
 
-    public static final ForgeConfigSpec.BooleanValue TE_WHITELIST;
-    public static final ForgeConfigSpec.ConfigValue<List<?>> TE_LIST;
+    public static final ModConfigSpec.BooleanValue TE_WHITELIST;
+    public static final ModConfigSpec.ConfigValue<List<?>> TE_LIST;
     private static final String[] TE_LIST_DEFAULT = {"chiselsandbits"};
 
     private static final HashMap<ResourceLocation, WandProperties> wandProperties = new HashMap<>();
 
     public static WandProperties getWandProperties(Item wand) {
-        return wandProperties.getOrDefault(ForgeRegistries.ITEMS.getKey(wand), WandProperties.DEFAULT);
+        return wandProperties.getOrDefault(BuiltInRegistries.ITEM.getKey(wand), WandProperties.DEFAULT);
     }
 
     public static class WandProperties
     {
         public static final WandProperties DEFAULT = new WandProperties(null, null, null, null, null);
 
-        private final ForgeConfigSpec.IntValue durability;
-        private final ForgeConfigSpec.IntValue limit;
-        private final ForgeConfigSpec.IntValue angel;
-        private final ForgeConfigSpec.IntValue destruction;
-        private final ForgeConfigSpec.BooleanValue upgradeable;
+        private final ModConfigSpec.IntValue durability;
+        private final ModConfigSpec.IntValue limit;
+        private final ModConfigSpec.IntValue angel;
+        private final ModConfigSpec.IntValue destruction;
+        private final ModConfigSpec.BooleanValue upgradeable;
 
-        private WandProperties(ForgeConfigSpec.IntValue durability, ForgeConfigSpec.IntValue limit,
-                               ForgeConfigSpec.IntValue angel, ForgeConfigSpec.IntValue destruction,
-                               ForgeConfigSpec.BooleanValue upgradeable) {
+        private WandProperties(ModConfigSpec.IntValue durability, ModConfigSpec.IntValue limit,
+                               ModConfigSpec.IntValue angel, ModConfigSpec.IntValue destruction,
+                               ModConfigSpec.BooleanValue upgradeable) {
             this.durability = durability;
             this.limit = limit;
             this.angel = angel;
@@ -56,7 +56,7 @@ public class ConfigServer
             this.upgradeable = upgradeable;
         }
 
-        public WandProperties(ForgeConfigSpec.Builder builder, RegistryObject<Item> wandSupplier, int defDurability, int defLimit,
+        public WandProperties(ModConfigSpec.Builder builder, DeferredHolder<Item, ? extends Item> wandSupplier, int defDurability, int defLimit,
                               int defAngel, int defDestruction, boolean defUpgradeable) {
             ResourceLocation registryName = wandSupplier.getId();
             builder.push(registryName.getPath());
@@ -101,7 +101,7 @@ public class ConfigServer
     }
 
     static {
-        final var builder = new ForgeConfigSpec.Builder();
+        final var builder = new ModConfigSpec.Builder();
 
         builder.comment("This is the Server config for ConstructionWand.",
                 "If you're not familiar with Forge's new split client/server config, let me explain:",

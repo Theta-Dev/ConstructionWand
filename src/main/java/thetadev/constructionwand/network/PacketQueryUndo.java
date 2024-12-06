@@ -1,37 +1,51 @@
 package thetadev.constructionwand.network;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import thetadev.constructionwand.ConstructionWand;
 
-public class PacketQueryUndo
+import static thetadev.constructionwand.ConstructionWand.MODID;
+
+public record PacketQueryUndo(boolean undoPressed) implements CustomPacketPayload
 {
-    public boolean undoPressed;
+    public static final StreamCodec<FriendlyByteBuf, PacketQueryUndo> CODEC = CustomPacketPayload.codec(
+            PacketQueryUndo::encode,
+            PacketQueryUndo::new);
+    public static final Type<PacketQueryUndo> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(MODID, "query_undo"));
 
-    public PacketQueryUndo(boolean undoPressed) {
-        this.undoPressed = undoPressed;
+    public PacketQueryUndo(FriendlyByteBuf buf) {
+        this(buf.readBoolean());
     }
 
-    public static void encode(PacketQueryUndo msg, FriendlyByteBuf buffer) {
-        buffer.writeBoolean(msg.undoPressed);
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeBoolean(undoPressed);
     }
 
-    public static PacketQueryUndo decode(FriendlyByteBuf buffer) {
-        return new PacketQueryUndo(buffer.readBoolean());
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return ID;
     }
 
     public static class Handler
     {
-        public static void handle(final PacketQueryUndo msg, final CustomPayloadEvent.Context ctx) {
-            if(!ctx.getDirection().getReceptionSide().isServer()) return;
+        public static void handle(final PacketQueryUndo msg, final IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                if (ctx.player() instanceof ServerPlayer player) {
+                    ConstructionWand.instance.undoHistory.updateClient(player, msg.undoPressed);
 
-            ServerPlayer player = ctx.getSender();
-            if(player == null) return;
-
-            ConstructionWand.instance.undoHistory.updateClient(player, msg.undoPressed);
-
-            //ConstructionWand.LOGGER.debug("Undo queried");
+                    //ConstructionWand.LOGGER.debug("Undo queried");
+                }
+            })
+            .exceptionally(e -> {
+                // Handle exception
+                ctx.disconnect(Component.translatable("constructionwand.networking.query_undo.failed", e.getMessage()));
+                return null;
+            });
         }
     }
 }

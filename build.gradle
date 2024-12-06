@@ -1,113 +1,54 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
-}
-
 plugins {
+    id 'java-library'
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0.14,6.2)'
+    id 'net.neoforged.gradle.userdev' version '7.0.171'
 }
 
 version = "${mcversion}-${version_major}.${version_minor}"
 group = "${author}.${modid}"
-archivesBaseName = "${modid}"
+base {
+    archivesName = "${modid}"
+}
 
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+// Mojang ships Java 21 to end users in 1.20.5+, so your mod should target Java 21.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: project.mcp_channel, version: project.mcp_mappings
+//minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
+//minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
 
-    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
-    // It is REQUIRED to be set to true for this template to function.
-    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-    copyIdeResources = true
+runs {
+    // applies to all the run configs below
+    configureEach {
+        // Recommended logging data for a userdev environment
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
 
-    runs {
-        client {
-            workingDirectory project.file("run/client").canonicalPath
+        // Recommended logging level for the console
+        systemProperty 'forge.logging.console.level', 'debug'
 
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+        //Limit ram usage for the dev environment to 4GB
+        jvmArgument '-Xmx4G'
 
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
+        modSource project.sourceSets.main
+    }
 
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            // property 'forge.enabledGameTestNamespaces', modid
+    client {
+        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+        systemProperty 'forge.enabledGameTestNamespaces', "${modid}"
+    }
 
-            mods {
-                constructionwand {
-                    source sourceSets.main
-                }
-            }
-        }
+    server {
+        systemProperty 'forge.enabledGameTestNamespaces', "${modid}"
+        programArgument '--nogui'
+    }
 
-        server {
-            workingDirectory project.file("run/server").canonicalPath
+    data {
+        // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
+        // workingDirectory project.file('run-data')
 
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            // property 'forge.enabledGameTestNamespaces', modid
-
-            mods {
-                constructionwand {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
-        gameTestServer {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', modid
-
-            mods {
-                examplemod {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file("run/client").canonicalPath
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', archivesBaseName, '--all',
-                    '--existing', '"' + file('src/main/resources/') + '"',
-                    '--existing', '"' + file('src/generated/resources/') + '"',
-                    '--output', '"' + file('src/generated/resources/') + '"'
-
-            mods {
-                constructionwand {
-                    source sourceSets.main
-                }
-            }
-        }
+        // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+        programArguments.addAll '--mod', "${modid}", '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 
@@ -125,22 +66,18 @@ repositories {
 }
 
 dependencies {
-    minecraft([
-            group  : "net.minecraftforge",
-            name   : "forge",
-            version: "${project.mcversion}-${project.forgeversion}"
-    ])
+    implementation "net.neoforged:neoforge:${neoversion}"
 
-    compileOnly fg.deobf("mezz.jei:jei-${mcversion}-common-api:${jei_version}")
-    compileOnly fg.deobf("mezz.jei:jei-${mcversion}-forge-api:${jei_version}")
-    runtimeOnly fg.deobf("mezz.jei:jei-${mcversion}-forge:${jei_version}")
+    compileOnly "mezz.jei:jei-${mcversion}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${mcversion}-neoforge-api:${jei_version}"
+    runtimeOnly "mezz.jei:jei-${mcversion}-neoforge:${jei_version}"
 
-    compileOnly fg.deobf([
-            group: "vazkii.botania",
-            name: "Botania",
-            version: "${project.botania}",
-            classifier: "api"
-    ])
+//    compileOnly ([
+//            group: "vazkii.botania",
+//            name: "Botania",
+//            version: "${project.botania}",
+//            classifier: "api"
+//    ])
 }
 
 jar {
@@ -157,12 +94,6 @@ jar {
     }
 }
 
-// Example configuration to allow publishing using the maven-publish task
-// This is the preferred method to reobfuscate your jar file
-jar.finalizedBy('reobfJar') 
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
-//publish.dependsOn('reobfJar')
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -173,6 +104,14 @@ publishing {
         maven {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
+    }
+}
+
+// IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
     }
 }
 

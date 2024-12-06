@@ -1,9 +1,12 @@
 package thetadev.constructionwand.basics.option;
 
+import net.minecraft.core.component.DataComponentType;
 import thetadev.constructionwand.ConstructionWand;
 
 public interface IOption<T>
 {
+    DataComponentType<?> getComponentType();
+
     String getKey();
 
     String getValueString();

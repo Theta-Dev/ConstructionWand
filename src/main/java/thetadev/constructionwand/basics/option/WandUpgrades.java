@@ -1,12 +1,12 @@
 package thetadev.constructionwand.basics.option;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ForgeRegistries;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IWandUpgrade;
 
@@ -36,7 +36,7 @@ public class WandUpgrades<T extends IWandUpgrade>
 
         for(int i = 0; i < listnbt.size(); i++) {
             String str = listnbt.getString(i);
-            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(str));
+            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(str));
 
             T data;
             try {

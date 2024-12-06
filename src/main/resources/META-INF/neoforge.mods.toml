@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[48,)"
+loaderVersion = "[4,)"
 license = "MIT License"
 [[mods]]
 modId="constructionwand"
@@ -18,14 +18,14 @@ behind the block you are facing, conjure blocks in mid air or destroy lots of bl
 This is my first minecraft mod. May the odds be ever in your favor.
 '''
 [[dependencies.constructionwand]]
-    modId="forge"
-mandatory = true
-versionRange = "[48,)"
-ordering = "NONE"
+    modId="neoforge"
+    type="required"
+    versionRange="[21.1.1,)"
+    ordering = "NONE"
     side="BOTH"
 [[dependencies.constructionwand]]
     modId="minecraft"
-mandatory = true
-versionRange = "[1.20.2, 1.21)"
-ordering = "NONE"
+    type="required"
+    versionRange="[1.21,1.22)"
+    ordering = "NONE"
     side="BOTH"

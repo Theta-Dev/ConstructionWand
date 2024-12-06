@@ -1,13 +1,13 @@
 package thetadev.constructionwand.basics;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import thetadev.constructionwand.ConstructionWand;
 
-@Mod.EventBusSubscriber(modid = ConstructionWand.MODID)
+@EventBusSubscriber(modid = ConstructionWand.MODID)
 public class CommonEvents
 {
     @SubscribeEvent

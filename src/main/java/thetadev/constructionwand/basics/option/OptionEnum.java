@@ -1,34 +1,42 @@
 package thetadev.constructionwand.basics.option;
 
 import com.google.common.base.Enums;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.item.ItemStack;
 
 public class OptionEnum<E extends Enum<E>> implements IOption<E>
 {
-    private final CompoundTag tag;
+    private final ItemStack stack;
+    private final DataComponentType<E> componentType;
     private final String key;
     private final Class<E> enumClass;
     private final boolean enabled;
     private final E dval;
     private E value;
 
-    public OptionEnum(CompoundTag tag, String key, Class<E> enumClass, E dval, boolean enabled) {
-        this.tag = tag;
+    public OptionEnum(ItemStack stack, DataComponentType<E> componentType, String key, Class<E> enumClass, E dval, boolean enabled) {
+        this.stack = stack;
+        this.componentType = componentType;
         this.key = key;
         this.enumClass = enumClass;
         this.enabled = enabled;
         this.dval = dval;
 
-        value = Enums.getIfPresent(enumClass, tag.getString(key).toUpperCase()).or(dval);
+        value = stack.getOrDefault(componentType, dval);
     }
 
-    public OptionEnum(CompoundTag tag, String key, Class<E> enumClass, E dval) {
-        this(tag, key, enumClass, dval, true);
+    public OptionEnum(ItemStack stack, DataComponentType<E> componentType, String key, Class<E> enumClass, E dval) {
+        this(stack, componentType, key, enumClass, dval, true);
     }
 
     @Override
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public DataComponentType<?> getComponentType() {
+        return componentType;
     }
 
     @Override
@@ -50,7 +58,7 @@ public class OptionEnum<E extends Enum<E>> implements IOption<E>
     public void set(E val) {
         if(!enabled) return;
         value = val;
-        tag.putString(key, getValueString());
+        stack.set(componentType, val);
     }
 
     @Override

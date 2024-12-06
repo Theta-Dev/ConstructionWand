@@ -1,10 +1,7 @@
 package thetadev.constructionwand.data;
 
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -16,22 +13,21 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.Tags;
 import thetadev.constructionwand.ConstructionWand;
+import thetadev.constructionwand.crafting.ModRecipes;
 import thetadev.constructionwand.crafting.RecipeWandUpgrade;
 import thetadev.constructionwand.items.ModItems;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class RecipeGenerator extends RecipeProvider {
-    public RecipeGenerator(PackOutput packOutput) {
-        super(packOutput);
+    public RecipeGenerator(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(packOutput, lookupProvider);
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput output) {
+    protected void buildRecipes(RecipeOutput output, HolderLookup.Provider provider) {
         wandRecipe(output, ModItems.WAND_STONE.get(), Inp.fromTag(ItemTags.STONE_TOOL_MATERIALS));
         wandRecipe(output, ModItems.WAND_IRON.get(), Inp.fromTag(Tags.Items.INGOTS_IRON));
         wandRecipe(output, ModItems.WAND_DIAMOND.get(), Inp.fromTag(Tags.Items.GEMS_DIAMOND));
@@ -40,7 +36,7 @@ public class RecipeGenerator extends RecipeProvider {
         coreRecipe(output, ModItems.CORE_ANGEL.get(), Inp.fromTag(Tags.Items.FEATHERS), Inp.fromTag(Tags.Items.INGOTS_GOLD));
         coreRecipe(output, ModItems.CORE_DESTRUCTION.get(), Inp.fromTag(Tags.Items.STORAGE_BLOCKS_DIAMOND), Inp.fromItem(Items.DIAMOND_PICKAXE));
 
-        specialRecipe(output, RecipeWandUpgrade.SERIALIZER);
+        specialRecipe(output, ModRecipes.WAND_UPGRADE.get());
     }
 
     private void wandRecipe(RecipeOutput output, ItemLike wand, Inp material) {
@@ -67,13 +63,7 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void specialRecipe(RecipeOutput output, SimpleCraftingRecipeSerializer<?> serializer) {
-        ResourceLocation name = ForgeRegistries.RECIPE_SERIALIZERS.getKey(serializer);
-        SpecialRecipeBuilder.special(serializer).save(output, ConstructionWand.loc("dynamic/" + name.getPath()).toString());
-    }
-
-    private static Criterion<InventoryChangeTrigger.TriggerInstance> inventoryTrigger(ItemPredicate... predicate) {
-        return CriteriaTriggers.INVENTORY_CHANGED.createCriterion(
-                new InventoryChangeTrigger.TriggerInstance(Optional.empty(), MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, List.of(predicate))
-        );
+        ResourceLocation name = BuiltInRegistries.RECIPE_SERIALIZER.getKey(serializer);
+        SpecialRecipeBuilder.special(RecipeWandUpgrade::new).save(output, ConstructionWand.loc("dynamic/" + name.getPath()).toString());
     }
 }

@@ -1,50 +1,31 @@
 package thetadev.constructionwand.network;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.SimpleChannel;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import static thetadev.constructionwand.ConstructionWand.MODID;
 
 public final class ModMessages {
-    private static SimpleChannel INSTANCE;
-    private static final int PROTOCOL_VERSION = 1;
 
     private ModMessages() {
     }
 
-    public static void register() {
-        INSTANCE = ChannelBuilder.named(new ResourceLocation(MODID, "main")).networkProtocolVersion(PROTOCOL_VERSION).simpleChannel();
-        int packetIndex = 0;
+    public static void registerPayloads(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar(MODID);
 
-        // Server -> Client
-        INSTANCE.messageBuilder(PacketUndoBlocks.class, packetIndex++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(PacketUndoBlocks::encode)
-                .decoder(PacketUndoBlocks::decode)
-                .consumerMainThread(PacketUndoBlocks.Handler::handle)
-                .add();
-
-        // Client -> Server
-        INSTANCE.messageBuilder(PacketQueryUndo.class, packetIndex++, NetworkDirection.PLAY_TO_SERVER)
-                .encoder(PacketQueryUndo::encode)
-                .decoder(PacketQueryUndo::decode)
-                .consumerMainThread(PacketQueryUndo.Handler::handle)
-                .add();
-        INSTANCE.messageBuilder(PacketWandOption.class, packetIndex, NetworkDirection.PLAY_TO_SERVER)
-                .encoder(PacketWandOption::encode)
-                .decoder(PacketWandOption::decode)
-                .consumerMainThread(PacketWandOption.Handler::handle)
-                .add();
+        registrar.playToClient(PacketUndoBlocks.ID, PacketUndoBlocks.CODEC, PacketUndoBlocks.Handler::handle);
+        registrar.playToServer(PacketQueryUndo.ID, PacketQueryUndo.CODEC, PacketQueryUndo.Handler::handle);
+        registrar.playToServer(PacketWandOption.ID, PacketWandOption.CODEC, PacketWandOption.Handler::handle);
     }
 
-    public static <MSG> void sendToServer(MSG message) {
-        INSTANCE.send(message, PacketDistributor.SERVER.noArg());
+    public static void sendToServer(CustomPacketPayload message) {
+        PacketDistributor.sendToServer(message);
     }
 
-    public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
-        INSTANCE.send(message, PacketDistributor.PLAYER.with(player));
+    public static void sendToPlayer(CustomPacketPayload message, ServerPlayer player) {
+        player.connection.send(message);
     }
 }

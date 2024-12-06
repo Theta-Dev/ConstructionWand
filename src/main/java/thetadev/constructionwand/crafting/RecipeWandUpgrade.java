@@ -1,12 +1,11 @@
 package thetadev.constructionwand.crafting;
 
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 import thetadev.constructionwand.api.IWandUpgrade;
 import thetadev.constructionwand.basics.ConfigServer;
@@ -17,18 +16,16 @@ import javax.annotation.Nonnull;
 
 public class RecipeWandUpgrade extends CustomRecipe
 {
-    public static final SimpleCraftingRecipeSerializer<RecipeWandUpgrade> SERIALIZER = new SimpleCraftingRecipeSerializer<>(RecipeWandUpgrade::new);
-
     public RecipeWandUpgrade(CraftingBookCategory category) {
         super(category);
     }
 
     @Override
-    public boolean matches(@Nonnull CraftingContainer inv, @Nonnull Level worldIn) {
+    public boolean matches(@Nonnull CraftingInput inv, @Nonnull Level worldIn) {
         ItemStack wand = null;
         IWandUpgrade upgrade = null;
 
-        for(int i = 0; i < inv.getContainerSize(); i++) {
+        for(int i = 0; i < inv.size(); i++) {
             ItemStack stack = inv.getItem(i);
             if(!stack.isEmpty()) {
                 if(wand == null && stack.getItem() instanceof ItemWand) wand = stack;
@@ -44,12 +41,12 @@ public class RecipeWandUpgrade extends CustomRecipe
 
     @Nonnull
     @Override
-    public ItemStack assemble(@Nonnull CraftingContainer inv, @Nonnull RegistryAccess registryAccess) {
+    public ItemStack assemble(@Nonnull CraftingInput input, HolderLookup.Provider registries) {
         ItemStack wand = null;
         IWandUpgrade upgrade = null;
 
-        for(int i = 0; i < inv.getContainerSize(); i++) {
-            ItemStack stack = inv.getItem(i);
+        for(int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getItem(i);
             if(!stack.isEmpty()) {
                 if(stack.getItem() instanceof ItemWand) wand = stack;
                 else if(stack.getItem() instanceof IWandUpgrade) upgrade = (IWandUpgrade) stack.getItem();
@@ -71,6 +68,6 @@ public class RecipeWandUpgrade extends CustomRecipe
     @Nonnull
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return SERIALIZER;
+        return ModRecipes.WAND_UPGRADE.get();
     }
 }

@@ -1,30 +1,37 @@
 package thetadev.constructionwand.basics.option;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.item.ItemStack;
 
 public class OptionBoolean implements IOption<Boolean>
 {
-    private final CompoundTag tag;
+    private final ItemStack stack;
+    private final DataComponentType<Boolean> componentType;
     private final String key;
     private final boolean enabled;
     private boolean value;
 
-    public OptionBoolean(CompoundTag tag, String key, boolean dval, boolean enabled) {
-        this.tag = tag;
+    public OptionBoolean(ItemStack stack, DataComponentType<Boolean> componentType, String key, boolean dval, boolean enabled) {
+        this.stack = stack;
+        this.componentType = componentType;
         this.key = key;
         this.enabled = enabled;
 
-        if(tag.contains(key)) value = tag.getBoolean(key);
-        else value = dval;
+        value = stack.getOrDefault(componentType, dval);
     }
 
-    public OptionBoolean(CompoundTag tag, String key, boolean dval) {
-        this(tag, key, dval, true);
+    public OptionBoolean(ItemStack stack, DataComponentType<Boolean> componentType, String key, boolean dval) {
+        this(stack, componentType, key, dval, true);
     }
 
     @Override
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public DataComponentType<Boolean> getComponentType() {
+        return componentType;
     }
 
     @Override
@@ -46,7 +53,7 @@ public class OptionBoolean implements IOption<Boolean>
     public void set(Boolean val) {
         if(!enabled) return;
         value = val;
-        tag.putBoolean(key, value);
+        stack.set(componentType, val);
     }
 
     @Override

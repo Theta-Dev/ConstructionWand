@@ -6,12 +6,12 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.basics.ConfigClient;
@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 @JeiPlugin
 public class ConstructionWandJeiPlugin implements IModPlugin
 {
-    private static final ResourceLocation pluginId = new ResourceLocation(ConstructionWand.MODID, ConstructionWand.MODID);
+    private static final ResourceLocation pluginId = ResourceLocation.fromNamespaceAndPath(ConstructionWand.MODID, ConstructionWand.MODID);
     private static final String baseKey = ConstructionWand.MODID + ".description.";
     private static final String baseKeyItem = "item." + ConstructionWand.MODID + ".";
 
@@ -45,7 +45,7 @@ public class ConstructionWandJeiPlugin implements IModPlugin
         Component wandModeComponent = keyComboComponent(ConfigClient.SHIFTOPT_MODE.get(), optkeyComponent);
         Component wandGuiComponent = keyComboComponent(ConfigClient.SHIFTOPT_GUI.get(), optkeyComponent);
 
-        for(RegistryObject<Item> wandSupplier : ModItems.WANDS) {
+        for(DeferredItem<Item> wandSupplier : ModItems.WANDS) {
             Item wand = wandSupplier.get();
             ConfigServer.WandProperties wandProperties = ConfigServer.getWandProperties(wand);
 
@@ -54,15 +54,15 @@ public class ConstructionWandJeiPlugin implements IModPlugin
 
             registration.addIngredientInfo(new ItemStack(wand), VanillaTypes.ITEM_STACK,
                     Component.translatable(baseKey + "wand",
-                            Component.translatable(baseKeyItem + ForgeRegistries.ITEMS.getKey(wand).getPath()),
+                            Component.translatable(baseKeyItem + BuiltInRegistries.ITEM.getKey(wand).getPath()),
                             wandProperties.getLimit(), durabilityComponent, optkeyComponent, wandModeComponent, wandGuiComponent)
             );
         }
 
-        for(RegistryObject<Item> coreSupplier : ModItems.CORES) {
+        for(DeferredItem<Item> coreSupplier : ModItems.CORES) {
             Item core = coreSupplier.get();
             registration.addIngredientInfo(new ItemStack(core), VanillaTypes.ITEM_STACK,
-                    Component.translatable(baseKey + ForgeRegistries.ITEMS.getKey(core).getPath())
+                    Component.translatable(baseKey + BuiltInRegistries.ITEM.getKey(core).getPath())
                             .append("\n\n")
                             .append(Component.translatable(baseKey + "core", wandModeComponent))
             );

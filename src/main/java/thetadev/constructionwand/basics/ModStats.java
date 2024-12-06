@@ -1,23 +1,16 @@
 package thetadev.constructionwand.basics;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.stats.StatFormatter;
-import net.minecraft.stats.Stats;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import thetadev.constructionwand.ConstructionWand;
+
+import java.util.function.Supplier;
 
 public class ModStats
 {
-    public static final ResourceLocation USE_WAND = new ResourceLocation(ConstructionWand.MODID, "use_wand");
+    public static final DeferredRegister<ResourceLocation> CUSTOM_STATS = DeferredRegister.create(BuiltInRegistries.CUSTOM_STAT, ConstructionWand.MODID);
 
-    public static void register() {
-        registerStat(USE_WAND);
-    }
-
-    private static void registerStat(ResourceLocation registryName) {
-        // Compare with net.minecraft.stats.Stats#registerCustom
-        Registry.register(BuiltInRegistries.CUSTOM_STAT, registryName.getPath(), registryName);
-        Stats.CUSTOM.get(registryName, StatFormatter.DEFAULT);
-    }
+    public static final ResourceLocation USE_WAND = ResourceLocation.fromNamespaceAndPath(ConstructionWand.MODID, "use_wand");
+    public static final Supplier<ResourceLocation> USE_WAND_STAT = CUSTOM_STATS.register("use_wand", () -> USE_WAND);
 }

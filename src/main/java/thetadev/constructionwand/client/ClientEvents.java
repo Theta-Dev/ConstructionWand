@@ -4,10 +4,10 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import thetadev.constructionwand.basics.ConfigClient;
 import thetadev.constructionwand.basics.WandUtil;
 import thetadev.constructionwand.basics.option.WandOptions;
@@ -43,7 +43,7 @@ public class ClientEvents
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void MouseScrollEvent(InputEvent.MouseScrollingEvent event) {
         Player player = Minecraft.getInstance().player;
-        double scroll = event.getDeltaY();
+        double scroll = event.getScrollDeltaY();
 
         if(player == null || !modeKeyCombDown(player) || scroll == 0) return;
 

@@ -14,9 +14,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
 import thetadev.constructionwand.ConstructionWand;
 import thetadev.constructionwand.api.IWandCore;
 import thetadev.constructionwand.basics.WandUtil;
@@ -80,7 +78,7 @@ public abstract class ItemWand extends Item implements ICustomItemModel
     }
 
     @Override
-    public boolean isCorrectToolForDrops(@Nonnull BlockState blockIn) {
+    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
         return false;
     }
 
@@ -94,8 +92,7 @@ public abstract class ItemWand extends Item implements ICustomItemModel
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void appendHoverText(@Nonnull ItemStack itemstack, Level worldIn, @Nonnull List<Component> lines, @Nonnull TooltipFlag extraInfo) {
+    public void appendHoverText(@Nonnull ItemStack itemstack, TooltipContext context, @Nonnull List<Component> lines, @Nonnull TooltipFlag extraInfo) {
         WandOptions options = new WandOptions(itemstack);
         int limit = options.cores.get().getWandAction().getLimit(itemstack);
 

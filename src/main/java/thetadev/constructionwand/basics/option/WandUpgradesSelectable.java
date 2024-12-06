@@ -1,14 +1,25 @@
 package thetadev.constructionwand.basics.option;
 
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import thetadev.constructionwand.api.IWandUpgrade;
 
 public class WandUpgradesSelectable<T extends IWandUpgrade> extends WandUpgrades<T> implements IOption<T>
 {
+    private final ItemStack stack;
+    private final DataComponentType<CompoundTag> componentType;
     private byte selector;
 
-    public WandUpgradesSelectable(CompoundTag tag, String key, T dval) {
-        super(tag, key, dval);
+    public WandUpgradesSelectable(ItemStack stack, DataComponentType<CompoundTag> componentType, String key, T dval) {
+        super(stack.getOrDefault(componentType, new CompoundTag()), key, dval);
+        this.stack = stack;
+        this.componentType = componentType;
+    }
+
+    @Override
+    public DataComponentType<?> getComponentType() {
+        return componentType;
     }
 
     @Override
@@ -63,7 +74,7 @@ public class WandUpgradesSelectable<T extends IWandUpgrade> extends WandUpgrades
     }
 
     @Override
-    protected void deserialize() {
+    protected void deserialize() {;
         super.deserialize();
 
         selector = tag.getByte(key + "_sel");
@@ -79,5 +90,6 @@ public class WandUpgradesSelectable<T extends IWandUpgrade> extends WandUpgrades
 
     private void serializeSelector() {
         tag.putByte(key + "_sel", selector);
+        stack.set(componentType, tag);
     }
 }
